@@ -28,6 +28,7 @@ class CouponService(
                 createdAt = LocalDateTime.now(),
                 isDeleted = false,
                 deletedAt = null,
+                quantity = couponRequest.quantity,
             )
         )
 

@@ -18,6 +18,9 @@ class Coupon(
     @Column(name = "discount_price", nullable = true)
     var discountPrice: Int? = null,
 
+    @Column(name = "quantity", nullable = false)
+    var quantity: Int,
+
     @Column(name = "expired_at", nullable = false)
     var expiredAt: LocalDateTime,
 
