@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.coupon.entity
 
+import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import jakarta.persistence.*
 import java.time.LocalDateTime
@@ -12,13 +13,13 @@ class Coupon(
     val id: Long? = null,
 
     @Column(name = "discount_rate", nullable = true)
-    val discountRate: Int? = null,
+    var discountRate: Int? = null,
 
     @Column(name = "discount_price", nullable = true)
-    val discountPrice: Long? = null,
+    var discountPrice: Int? = null,
 
     @Column(name = "expired_at", nullable = false)
-    val expiredAt: LocalDateTime,
+    var expiredAt: LocalDateTime,
 
     @Column(name = "created_at", nullable = false)
     val createdAt: LocalDateTime,
@@ -33,4 +34,10 @@ class Coupon(
     @JoinColumn(name = "product_id")
     val product: Product
 ){
+
+    fun update(updateCouponRequest: UpdateCouponRequest) {
+        discountRate = updateCouponRequest.discountRate
+        discountPrice = updateCouponRequest.discountPrice
+        expiredAt = updateCouponRequest.expiredAt
+    }
 }

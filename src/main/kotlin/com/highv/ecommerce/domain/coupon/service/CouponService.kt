@@ -4,6 +4,7 @@ import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.coupon.dto.CouponResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
+import com.highv.ecommerce.domain.coupon.entity.Coupon
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -26,7 +27,7 @@ class CouponService(
                 expiredAt = couponRequest.expiredAt,
                 createdAt = LocalDateTime.now(),
                 isDeleted = false,
-                deletedAt = null
+                deletedAt = null,
             )
         )
 
@@ -60,7 +61,7 @@ class CouponService(
 
     @Transactional(readOnly = true)
     fun getSellerCouponList(): List<CouponResponse>? {
-        return couponRepository.findAll().let{ CouponResponse.from(it) }
+        return couponRepository.findAll().map{ CouponResponse.from(it) }
     }
 
     @Transactional(readOnly = true)
@@ -73,7 +74,7 @@ class CouponService(
 
     @Transactional(readOnly = true)
     fun getBuyerCouponList(): List<CouponResponse>? {
-        return couponRepository.findAll().let{ CouponResponse.from(it) }
+        return couponRepository.findAll().map{ CouponResponse.from(it) }
     }
 
 
