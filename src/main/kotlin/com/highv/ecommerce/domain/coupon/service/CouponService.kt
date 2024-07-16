@@ -4,13 +4,16 @@ import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.coupon.dto.CouponResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
+import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
 @Transactional
-class CouponService {
+class CouponService(
+    private val couponRepository: CouponRepository
+){
 
 
     fun createCoupon(couponRequest: CreateCouponRequest): DefaultResponse{
