@@ -48,6 +48,7 @@ class CouponService {
         return DefaultResponse.from("쿠폰 삭제가 완료 되었습니다")
     }
 
+    @Transactional(readOnly = true)
     fun getSellerCouponById(couponId: Long): CouponResponse {
         val result = couponRepository.findByIdOrNull(couponId) ?: throw ModelNotFoundException()
 
@@ -59,7 +60,13 @@ class CouponService {
         return couponRepository.findAll().let{ CouponResponse.from(it) }
     }
 
+    @Transactional(readOnly = true)
+    fun getBuyerCouponById(couponId: Long): CouponResponse {
 
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw ModelNotFoundException()
+
+        return CouponResponse.from(result)
+    }
 
 
 }
