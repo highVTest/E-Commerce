@@ -53,8 +53,8 @@ CREATE TABLE coupon_to_buyer
 (
     quantity  INT    NOT NULL,
 
-    coupon_id BIGINT NOT NULL,
-    buyer_id  BIGINT NOT NULL
+    coupon_id BIGINT PRIMARY KEY NOT NULL,
+    buyer_id  BIGINT PRIMARY KEY NOT NULL
 );
 
 CREATE TABLE shop
