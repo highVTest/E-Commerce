@@ -36,8 +36,7 @@ class CouponService(
 
     fun updateCoupon(couponId: Long, updateCouponRequest: UpdateCouponRequest): DefaultResponse {
 
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw ModelNotFoundException()
-
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("coupon not found")
         result.update(updateCouponRequest)
 
         return DefaultResponse.from("쿠폰 업데이트가 완료 되었습니다")
@@ -45,7 +44,7 @@ class CouponService(
 
     fun deleteCoupon(couponId: Long): DefaultResponse {
 
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw ModelNotFoundException()
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("coupon not found")
 
         couponRepository.delete(result)
 
@@ -54,7 +53,7 @@ class CouponService(
 
     @Transactional(readOnly = true)
     fun getSellerCouponById(couponId: Long): CouponResponse {
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw ModelNotFoundException()
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("coupon not found")
 
         return CouponResponse.from(result)
     }
@@ -67,7 +66,7 @@ class CouponService(
     @Transactional(readOnly = true)
     fun getBuyerCouponById(couponId: Long): CouponResponse {
 
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw ModelNotFoundException()
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("coupon not found")
 
         return CouponResponse.from(result)
     }
