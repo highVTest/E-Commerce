@@ -30,9 +30,11 @@ class Coupon(
     @Column(name = "is_deleted", nullable = false)
     val isDeleted: Boolean = false,
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id")
-    val product: Product
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "product_id")
+//    val product: Product
+
+    val productId: Long
 ){
 
     fun update(updateCouponRequest: UpdateCouponRequest) {

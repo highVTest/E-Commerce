@@ -21,7 +21,7 @@ class CouponService(
 
         val coupon = couponRepository.save(
             Coupon(
-                product = couponRequest.productId,
+                productId = couponRequest.productId,
                 discountRate = couponRequest.discountRate,
                 discountPrice = couponRequest.discountPrice,
                 expiredAt = couponRequest.expiredAt,
