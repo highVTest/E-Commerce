@@ -1,7 +1,9 @@
 package com.highv.ecommerce.domain.coupon.dto
 
+import java.time.LocalDateTime
+
 data class UpdateCouponRequest(
-    val productId : Long,
+    val expiredAt: LocalDateTime,
     val discountRate : Int?,
     val discountPrice : Int?,
 )
