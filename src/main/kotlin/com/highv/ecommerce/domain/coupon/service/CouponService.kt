@@ -68,5 +68,10 @@ class CouponService {
         return CouponResponse.from(result)
     }
 
+    @Transactional(readOnly = true)
+    fun getBuyerCouponList(): List<CouponResponse>? {
+        return couponRepository.findAll().let{ CouponResponse.from(it) }
+    }
+
 
 }
