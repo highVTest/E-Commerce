@@ -3,12 +3,10 @@ CREATE TABLE product
     id            BIGINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     name          TEXT                              NOT NULL,
     description   TEXT                              NOT NULL,
-    price         INT                               NOT NULL,
     product_image TEXT                              NOT NULL,
     favorite      INT                               NOT NULL,
     created_at    TIMESTAMP                         NOT NULL,
     updated_at    TIMESTAMP                         NOT NULL,
-    quantity      INT                               NOT NULL,
     is_sold_out   BOOLEAN                           NOT NULL,
     deleted_at    TIMESTAMP,
     is_deleted    BOOLEAN                         NOT NULL,
@@ -159,6 +157,15 @@ CREATE TABLE black_list(
 CREATE TABLE favorite(
     product_id BIGINT NOT NULL,
     buyer_id BIGINT NOT NULL
+);
+
+CREATE TABLE product_backoffice
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    product_id BIGINT                            NOT NULL,
+    price      INT                               NOT NULL,
+    quantity   INT                               NOT NULL
+
 );
 
 
