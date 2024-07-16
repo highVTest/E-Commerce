@@ -37,11 +37,31 @@ class CouponController(
         .status(HttpStatus.NO_CONTENT)
         .body(couponService.deleteCoupon(couponId))
 
-    @GetMapping("/{couponId}")
-    fun getCouponById(
+    @GetMapping("/seller/{couponId}")
+    fun getSellerCouponById(
         @PathVariable("couponId") couponId: Long
     ): ResponseEntity<CouponResponse> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(couponService.getCouponById(couponId))
+        .body(couponService.getSellerCouponById(couponId))
+
+
+    @GetMapping("/seller")
+    fun getSellerCouponList(): ResponseEntity<List<CouponResponse>> = ResponseEntity
+            .status(HttpStatus.OK)
+            .body(couponService.getSellerCouponList(couponId))
+
+    @GetMapping("/buyer/{couponId}")
+    fun getBuyerCouponById(
+        @PathVariable("couponId") couponId: Long
+    ): ResponseEntity<CouponResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(couponService.getBuyerCouponById(couponId))
+
+
+    @GetMapping("/buyer")
+    fun getBuyerCouponList(): ResponseEntity<List<CouponResponse>> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(couponService.getBuyerCouponList(couponId))
+
 
 }
