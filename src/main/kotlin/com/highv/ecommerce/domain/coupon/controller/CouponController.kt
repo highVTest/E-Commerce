@@ -33,15 +33,15 @@ class CouponController(
     @DeleteMapping("/{couponId}")
     fun deleteCoupon(
         @PathVariable couponId: Long
-    ): ResponseEntity<Unit> = ResponseEntity
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
         .status(HttpStatus.NO_CONTENT)
-        .body(couponService.deletecoupon(couponId))
+        .body(couponService.deleteCoupon(couponId))
 
     @GetMapping("/{couponId}")
     fun getCouponById(
         @PathVariable("couponId") couponId: Long
     ): ResponseEntity<CouponResponse> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(couponService.getcouponById(couponId))
+        .body(couponService.getCouponById(couponId))
 
 }

@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.coupon.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.domain.coupon.dto.CouponResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import org.springframework.stereotype.Service
@@ -37,5 +38,21 @@ class CouponService {
 
         return DefaultResponse.from("쿠폰 업데이트가 완료 되었습니다")
     }
+
+    fun deleteCoupon(couponId: Long): DefaultResponse {
+
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw ModelNotFoundException()
+
+        couponRepository.delete(result)
+
+        return DefaultResponse.from("쿠폰 삭제가 완료 되었습니다")
+    }
+
+    fun getCouponById(couponId: Long): CouponResponse {
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw ModelNotFoundException()
+
+        return CouponResponse.from(result)
+    }
+
 
 }

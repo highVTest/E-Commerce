@@ -8,4 +8,14 @@ class CouponResponse(
     val discountPrice : Int?,
     val produceId : Long,
     val expiredAt : LocalDateTime
-)
+){
+    companion object {
+        fun from(coupon: Coupon) = CouponResponse(
+            sellerId = coupon.sellerId,
+            discountRate = coupon.discountRate,
+            discountPrice = coupon.discountPrice,
+            produceId = coupon.produceId,
+            expiredAt = coupon.expiredAt
+        )
+    }
+}
