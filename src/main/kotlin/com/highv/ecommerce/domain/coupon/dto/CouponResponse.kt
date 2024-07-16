@@ -1,20 +1,19 @@
 package com.highv.ecommerce.domain.coupon.dto
 
+import com.highv.ecommerce.domain.coupon.entity.Coupon
 import java.time.LocalDateTime
 
 class CouponResponse(
-    val sellerId: Long,
     val discountRate : Int?,
     val discountPrice : Int?,
-    val produceId : Long,
+    val productId : Long,
     val expiredAt : LocalDateTime
 ){
     companion object {
         fun from(coupon: Coupon) = CouponResponse(
-            sellerId = coupon.sellerId,
             discountRate = coupon.discountRate,
             discountPrice = coupon.discountPrice,
-            produceId = coupon.produceId,
+            productId = coupon.product.id!!,
             expiredAt = coupon.expiredAt
         )
     }
