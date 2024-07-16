@@ -48,7 +48,7 @@ class CouponController(
     @GetMapping("/seller")
     fun getSellerCouponList(): ResponseEntity<List<CouponResponse>> = ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.getSellerCouponList(couponId))
+            .body(couponService.getSellerCouponList())
 
     @GetMapping("/buyer/{couponId}")
     fun getBuyerCouponById(
