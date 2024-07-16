@@ -2,6 +2,7 @@ package com.highv.ecommerce.domain.coupon.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
+import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -13,13 +14,12 @@ class CouponService {
 
     fun createCoupon(couponRequest: CreateCouponRequest): DefaultResponse{
 
-        couponRepository.save(
+        val coupon = couponRepository.save(
             Coupon(
                 productId = couponRequest.productId,
                 discountRate = couponRequest.discountRate,
                 discountPrice = couponRequest.discountPrice,
                 expiredAt = couponRequest.expiredAt,
-                quantity = couponRequest.quantity,
                 createdAt = LocalDateTime.now(),
                 isDeleted = false,
                 deletedAt = null
@@ -27,6 +27,15 @@ class CouponService {
         )
 
         return DefaultResponse.from("쿠폰 생성이 완료 되었습니다")
+    }
+
+    fun updateCoupon(couponId: Long, updateCouponRequest: UpdateCouponRequest): DefaultResponse {
+
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw ModelNotFoundException()
+
+        result.update(updateCouponRequest)
+
+        return DefaultResponse.from("쿠폰 업데이트가 완료 되었습니다")
     }
 
 }

@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.coupon.controller
 
+import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.coupon.dto.CouponResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
@@ -17,7 +18,7 @@ class CouponController(
     @PostMapping
     fun createCoupon(
         couponRequest: CreateCouponRequest,
-    ): ResponseEntity<CouponResponse> = ResponseEntity
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
         .status(HttpStatus.CREATED)
         .body(couponService.createCoupon(couponRequest))
 
@@ -25,9 +26,9 @@ class CouponController(
     fun updateCoupon(
         @PathVariable("couponId") couponId:Long,
         updateCouponRequest: UpdateCouponRequest
-    ): ResponseEntity<CouponResponse> = ResponseEntity
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(couponService.updatecoupon(couponId, updateCouponRequest))
+        .body(couponService.updateCoupon(couponId, updateCouponRequest))
 
     @DeleteMapping("/{couponId}")
     fun deleteCoupon(
