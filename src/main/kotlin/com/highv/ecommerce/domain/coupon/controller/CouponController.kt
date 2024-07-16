@@ -22,7 +22,7 @@ class CouponController(
         .status(HttpStatus.CREATED)
         .body(couponService.createCoupon(couponRequest))
 
-    @PatchMapping("/{couponId}")
+    @PutMapping("/{couponId}")
     fun updateCoupon(
         @PathVariable("couponId") couponId:Long,
         updateCouponRequest: UpdateCouponRequest
@@ -63,5 +63,8 @@ class CouponController(
         .status(HttpStatus.OK)
         .body(couponService.getBuyerCouponList())
 
-
+    @PatchMapping("/{couponId}")
+    fun issuedCoupon(@PathVariable couponId: Long): ResponseEntity<DefaultResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(couponService.issuedCoupon(couponId))
 }

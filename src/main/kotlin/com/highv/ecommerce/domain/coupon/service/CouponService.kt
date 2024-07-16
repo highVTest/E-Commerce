@@ -76,5 +76,12 @@ class CouponService(
         return couponRepository.findAll().map{ CouponResponse.from(it) }
     }
 
+    fun issuedCoupon(couponId: Long): DefaultResponse {
+
+        couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("coupon not found")
+
+        return DefaultResponse.from("쿠폰이 지급 되었습니다")
+    }
+
 
 }
