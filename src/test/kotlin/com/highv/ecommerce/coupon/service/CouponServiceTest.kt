@@ -19,7 +19,7 @@ class CouponServiceTest {
 
     //Given
     companion object{
-        val createCouponRequest = CreateCouponRequest(
+        private val createCouponRequest = CreateCouponRequest(
             productId = 1,
             discountRate = 50,
             discountPrice = null,
@@ -27,14 +27,14 @@ class CouponServiceTest {
             quantity = 1
         )
 
-        val updateCouponRequest = UpdateCouponRequest(
+        private val updateCouponRequest = UpdateCouponRequest(
             discountRate = null,
             discountPrice = null,
             expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
             quantity = 1
         )
 
-        val coupon = Coupon(
+        private val coupon = Coupon(
             id = 1L,
             productId = 1,
             discountRate = 50,
@@ -46,7 +46,7 @@ class CouponServiceTest {
             isDeleted = false,
         )
 
-        val coupon2 = Coupon(
+        private val coupon2 = Coupon(
             id = 2L,
             productId = 2,
             discountRate = null,
