@@ -4,13 +4,13 @@ import com.highv.ecommerce.domain.seller.dto.CreateSellerRequest
 import com.highv.ecommerce.domain.seller.dto.SellerResponse
 import com.highv.ecommerce.domain.seller.entity.Seller
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
 class SellerService(
     private val sellerRepository: SellerRepository,
-    private val passwordEncoder: BCryptPasswordEncoder
+    private val passwordEncoder: PasswordEncoder
 ) {
 
     fun signUp(request: CreateSellerRequest): SellerResponse {
