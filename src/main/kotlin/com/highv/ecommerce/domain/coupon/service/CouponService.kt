@@ -19,6 +19,8 @@ class CouponService(
 
     fun createCoupon(couponRequest: CreateCouponRequest): DefaultResponse{
 
+
+
         val coupon = couponRepository.save(
             Coupon(
                 productId = couponRequest.productId,
@@ -37,7 +39,7 @@ class CouponService(
 
     fun updateCoupon(couponId: Long, updateCouponRequest: UpdateCouponRequest): DefaultResponse {
 
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("coupon not found")
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
         result.update(updateCouponRequest)
 
         return DefaultResponse.from("쿠폰 업데이트가 완료 되었습니다")
@@ -45,7 +47,7 @@ class CouponService(
 
     fun deleteCoupon(couponId: Long): DefaultResponse {
 
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("coupon not found")
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
         couponRepository.delete(result)
 
@@ -54,7 +56,7 @@ class CouponService(
 
     @Transactional(readOnly = true)
     fun getSellerCouponById(couponId: Long): CouponResponse {
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("coupon not found")
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
         return CouponResponse.from(result)
     }
@@ -67,7 +69,7 @@ class CouponService(
     @Transactional(readOnly = true)
     fun getBuyerCouponById(couponId: Long): CouponResponse {
 
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("coupon not found")
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
         return CouponResponse.from(result)
     }
@@ -79,12 +81,12 @@ class CouponService(
 
     fun issuedCoupon(couponId: Long): DefaultResponse {
 
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("coupon not found")
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
+        result.validExpiredAt()
         result.spendCoupon()
 
         return DefaultResponse.from("쿠폰이 지급 되었습니다")
     }
-
 
 }

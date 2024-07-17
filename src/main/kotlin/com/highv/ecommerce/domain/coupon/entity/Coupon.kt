@@ -51,4 +51,8 @@ class Coupon(
         if(quantity <= 0) throw RuntimeException("쿠폰이 매진 되었습니다")
         quantity -= 1
     }
+
+    fun validExpiredAt() {
+        if(expiredAt <= LocalDateTime.now()) throw RuntimeException("쿠폰 유호 기간이 지났 습니다")
+    }
 }
