@@ -24,7 +24,7 @@ class CouponService(
                 productId = couponRequest.productId,
                 discountRate = couponRequest.discountRate,
                 discountPrice = couponRequest.discountPrice,
-                expiredAt = couponRequest.expiredAt,
+                expiredAt = couponRequest.toLocalDateTime(),
                 createdAt = LocalDateTime.now(),
                 isDeleted = false,
                 deletedAt = null,
@@ -79,7 +79,9 @@ class CouponService(
 
     fun issuedCoupon(couponId: Long): DefaultResponse {
 
-        couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("coupon not found")
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("coupon not found")
+
+        result.spendCoupon()
 
         return DefaultResponse.from("쿠폰이 지급 되었습니다")
     }

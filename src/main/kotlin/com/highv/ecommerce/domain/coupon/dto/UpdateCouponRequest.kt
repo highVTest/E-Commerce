@@ -6,4 +6,5 @@ data class UpdateCouponRequest(
     val expiredAt: LocalDateTime,
     val discountRate : Int?,
     val discountPrice : Int?,
+    val quantity : Int = 0,
 )

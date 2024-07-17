@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.coupon.repository
 
 import com.highv.ecommerce.domain.coupon.entity.Coupon
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
 @Repository

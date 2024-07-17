@@ -13,7 +13,7 @@ class CouponResponse(
         fun from(coupon: Coupon) = CouponResponse(
             discountRate = coupon.discountRate,
             discountPrice = coupon.discountPrice,
-            productId = coupon.product.id!!,
+            productId = coupon.productId,
             expiredAt = coupon.expiredAt
         )
     }

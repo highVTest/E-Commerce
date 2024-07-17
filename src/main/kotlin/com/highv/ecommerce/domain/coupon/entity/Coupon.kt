@@ -44,5 +44,11 @@ class Coupon(
         discountRate = updateCouponRequest.discountRate
         discountPrice = updateCouponRequest.discountPrice
         expiredAt = updateCouponRequest.expiredAt
+        quantity = updateCouponRequest.quantity
+    }
+
+    fun spendCoupon() {
+        if(quantity <= 0) throw RuntimeException("쿠폰이 매진 되었습니다")
+        quantity -= 1
     }
 }
