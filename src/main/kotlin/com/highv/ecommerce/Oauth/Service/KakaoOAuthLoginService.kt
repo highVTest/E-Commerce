@@ -18,6 +18,7 @@ class KakaoOAuthLoginService(
     }
 
     fun login(code: String): String {
+
         return kakaoOAuthLoginClient.getAccessToken(code) // code를 통해서 AccessToken 발급
             .let { kakaoOAuthLoginClient.retrieveUserInfo(it) } // 사용자 정보 조회
             .let { socialMemberDomainService.registerIfAbsent(it) } // 사용자정보로 카카오 회원가입 & 조회

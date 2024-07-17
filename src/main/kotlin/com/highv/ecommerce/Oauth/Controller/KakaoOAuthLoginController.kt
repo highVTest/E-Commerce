@@ -1,6 +1,7 @@
 package com.highv.ecommerce.Oauth.Controller
 
 import com.highv.ecommerce.Oauth.Service.KakaoOAuthLoginService
+import com.highv.ecommerce.common.dto.AccessTokenResponse
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -22,8 +23,8 @@ class KakaoOAuthLoginController(
     @GetMapping("/oauth/login/callback")
     fun callback(
         @RequestParam code: String
-    ): ResponseEntity<String> {
+    ): ResponseEntity<AccessTokenResponse> {
         val accessToken = kakaoOAuthLoginService.login(code)
-        return ResponseEntity.ok(accessToken)
+        return ResponseEntity.ok(AccessTokenResponse(accessToken))
     }
 }

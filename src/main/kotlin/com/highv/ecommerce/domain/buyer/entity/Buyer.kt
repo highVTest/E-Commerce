@@ -1,18 +1,27 @@
 package com.highv.ecommerce.domain.buyer.entity
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 
 @Entity
-data class Buyer(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
-    val nickname: String,
-    val password: String,
-    val email: String,
-    val profileImage: String,
-    val phoneNumber: String,
-    val address: String,
+@Table(name = "buyer")
+class Buyer(
+   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+   val id: Long? = null,
+   @Column(name = "nickname")
+   val nickname: String,
+   @Column(name = "password")
+   val password: String,
+   @Column(name = "email")
+   val email: String,
+   @Column(name = "profile_image")
+   val profileImage: String,
+   @Column(name = "phone_number")
+   val phoneNumber: String,
+   @Column(name = "address")
+   val address: String,
+
+   @Column(name = "provider_name")
+   val providerName: String?,
+   @Column(name = "provider_id")
+   val providerId: Long?
 )

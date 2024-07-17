@@ -20,7 +20,9 @@ class BuyerService(
             password = passwordEncoder.encode(request.password),
             profileImage = request.profileImage,
             phoneNumber = request.phoneNumber,
-            address = request.address
+            address = request.address,
+            providerName = null,
+            providerId = null
         )
         val savedBuyer = buyerRepository.save(buyer)
         return BuyerResponse.from(savedBuyer)
