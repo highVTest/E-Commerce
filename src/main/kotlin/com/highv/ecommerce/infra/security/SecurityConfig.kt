@@ -1,4 +1,4 @@
-package com.highv.ecommerce.infra.swagger.security
+package com.highv.ecommerce.infra.security
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,8 +19,4 @@ class SecurityConfig {
             .build()
     }
 
-    @Bean
-    fun passwordEncoder(): PasswordEncoder {
-        return BCryptPasswordEncoder()
-    }
 }
