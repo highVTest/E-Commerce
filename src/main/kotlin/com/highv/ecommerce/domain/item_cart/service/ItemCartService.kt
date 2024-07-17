@@ -17,6 +17,11 @@ class ItemCartService(
     private val productRepository: ProductRepository
 ) {
     fun addItemIntoCart(productId: Long, request: AddItemIntoCartRequest, buyerId: Long) {
+
+        if (request.quantity < 1) {
+            throw RuntimeException("상품의 개수가 1개보다 적을 수 없습니다.")
+        }
+
         val product: Product =
             productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
 
