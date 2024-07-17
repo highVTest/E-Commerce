@@ -24,7 +24,7 @@ class CouponService(
                 productId = couponRequest.productId,
                 discountRate = couponRequest.discountRate,
                 discountPrice = couponRequest.discountPrice,
-                expiredAt = couponRequest.toLocalDateTime(),
+                expiredAt = LocalDateTime.now(),
                 createdAt = LocalDateTime.now(),
                 isDeleted = false,
                 deletedAt = null,
