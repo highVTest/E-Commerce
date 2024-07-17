@@ -1,6 +1,7 @@
-package com.highv.ecommerce
+package com.highv.ecommerce.item_cart
 
 import com.highv.ecommerce.domain.item_cart.dto.request.AddItemIntoCartRequest
+import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.item_cart.service.ItemCartService
 import com.highv.ecommerce.domain.product.entity.Product
@@ -28,7 +29,7 @@ class ItemCartServiceTest : BehaviorSpec() {
             clearAllMocks()
         }
 
-        Given("상품을 장바구니에 담을 때") {
+        this.Given("상품을 장바구니에 담을 때") {
 
             val product = Product(
                 name = "Test Product",
@@ -53,6 +54,14 @@ class ItemCartServiceTest : BehaviorSpec() {
 
                 every { productRepository.findByIdOrNull(any()) } returns product
 
+                every { itemCartRepository.save(any()) } returns ItemCart(
+                    productId = 1L,
+                    productName = product.name,
+                    price = 3000 * request.quantity, // 추후 프로덕트에서 price 관련된 게 생길 예정
+                    quantity = request.quantity,
+                    buyerId = buyerId
+                ).apply { id = buyerId }
+
                 Then("장바구니에 추가된다.") {
                     itemCartService.addItemIntoCart(product.id!!, request, buyerId)
 
@@ -72,6 +81,18 @@ class ItemCartServiceTest : BehaviorSpec() {
                     }.let {
                         it.message shouldBe "상품의 개수가 1개보다 적을 수 없습니다."
                     }
+                }
+            }
+
+            When("존재하지 않는 상품일 때") {
+                val request: AddItemIntoCartRequest = AddItemIntoCartRequest(quantity = 1)
+                every { productRepository.findByIdOrNull(any()) } returns null
+
+                Then("상품이 없다는 예외가 발생한다.") {
+                    shouldThrow<RuntimeException> { itemCartService.addItemIntoCart(1L, request, buyerId) }
+                        .let {
+                            it.message shouldBe "Product not found"
+                        }
                 }
             }
 
