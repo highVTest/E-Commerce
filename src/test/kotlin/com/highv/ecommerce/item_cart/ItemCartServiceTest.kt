@@ -22,10 +22,9 @@ class ItemCartServiceTest : BehaviorSpec() {
 
         val itemCartRepository = mockk<ItemCartRepository>(relaxed = true)
         val productRepository = mockk<ProductRepository>(relaxed = true)
-
         val itemCartService: ItemCartService = ItemCartService(itemCartRepository, productRepository)
 
-        afterContainer {
+        afterEach {
             clearAllMocks()
         }
 
@@ -36,12 +35,10 @@ class ItemCartServiceTest : BehaviorSpec() {
             val product = Product(
                 name = "Test Product",
                 description = "Test Description",
-                price = 1000,
                 productImage = "image.jpg",
                 favorite = 0,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now(),
-                quantity = 10,
                 isSoldOut = false,
                 deletedAt = LocalDateTime.now(),
                 isDeleted = false,
@@ -52,16 +49,20 @@ class ItemCartServiceTest : BehaviorSpec() {
 
             When("상품 수량이 1개 이상이면") {
                 val request: SelectProductQuantity = SelectProductQuantity(quantity = 1)
-
-                every { productRepository.findByIdOrNull(any()) } returns product
-
-                every { itemCartRepository.save(any()) } returns ItemCart(
+                val itemCart = ItemCart(
                     productId = 1L,
                     productName = product.name,
                     price = 3000 * request.quantity, // 추후 프로덕트에서 price 관련된 게 생길 예정
                     quantity = request.quantity,
                     buyerId = buyerId
                 ).apply { id = buyerId }
+
+                every { productRepository.findByIdOrNull(any()) } returns product
+
+                every { itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(any(), any()) } returns null
+
+                every { itemCartRepository.save(any()) } returns itemCart
+
 
                 Then("장바구니에 추가된다.") {
                     itemCartService.addItemIntoCart(product.id!!, request, buyerId)
@@ -73,7 +74,6 @@ class ItemCartServiceTest : BehaviorSpec() {
 
             When("상품 수량이 1개보다 적으면") {
                 val request: SelectProductQuantity = SelectProductQuantity(quantity = 0)
-
                 every { productRepository.findByIdOrNull(any()) } returns product
 
                 Then("상품 개수 예외가 발생한다.") {
@@ -106,12 +106,10 @@ class ItemCartServiceTest : BehaviorSpec() {
             val product = Product(
                 name = "Test Product",
                 description = "Test Description",
-                price = 1000,
                 productImage = "image.jpg",
                 favorite = 0,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now(),
-                quantity = 10,
                 isSoldOut = false,
                 deletedAt = LocalDateTime.now(),
                 isDeleted = false,
