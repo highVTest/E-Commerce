@@ -36,7 +36,7 @@ class Coupon(
     @Column(name = "is_deleted", nullable = false)
     val isDeleted: Boolean = false,
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     val product: Product
 

@@ -168,6 +168,12 @@ CREATE TABLE product_backoffice
 
 );
 
+CREATE TABLE favorite(
+    id BIGINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    keyword TEXT NOT NULL,
+    searched_at TIMESTAMP NOT NULL
+);
+
 
 ALTER TABLE sales_history ADD CONSTRAINT fk_sales_history_seller_id
 FOREIGN KEY (seller_id)

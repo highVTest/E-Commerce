@@ -25,8 +25,8 @@ class CouponController(
     @PostMapping
     fun createCoupon(
         @Valid @RequestBody couponRequest: CreateCouponRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-        bindingResult: BindingResult
+        bindingResult: BindingResult,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<DefaultResponse>{
 
         if(bindingResult.hasErrors()) throw RuntimeException(bindingResult.fieldError?.defaultMessage.toString())
@@ -42,8 +42,8 @@ class CouponController(
     fun updateCoupon(
         @PathVariable("couponId") couponId:Long,
         @Valid @RequestBody updateCouponRequest: UpdateCouponRequest,
+        bindingResult: BindingResult,
         @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-        bindingResult: BindingResult
     ): ResponseEntity<DefaultResponse> {
 
         if(bindingResult.hasErrors()) throw RuntimeException(bindingResult.fieldError?.defaultMessage.toString())

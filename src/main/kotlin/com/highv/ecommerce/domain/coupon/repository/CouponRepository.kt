@@ -12,4 +12,8 @@ interface CouponRepository {
     fun delete(coupon: Coupon)
 
     fun findAll(): List<Coupon>
+
+    fun findAllCouponIdWithBuyer(couponIdList: List<Long>): List<Coupon>
+
+    fun existsByProductId(productId: Long): Boolean
 }

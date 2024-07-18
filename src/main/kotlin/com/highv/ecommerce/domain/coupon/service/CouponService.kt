@@ -9,6 +9,7 @@ import com.highv.ecommerce.domain.coupon.entity.Coupon
 import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
 import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
+import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerJpaRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.infra.security.UserPrincipal
@@ -32,6 +33,8 @@ class CouponService(
             throw RuntimeException("할인율은 100%를 넘길 수 없습 니다")
 
         val product = productRepository.findByIdOrNull(couponRequest.productId) ?: throw RuntimeException()
+
+        if(couponRepository.existsByProductId(couponRequest.productId)) throw RuntimeException()
 
         couponRepository.save(
             Coupon(
@@ -71,9 +74,11 @@ class CouponService(
 
 
     fun getSellerCouponById(couponId: Long, userPrincipal: UserPrincipal): CouponResponse {
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
-        return CouponResponse.from(result)
+        val coupon = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
+
+
+        return CouponResponse.from(coupon)
     }
 
     fun getSellerCouponList(userPrincipal: UserPrincipal): List<CouponResponse>? {
@@ -88,7 +93,10 @@ class CouponService(
     }
 
     fun getBuyerCouponList(userPrincipal: UserPrincipal): List<CouponResponse>? {
-        return couponRepository.findAll().map{ CouponResponse.from(it) }
+
+        val couponIdList = couponToBuyerRepository.findAllProductIdWithBuyerId(userPrincipal.id)
+
+        return couponRepository.findAllCouponIdWithBuyer(couponIdList).map{ CouponResponse.from(it) }
     }
 
     @Transactional
