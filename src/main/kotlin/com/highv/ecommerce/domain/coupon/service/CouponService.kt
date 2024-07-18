@@ -7,6 +7,7 @@ import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import com.highv.ecommerce.domain.coupon.entity.Coupon
 import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
+import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
@@ -26,6 +27,9 @@ class CouponService(
 
     @Transactional
     fun createCoupon(couponRequest: CreateCouponRequest, userPrincipal: UserPrincipal): DefaultResponse{
+
+        if(couponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && couponRequest.discount > 100)
+            throw RuntimeException("할인율은 100%를 넘길 수 없습 니다")
 
         val product = productRepository.findByIdOrNull(couponRequest.productId) ?: throw RuntimeException()
 
