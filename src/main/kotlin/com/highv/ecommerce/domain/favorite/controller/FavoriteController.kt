@@ -24,5 +24,5 @@ class FavoriteController(
         @AuthenticationPrincipal user: UserPrincipal
     ): ResponseEntity<String> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(favoriteService.management(productId, user))
+        .body(favoriteService.management(productId, user.id))
 }
