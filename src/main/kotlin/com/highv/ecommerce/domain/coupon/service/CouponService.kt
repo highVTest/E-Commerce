@@ -9,6 +9,7 @@ import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.infra.security.UserPrincipal
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -22,11 +23,11 @@ class CouponService(
     @Transactional
     fun createCoupon(couponRequest: CreateCouponRequest, userPrincipal: UserPrincipal): DefaultResponse{
 
-        if(productRepository.existsById(couponRequest.productId)) throw RuntimeException()
+        val product = productRepository.findByIdOrNull(couponRequest.productId) ?: throw RuntimeException()
 
         couponRepository.save(
             Coupon(
-                productId = couponRequest.productId,
+                product = product,
                 discountPolicy = couponRequest.discountPolicy,
                 discount = couponRequest.discount,
                 expiredAt = couponRequest.expiredAt,
