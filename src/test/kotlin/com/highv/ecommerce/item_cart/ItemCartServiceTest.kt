@@ -1,7 +1,6 @@
 package com.highv.ecommerce.item_cart
 
-import com.highv.ecommerce.domain.item_cart.dto.request.AddItemIntoCartRequest
-import com.highv.ecommerce.domain.item_cart.dto.request.UpdateItemIntoCartRequest
+import com.highv.ecommerce.domain.item_cart.dto.request.SelectProductQuantity
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.item_cart.service.ItemCartService
@@ -52,7 +51,7 @@ class ItemCartServiceTest : BehaviorSpec() {
 
 
             When("상품 수량이 1개 이상이면") {
-                val request: AddItemIntoCartRequest = AddItemIntoCartRequest(quantity = 1)
+                val request: SelectProductQuantity = SelectProductQuantity(quantity = 1)
 
                 every { productRepository.findByIdOrNull(any()) } returns product
 
@@ -73,7 +72,7 @@ class ItemCartServiceTest : BehaviorSpec() {
             }
 
             When("상품 수량이 1개보다 적으면") {
-                val request: AddItemIntoCartRequest = AddItemIntoCartRequest(quantity = 0)
+                val request: SelectProductQuantity = SelectProductQuantity(quantity = 0)
 
                 every { productRepository.findByIdOrNull(any()) } returns product
 
@@ -87,7 +86,7 @@ class ItemCartServiceTest : BehaviorSpec() {
             }
 
             When("존재하지 않는 상품일 때") {
-                val request: AddItemIntoCartRequest = AddItemIntoCartRequest(quantity = 1)
+                val request: SelectProductQuantity = SelectProductQuantity(quantity = 1)
                 every { productRepository.findByIdOrNull(any()) } returns null
 
                 Then("상품이 없다는 예외가 발생한다.") {
@@ -131,7 +130,7 @@ class ItemCartServiceTest : BehaviorSpec() {
 
 
             When("변경할 수량이 1개 이상이면") {
-                val request: UpdateItemIntoCartRequest = UpdateItemIntoCartRequest(quantity = 5)
+                val request: SelectProductQuantity = SelectProductQuantity(quantity = 5)
 
                 every { productRepository.findByIdOrNull(any()) } returns product
                 every { itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(any(), any()) } returns itemCart
@@ -145,7 +144,7 @@ class ItemCartServiceTest : BehaviorSpec() {
             }
 
             When("상품이 장바구니에 없으면") {
-                val request: UpdateItemIntoCartRequest = UpdateItemIntoCartRequest(quantity = 5)
+                val request: SelectProductQuantity = SelectProductQuantity(quantity = 5)
 
                 every { productRepository.findByIdOrNull(any()) } returns product
                 every { itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(any(), any()) } returns null
