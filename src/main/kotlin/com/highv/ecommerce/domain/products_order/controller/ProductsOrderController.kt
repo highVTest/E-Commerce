@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.products_order.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.domain.products_order.dto.DescriptionRequest
 import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
 import com.highv.ecommerce.domain.products_order.service.ProductsOrderService
@@ -28,5 +29,17 @@ class ProductsOrderController(
     ): ResponseEntity<DefaultResponse> {
         return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.updateOrderStatus(orderId, orderStatusRequest))
     }
+
+    @PatchMapping("/refund/{orderId}")
+    fun requestRefund(
+        @PathVariable("orderId") orderId: Long,
+        @RequestBody descriptionRequest: DescriptionRequest
+    ): ResponseEntity<DefaultResponse> {
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefund(orderId, descriptionRequest))
+    }
+
+
+
+
 
 }
