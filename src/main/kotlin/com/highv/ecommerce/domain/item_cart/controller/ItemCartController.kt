@@ -1,7 +1,6 @@
 package com.highv.ecommerce.domain.item_cart.controller
 
-import com.highv.ecommerce.domain.item_cart.dto.request.AddItemIntoCartRequest
-import com.highv.ecommerce.domain.item_cart.dto.request.UpdateItemIntoCartRequest
+import com.highv.ecommerce.domain.item_cart.dto.request.SelectProductQuantity
 import com.highv.ecommerce.domain.item_cart.dto.response.ItemCartResponse
 import com.highv.ecommerce.domain.item_cart.service.ItemCartService
 import com.highv.ecommerce.infra.security.UserPrincipal
@@ -29,7 +28,7 @@ class ItemCartController(
     fun addItemIntoCart(
         @PathVariable(value = "productId") productId: Long,
         @AuthenticationPrincipal user: UserPrincipal,
-        @RequestBody request: AddItemIntoCartRequest
+        @RequestBody request: SelectProductQuantity
     ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -49,7 +48,7 @@ class ItemCartController(
     fun updateIntoCart(
         @PathVariable(value = "productId") productId: Long,
         @AuthenticationPrincipal user: UserPrincipal,
-        @RequestBody request: UpdateItemIntoCartRequest
+        @RequestBody request: SelectProductQuantity
     ): ResponseEntity<Unit> = ResponseEntity
         .status(HttpStatus.OK)
         .body(itemCartService.updateItemIntoCart(productId, request, user.id))

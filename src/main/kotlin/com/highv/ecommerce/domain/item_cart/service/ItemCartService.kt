@@ -1,7 +1,6 @@
 package com.highv.ecommerce.domain.item_cart.service
 
-import com.highv.ecommerce.domain.item_cart.dto.request.AddItemIntoCartRequest
-import com.highv.ecommerce.domain.item_cart.dto.request.UpdateItemIntoCartRequest
+import com.highv.ecommerce.domain.item_cart.dto.request.SelectProductQuantity
 import com.highv.ecommerce.domain.item_cart.dto.response.ItemCartResponse
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
@@ -16,7 +15,7 @@ class ItemCartService(
     private val itemCartRepository: ItemCartRepository,
     private val productRepository: ProductRepository
 ) {
-    fun addItemIntoCart(productId: Long, request: AddItemIntoCartRequest, buyerId: Long) {
+    fun addItemIntoCart(productId: Long, request: SelectProductQuantity, buyerId: Long) {
 
         if (request.quantity < 1) {
             throw RuntimeException("상품의 개수가 1개보다 적을 수 없습니다.")
@@ -44,7 +43,7 @@ class ItemCartService(
     }
 
     @Transactional
-    fun updateItemIntoCart(productId: Long, request: UpdateItemIntoCartRequest, buyerId: Long) {
+    fun updateItemIntoCart(productId: Long, request: SelectProductQuantity, buyerId: Long) {
 
         val product: Product =
             productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
