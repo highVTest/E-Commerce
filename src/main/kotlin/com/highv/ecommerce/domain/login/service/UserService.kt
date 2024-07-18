@@ -17,16 +17,19 @@ class UserService(
 
 ) {
     fun login(loginRequest: LoginRequest): AccessTokenResponse {
-        val buyer = buyerRepository.findByEmail(loginRequest.email)
-        if (buyer != null && passwordEncoder.matches(loginRequest.password, buyer.password)) {
-            val token = jwtPlugin.generateAccessToken(buyer.id.toString(), buyer.email, "BUYER")
-            return AccessTokenResponse(token)
-        }
 
-        val seller = sellerRepository.findByEmail(loginRequest.email)
-        if (seller != null && passwordEncoder.matches(loginRequest.password, seller.password)) {
-            val token = jwtPlugin.generateAccessToken(seller.id.toString(), seller.email, "SELLER")
-            return AccessTokenResponse(token)
+        if (loginRequest.role == "BUYER") {
+            val buyer = buyerRepository.findByEmail(loginRequest.email)
+            if (buyer != null && passwordEncoder.matches(loginRequest.password, buyer.password)) {
+                val token = jwtPlugin.generateAccessToken(buyer.id.toString(), buyer.email, "BUYER")
+                return AccessTokenResponse(token)
+            }
+        } else if (loginRequest.role == "SELLER") {
+            val seller = sellerRepository.findByEmail(loginRequest.email)
+            if (seller != null && passwordEncoder.matches(loginRequest.password, seller.password)) {
+                val token = jwtPlugin.generateAccessToken(seller.id.toString(), seller.email, "SELLER")
+                return AccessTokenResponse(token)
+            }
         }
 
         throw IllegalArgumentException("Invalid email or password")
