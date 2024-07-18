@@ -7,7 +7,6 @@ import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.infra.security.jwt.JwtPlugin
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import javax.management.relation.Role
 
 @Service
 class UserService(
@@ -20,13 +19,13 @@ class UserService(
     fun login(loginRequest: LoginRequest): AccessTokenResponse {
         val buyer = buyerRepository.findByEmail(loginRequest.email)
         if (buyer != null && passwordEncoder.matches(loginRequest.password, buyer.password)) {
-            val token = jwtPlugin.generateAccessToken(buyer.id.toString(), buyer.email, "buyer")
+            val token = jwtPlugin.generateAccessToken(buyer.id.toString(), buyer.email, "BUYER")
             return AccessTokenResponse(token)
         }
 
         val seller = sellerRepository.findByEmail(loginRequest.email)
         if (seller != null && passwordEncoder.matches(loginRequest.password, seller.password)) {
-            val token = jwtPlugin.generateAccessToken(seller.id.toString(), seller.email, "seller")
+            val token = jwtPlugin.generateAccessToken(seller.id.toString(), seller.email, "SELLER")
             return AccessTokenResponse(token)
         }
 
