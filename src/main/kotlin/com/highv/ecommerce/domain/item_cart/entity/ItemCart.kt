@@ -43,7 +43,7 @@ class ItemCart(
     var deletedAt: LocalDateTime? = null
 
     fun updateQuantityAndPrice(quantity: Int, productPrice: Int) {
-        if (quantity <= 0) throw RuntimeException("물품이 0보다 작거나 같을 수 없습니다.")
+        if (quantity <= 0) throw RuntimeException("물품의 수량이 0보다 작거나 같을 수 없습니다.")
 
         this.quantity = quantity
         price = this.quantity * productPrice
