@@ -14,15 +14,22 @@ class SellerService(
 ) {
 
     fun signUp(request: CreateSellerRequest): SellerResponse {
+
+        if (sellerRepository.existsByEmail(request.email)) {
+            throw RuntimeException("이미 존재하는 이메일입니다. 가입할 수 없습니다.")
+        }
+
         val seller = Seller(
             email = request.email,
             nickname = request.nickname,
             password = passwordEncoder.encode(request.password),
-            profileImage = request.profileImage ?: "",
+            profileImage = request.profileImage,
             phoneNumber = request.phoneNumber,
             address = request.address
         )
+
         val savedSeller = sellerRepository.save(seller)
+
         return SellerResponse.from(savedSeller)
     }
 }
