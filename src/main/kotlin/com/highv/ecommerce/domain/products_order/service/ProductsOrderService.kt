@@ -54,7 +54,7 @@ class ProductsOrderService(
 
         val order = productsOrderRepository.findByIdOrNull(orderId) ?: throw RuntimeException()
 
-        order.update(orderStatusRequest)
+        order.update(orderStatusRequest, null)
 
         return DefaultResponse.from("주문 상태 변경이 완료 되었습니다. 변경된 상태 : ${orderStatusRequest.statusCode.name}")
     }
