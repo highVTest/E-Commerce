@@ -23,7 +23,7 @@ class SocialMemberDomainService(
                     // -----------------
                     providerName = "KAKAO",
                     providerId = userInfo.id,
-                    nickname = userInfo.properties.nickname ?: "테스트",
+                    nickname = userInfo.properties.nickname,
                     profileImage = userInfo.properties.profileImage
                 )
             )
