@@ -29,10 +29,19 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.springframework.boot:spring-boot-starter-validation") //email, password validation 사용 가능
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("com.mysql:mysql-connector-j")
+    implementation("org.springframework.boot:spring-boot-starter-security") //security 사용 가능
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+
+    // 추가된 부분: JSON 웹 토큰(JWT) 관련 의존성
+    implementation("io.jsonwebtoken:jjwt-api:0.12.3")
+    implementation("io.jsonwebtoken:jjwt-impl:0.12.3")
+    implementation("io.jsonwebtoken:jjwt-jackson:0.12.3")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
