@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.coupon.entity
 
+import com.highv.ecommerce.domain.buyer.entity.Buyer
 import jakarta.persistence.*
 
 @Entity
@@ -14,10 +15,8 @@ class CouponToBuyer(
     @JoinColumn(name = "coupon_id")
     val coupon: Coupon,
 
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "coupon_id")
-//    val buyer: Buyer,
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "coupon_id")
+    val buyer: Buyer,
 
-    @Column(name = "quantity", nullable = false)
-    val quantity: Int,
 )
