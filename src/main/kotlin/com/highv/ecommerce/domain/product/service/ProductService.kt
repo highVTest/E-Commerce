@@ -5,6 +5,8 @@ import com.highv.ecommerce.domain.product.dto.ProductResponse
 import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -57,5 +59,23 @@ class ProductService(
     fun getProductById(productId: Long): ProductResponse {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
         return ProductResponse.from(product)
+    }
+
+    fun getAllProducts(pageable: Pageable): Page<ProductResponse> {
+        val products = productRepository.findAllPaginated(pageable)
+        return products.map { ProductResponse.from(it) }
+    }
+
+    fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductResponse> {
+        val products = productRepository.findByCategoryPaginated(categoryId, pageable)
+        return products.map { ProductResponse.from(it) }
+    }
+
+    fun searchProduct(keyword: String, pageable: Pageable): Page<ProductResponse> {
+        val products = productRepository.searchByKeywordPaginated(keyword, pageable)
+        if (products.hasContent()) {
+            return products.map { ProductResponse.from(it) }
+        }
+        return Page.empty(pageable)
     }
 }
