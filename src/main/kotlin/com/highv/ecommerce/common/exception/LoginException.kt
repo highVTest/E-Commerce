@@ -1,4 +1,3 @@
 package com.highv.ecommerce.common.exception
 
-class LoginException {
-}
+data class LoginException(override val message: String) : RuntimeException()
