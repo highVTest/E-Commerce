@@ -6,11 +6,13 @@ import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import com.highv.ecommerce.domain.coupon.service.CouponService
 import com.highv.ecommerce.infra.security.UserPrincipal
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -22,10 +24,12 @@ class CouponController(
     @PreAuthorize("hasRole('SELLER')")
     @PostMapping
     fun createCoupon(
-        couponRequest: CreateCouponRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
+        @Valid @RequestBody couponRequest: CreateCouponRequest,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
+        bindingResult: BindingResult
     ): ResponseEntity<DefaultResponse>{
 
+        if(bindingResult.hasErrors()) throw RuntimeException(bindingResult.fieldError?.defaultMessage.toString())
         if(userPrincipal == null) throw RuntimeException()
 
         return ResponseEntity
