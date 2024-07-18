@@ -3,7 +3,6 @@ package com.highv.ecommerce.socialmember.service
 import com.highv.ecommerce.Oauth.client.dto.KakaoLoginUserInfoResponse
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
-import com.highv.ecommerce.socialmember.entity.KakaoSocialMember
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,17 +16,16 @@ class SocialMemberDomainService(
                 Buyer(
                     // ----------------------
                     // 수정하기
-                    email = "test@test.com",
-                    password = "null", // <== 널러블 필요 없음
-                    profileImage = "testProfileImage",
-                    phoneNumber = "null",
-                    address = "null", // 나중에 프로필 수정할 때 추가할 수 있게끔 하는 게 편할듯?
+                    email = "null", // 소셜 로그인 한 사람은 업데이트 못하게 하기
+                    password = "null", // 소셜 로그인 한 사람은 업데이트 못하게 하기
+                    phoneNumber = "null", // 소셜 로그인 한 사람은 업데이트 하기
+                    address = "null", // 소셜 로그인 한 사람은 업데이트 하기
                     // -----------------
                     providerName = "KAKAO",
                     providerId = userInfo.id,
-                    nickname = userInfo.properties?.nickname ?: "테스트"
+                    nickname = userInfo.properties.nickname ?: "테스트",
+                    profileImage = userInfo.properties.profileImage
                 )
             )
-
     }
 }
