@@ -1,13 +1,15 @@
 package com.highv.ecommerce.domain.coupon.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.coupon.dto.CouponResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import com.highv.ecommerce.domain.coupon.entity.Coupon
+import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
+import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
-import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -18,6 +20,8 @@ import java.time.LocalDateTime
 class CouponService(
     private val couponRepository: CouponRepository,
     private val productRepository: ProductRepository,
+    private val couponToBuyerRepository: CouponToBuyerRepository,
+    private val buyerRepository: BuyerRepository
 ){
 
     @Transactional
@@ -85,10 +89,19 @@ class CouponService(
 
     fun issuedCoupon(couponId: Long, userPrincipal: UserPrincipal): DefaultResponse {
 
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
+        val buyer = buyerRepository.findByEmail(userPrincipal.email) ?: throw RuntimeException("바이어가 존재 하지 않습니다")
+        val coupon = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
-        result.validExpiredAt()
-        result.spendCoupon()
+        coupon.validExpiredAt()
+
+        couponToBuyerRepository.save(
+            CouponToBuyer(
+                buyer = buyer,
+                coupon = coupon
+            )
+        )
+
+        coupon.spendCoupon()
 
         return DefaultResponse.from("쿠폰이 지급 되었습니다")
     }
