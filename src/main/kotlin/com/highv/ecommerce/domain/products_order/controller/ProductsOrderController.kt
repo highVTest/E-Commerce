@@ -43,20 +43,6 @@ class ProductsOrderController(
     ): ResponseEntity<DefaultResponse>
         = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefundReject(orderId, descriptionRequest))
 
-    @PatchMapping("/exchange/{orderId}")
-    fun requestExchange(
-        @PathVariable("orderId") orderId: Long,
-        @RequestBody descriptionRequest: DescriptionRequest
-    ): ResponseEntity<DefaultResponse>
-       = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestExchange(orderId, descriptionRequest))
-
-    @PatchMapping("/exchange/reject/{orderId}")
-    fun requestExchangeReject(
-        @PathVariable("orderId") orderId: Long,
-        @RequestBody descriptionRequest: DescriptionRequest
-    ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestExchangeReject(orderId, descriptionRequest))
-
     @GetMapping("/order_status/{orderId}")
     fun getOrderDetails(@PathVariable("orderId") orderId: Long,): ResponseEntity<ProductsOrderResponse>
         = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.getOrderDetails(orderId))

@@ -71,16 +71,6 @@ class ProductsOrderService(
         return DefaultResponse.from("환불 거절 요청 완료 되었습니다")
     }
 
-    @Transactional
-    fun requestExchange(orderId: Long, descriptionRequest: DescriptionRequest): DefaultResponse {
-        return DefaultResponse.from("교환 요청 완료 되었습니다")
-    }
-
-    @Transactional
-    fun requestExchangeReject(orderId: Long, descriptionRequest: DescriptionRequest): DefaultResponse {
-        return DefaultResponse.from("교환 거절 요청 완료 되었습니다")
-    }
-
     fun getOrderDetails(orderId: Long): ProductsOrderResponse {
         TODO("정보 내려 주기")
     }
