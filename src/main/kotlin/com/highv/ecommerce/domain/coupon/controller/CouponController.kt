@@ -41,9 +41,12 @@ class CouponController(
     @PutMapping("/{couponId}")
     fun updateCoupon(
         @PathVariable("couponId") couponId:Long,
-        updateCouponRequest: UpdateCouponRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
+        @Valid @RequestBody updateCouponRequest: UpdateCouponRequest,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
+        bindingResult: BindingResult
     ): ResponseEntity<DefaultResponse> {
+
+        if(bindingResult.hasErrors()) throw RuntimeException(bindingResult.fieldError?.defaultMessage.toString())
 
         if(userPrincipal == null) throw RuntimeException()
 
