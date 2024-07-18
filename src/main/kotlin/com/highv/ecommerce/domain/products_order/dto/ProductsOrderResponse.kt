@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 data class ProductsOrderResponse(
     val id : Long,
     val statusCode: StatusCode,
-    val statusDate: LocalDateTime,
+    val updatedDate: LocalDateTime,
     val statusDescription : String,
     val buyerName : String,
     val totalPrice : Int,
