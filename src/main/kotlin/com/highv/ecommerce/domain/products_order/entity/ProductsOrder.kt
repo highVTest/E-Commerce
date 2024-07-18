@@ -36,26 +36,29 @@ class ProductsOrder(
     @Column(name = "cancel_yn", nullable = false)
     val isCancelled : Boolean,
 
+    @Column(name= "cancel_dt", nullable = false)
+    val cancelDate : LocalDateTime?,
+
     @Column(name= "cancel_desc", nullable = false)
-    val cancelDescription : String,
+    val cancelDescription : String?,
 
     @Column(name="refund_yn", nullable = false)
     val isRefund : Boolean,
 
     @Column(name = "refund_dt", nullable = false)
-    val refundDate : LocalDateTime,
+    val refundDate : LocalDateTime?,
 
     @Column(name="refund_desc", nullable = false)
-    val refundDescription : String,
+    val refundDescription : String?,
 
     @Column(name = "refund_reject_yn", nullable = false)
     val isRefundReject : Boolean,
 
     @Column(name = "refund_reject_dt")
-    val refundRejectDate : LocalDateTime,
+    val refundRejectDate : LocalDateTime?,
 
     @Column(name="refund_reject_desc", nullable = false)
-    val refundRejectDescription : String,
+    val refundRejectDescription : String?,
 
     @Column(name="reg_dt", nullable = false)
     val regDate : LocalDateTime,
