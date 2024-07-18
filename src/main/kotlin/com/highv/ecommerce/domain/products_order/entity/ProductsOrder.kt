@@ -1,5 +1,7 @@
 package com.highv.ecommerce.domain.products_order.entity
 
+import com.highv.ecommerce.domain.products_order.dto.DescriptionRequest
+import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
 import jakarta.persistence.*
 import java.time.LocalDateTime
@@ -13,7 +15,7 @@ class ProductsOrder(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status_code", nullable = false)
-    val statusCode : StatusCode,
+    var statusCode : StatusCode,
 
     @Column(name = "buyer_id", nullable = false)
     val buyerId: Long,
@@ -49,7 +51,7 @@ class ProductsOrder(
     val refundDate : LocalDateTime?,
 
     @Column(name="refund_desc", nullable = false)
-    val refundDescription : String?,
+    var refundDescription : String?,
 
     @Column(name = "refund_reject_yn", nullable = false)
     val isRefundReject : Boolean,
@@ -58,7 +60,7 @@ class ProductsOrder(
     val refundRejectDate : LocalDateTime?,
 
     @Column(name="refund_reject_desc", nullable = false)
-    val refundRejectDescription : String?,
+    var refundRejectDescription : String?,
 
     @Column(name="reg_dt", nullable = false)
     val regDate : LocalDateTime,
@@ -68,4 +70,28 @@ class ProductsOrder(
 
     @Column(name = "is_deleted", nullable = false)
     val isDeleted: Boolean
-)
+){
+
+    fun <T> update(request: T, statusCode: StatusCode?){
+
+        if(request is OrderStatusRequest) this.statusCode = request.statusCode
+        else if(request is DescriptionRequest){
+
+            this.statusCode = statusCode ?: throw RuntimeException("상태 정보를 입력해 주세요")
+
+            when(statusCode.name){
+                "refund" -> this.refundDescription = request.description
+                "refundReject" -> this.refundRejectDescription = request.description
+            }
+
+        }else{
+            throw RuntimeException("잘못된 조건이 입력 되었습니다")
+        }
+    }
+}
+
+//Refund
+//RefundReject
+//exchange
+//exchangeReject
+//OrderCanceled
