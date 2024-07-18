@@ -14,6 +14,7 @@ class Coupon(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "discount_policy", nullable = false)
     var discountPolicy: DiscountPolicy,
 

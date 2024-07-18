@@ -17,12 +17,10 @@ class ProductService(
         val product = Product(
             name = productRequest.name,
             description = productRequest.description,
-            price = productRequest.price,
             productImage = productRequest.productImage,
             favorite = 0,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
-            quantity = productRequest.quantity,
             isSoldOut = false,
             deletedAt = LocalDateTime.now(),
             isDeleted = false,
@@ -33,21 +31,18 @@ class ProductService(
         return ProductResponse.from(savedProduct)
     }
 
-    fun updateProduct(productId: Long,updateProductRequest: UpdateProductRequest): ProductResponse {
+    fun updateProduct(productId: Long, updateProductRequest: UpdateProductRequest): ProductResponse {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
         product.apply {
             name = updateProductRequest.name
             description = updateProductRequest.description
-            price = updateProductRequest.price
             productImage = updateProductRequest.productImage
             updatedAt = LocalDateTime.now()
-            quantity = updateProductRequest.quantity
             isSoldOut = updateProductRequest.isSoldOut
             categoryId = updateProductRequest.categoryId
         }
         val updatedProduct = productRepository.save(product)
         return ProductResponse.from(updatedProduct)
-
     }
 
     fun deleteProduct(productId: Long) {
