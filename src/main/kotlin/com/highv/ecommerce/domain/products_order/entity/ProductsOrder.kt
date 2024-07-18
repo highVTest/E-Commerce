@@ -42,7 +42,7 @@ class ProductsOrder(
     val cancelDate : LocalDateTime?,
 
     @Column(name= "cancel_desc", nullable = false)
-    val cancelDescription : String?,
+    var cancelDescription : String?,
 
     @Column(name="refund_yn", nullable = false)
     val isRefund : Boolean,
@@ -82,6 +82,8 @@ class ProductsOrder(
             when(statusCode.name){
                 "refund" -> this.refundDescription = request.description
                 "refundReject" -> this.refundRejectDescription = request.description
+                "orderCanceled" -> this.cancelDescription = request.description
+                else -> throw RuntimeException("잘못된 조건이 입력 되었습니다")
             }
 
         }else{
@@ -92,6 +94,4 @@ class ProductsOrder(
 
 //Refund
 //RefundReject
-//exchange
-//exchangeReject
 //OrderCanceled
