@@ -1,8 +1,10 @@
 package com.highv.ecommerce.domain.coupon.entity
 
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
+import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import com.highv.ecommerce.domain.product.entity.Product
 import jakarta.persistence.*
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @Entity
@@ -12,11 +14,11 @@ class Coupon(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column(name = "discount_rate", nullable = true)
-    var discountRate: Int? = null,
+    @Column(name = "discount_policy", nullable = false)
+    var discountPolicy: DiscountPolicy,
 
-    @Column(name = "discount_price", nullable = true)
-    var discountPrice: Int? = null,
+    @Column(name = "discount", nullable = true)
+    var discount: Int,
 
     @Column(name = "quantity", nullable = false)
     var quantity: Int,
@@ -41,8 +43,8 @@ class Coupon(
 ){
 
     fun update(updateCouponRequest: UpdateCouponRequest) {
-        discountRate = updateCouponRequest.discountRate
-        discountPrice = updateCouponRequest.discountPrice
+        discountPolicy = updateCouponRequest.discountPolicy
+        discount = updateCouponRequest.discount
         expiredAt = updateCouponRequest.expiredAt
         quantity = updateCouponRequest.quantity
     }

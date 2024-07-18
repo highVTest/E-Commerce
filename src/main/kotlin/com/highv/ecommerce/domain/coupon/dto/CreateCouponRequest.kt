@@ -1,13 +1,14 @@
 package com.highv.ecommerce.domain.coupon.dto
 
+import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 data class CreateCouponRequest (
     val productId : Long,
-    val discountRate : Int?,
-    val discountPrice : Int?,
+    val discountPolicy: DiscountPolicy,
+    val discount : Int,
     val expiredAt: LocalDateTime,
     val quantity : Int
 ){

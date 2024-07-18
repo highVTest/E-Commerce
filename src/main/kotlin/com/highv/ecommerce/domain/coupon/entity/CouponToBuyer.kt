@@ -11,12 +11,12 @@ class CouponToBuyer(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "coupon_id")
     val coupon: Coupon,
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "coupon_id")
+    @JoinColumn(name = "buyer_id")
     val buyer: Buyer,
 
 )
