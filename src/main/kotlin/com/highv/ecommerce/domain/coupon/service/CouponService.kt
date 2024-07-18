@@ -6,6 +6,7 @@ import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import com.highv.ecommerce.domain.coupon.entity.Coupon
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
+import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -17,9 +18,7 @@ class CouponService(
 ){
 
 
-    fun createCoupon(couponRequest: CreateCouponRequest): DefaultResponse{
-
-
+    fun createCoupon(couponRequest: CreateCouponRequest, userPrincipal: UserPrincipal): DefaultResponse{
 
         val coupon = couponRepository.save(
             Coupon(
