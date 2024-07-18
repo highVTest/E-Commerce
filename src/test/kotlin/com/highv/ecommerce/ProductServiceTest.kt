@@ -33,12 +33,10 @@ class ProductServiceTest : BehaviorSpec({
         val product = Product(
             name = "Test Product",
             description = "Test Description",
-            price = 1000,
             productImage = "image.jpg",
             favorite = 0,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
-            quantity = 10,
             isSoldOut = false,
             deletedAt = LocalDateTime.now(),
             isDeleted = false,
@@ -54,7 +52,7 @@ class ProductServiceTest : BehaviorSpec({
             then("the product should be saved and returned correctly") {
                 response.name shouldBe "Test Product"
                 response.description shouldBe "Test Description"
-                response.price shouldBe 1000
+//                response.price shouldBe 1000
 
                 verify { productRepository.save(any<Product>()) }
             }
@@ -65,12 +63,10 @@ class ProductServiceTest : BehaviorSpec({
         val product = Product(
             name = "Test Product",
             description = "Test Description",
-            price = 1000,
             productImage = "image.jpg",
             favorite = 0,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
-            quantity = 10,
             isSoldOut = false,
             deletedAt = LocalDateTime.now(),
             isDeleted = false,
@@ -93,9 +89,7 @@ class ProductServiceTest : BehaviorSpec({
         every { productRepository.save(any<Product>()) } returns product.apply {
             name = updateRequest.name
             description = updateRequest.description
-            price = updateRequest.price
             productImage = updateRequest.productImage
-            quantity = updateRequest.quantity
             isSoldOut = updateRequest.isSoldOut
             updatedAt = updateRequest.updatedAt
             categoryId = updateRequest.categoryId
@@ -107,7 +101,7 @@ class ProductServiceTest : BehaviorSpec({
             then("the product should be updated and returned correctly") {
                 response.name shouldBe "Updated Product"
                 response.description shouldBe "Updated Description"
-                response.price shouldBe 2000
+//                response.price shouldBe 2000
 
                 verify { productRepository.findByIdOrNull(1L) }
                 verify { productRepository.save(any<Product>()) }
@@ -143,12 +137,12 @@ class ProductServiceTest : BehaviorSpec({
         val product = Product(
             name = "Test Product",
             description = "Test Description",
-            price = 1000,
+//            price = 1000,
             productImage = "image.jpg",
             favorite = 0,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
-            quantity = 10,
+//            quantity = 10,
             isSoldOut = false,
             deletedAt = LocalDateTime.now(),
             isDeleted = false,
@@ -176,12 +170,12 @@ class ProductServiceTest : BehaviorSpec({
         val product = Product(
             name = "Test Product",
             description = "Test Description",
-            price = 1000,
+//            price = 1000,
             productImage = "image.jpg",
             favorite = 0,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
-            quantity = 10,
+//            quantity = 10,
             isSoldOut = false,
             deletedAt = LocalDateTime.now(),
             isDeleted = false,
@@ -197,7 +191,7 @@ class ProductServiceTest : BehaviorSpec({
             then("the correct product should be returned") {
                 response.name shouldBe "Test Product"
                 response.description shouldBe "Test Description"
-                response.price shouldBe 1000
+//                response.price shouldBe 1000
 
                 verify { productRepository.findByIdOrNull(1L) }
             }

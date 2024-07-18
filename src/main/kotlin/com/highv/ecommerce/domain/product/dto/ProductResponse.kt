@@ -27,7 +27,7 @@ data class ProductResponse(
             createdAt = product.createdAt,
             updatedAt = product.updatedAt,
             isSoldOut = product.isSoldOut,
-            deletedAt = product.deletedAt,
+            deletedAt = product.deletedAt!!,
             isDeleted = product.isDeleted,
             shopId = product.shopId,
             categoryId = product.categoryId,

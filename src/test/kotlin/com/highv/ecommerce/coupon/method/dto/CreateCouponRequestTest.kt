@@ -1,6 +1,7 @@
 package com.highv.ecommerce.coupon.method.dto
 
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
+import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import io.kotest.matchers.shouldBe
 import java.time.LocalDateTime
 import kotlin.test.Test
@@ -13,8 +14,8 @@ class CreateCouponRequestTest {
 
         val createCouponRequest = CreateCouponRequest(
             productId = 1L,
-            discountRate = null,
-            discountPrice = null,
+            discountPolicy = DiscountPolicy.DISCOUNT_PRICE,
+            discount = 30000,
             expiredAt = expected,
             quantity = 0
         )
