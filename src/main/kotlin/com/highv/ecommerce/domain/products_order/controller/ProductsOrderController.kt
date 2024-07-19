@@ -33,7 +33,7 @@ class ProductsOrderController(
 
         if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
 
-        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(cartId))
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(cartId, userPrincipal))
     }
 
     @PreAuthorize("hasRole('SELLER')")
@@ -46,7 +46,7 @@ class ProductsOrderController(
 
         if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
 
-        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.updateOrderStatus(orderId, orderStatusRequest))
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.updateOrderStatus(orderId, orderStatusRequest, userPrincipal))
     }
 
     @PreAuthorize("hasRole('BUYER')")
@@ -58,7 +58,7 @@ class ProductsOrderController(
     ): ResponseEntity<DefaultResponse> {
         if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
 
-        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefund(orderId, descriptionRequest))
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefund(orderId, descriptionRequest, userPrincipal))
     }
 
     @PreAuthorize("hasRole('SELLER')")
@@ -71,7 +71,7 @@ class ProductsOrderController(
 
         if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
 
-        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefundReject(orderId, descriptionRequest))
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefundReject(orderId, descriptionRequest, userPrincipal))
     }
 
     @PreAuthorize("hasRole('SELLER') or hasRole('BUYER')")
@@ -83,7 +83,7 @@ class ProductsOrderController(
 
         if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
 
-        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.getOrderDetails(orderId))
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.getOrderDetails(orderId, userPrincipal))
     }
 
 
@@ -96,7 +96,7 @@ class ProductsOrderController(
 
         if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
 
-        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestOrderCanceled(orderId))
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestOrderCanceled(orderId, userPrincipal))
     }
 
 
