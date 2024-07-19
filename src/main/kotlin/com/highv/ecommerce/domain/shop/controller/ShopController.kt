@@ -32,6 +32,6 @@ class ShopController(private val shopService: ShopService) {
     fun getShopById(
         @AuthenticationPrincipal seller: UserPrincipal
     ): ResponseEntity<ShopResponse> = ResponseEntity
-        .status(HttpStatus.CREATED)
+        .status(HttpStatus.OK)
         .body(shopService.getShopById(seller.id))
 }

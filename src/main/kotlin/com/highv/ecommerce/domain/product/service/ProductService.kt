@@ -5,6 +5,7 @@ import com.highv.ecommerce.domain.product.dto.ProductResponse
 import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
+import com.highv.ecommerce.domain.shop.repository.ShopRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -13,9 +14,11 @@ import java.time.LocalDateTime
 
 @Service
 class ProductService(
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val shopRepository: ShopRepository
 ) {
     fun createProduct(sellerId: Long, productRequest: CreateProductRequest): ProductResponse {
+        val shop = shopRepository.findShopBySellerId(sellerId)
         val product = Product(
             name = productRequest.name,
             description = productRequest.description,
@@ -26,7 +29,7 @@ class ProductService(
             isSoldOut = false,
             deletedAt = LocalDateTime.now(),
             isDeleted = false,
-            shopId = sellerId,
+            shop = shop,
             categoryId = productRequest.categoryId
         )
         val savedProduct = productRepository.save(product)
@@ -35,7 +38,7 @@ class ProductService(
 
     fun updateProduct(sellerId: Long, productId: Long, updateProductRequest: UpdateProductRequest): ProductResponse {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
-        if (product.shopId != sellerId) throw RuntimeException("No Authority")
+        if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")
         product.apply {
             name = updateProductRequest.name
             description = updateProductRequest.description
@@ -50,7 +53,7 @@ class ProductService(
 
     fun deleteProduct(sellerId: Long, productId: Long) {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
-        if (product.shopId != sellerId) throw RuntimeException("No Authority")
+        if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")
         product.apply {
             isDeleted = true
             deletedAt = LocalDateTime.now()

@@ -36,7 +36,7 @@ class InventoryManagementService(
             ?: throw IllegalArgumentException("Product with id $productId not found")
         val product = productBackOfficeRepository.findByIdOrNull(productId)
             ?: throw RuntimeException("Product with ID $productId not found")
-        if (productName.shopId != sellerId) throw IllegalArgumentException("No Authority")
+        if (productName.shop.sellerId != sellerId) throw IllegalArgumentException("No Authority")
         return product
     }
 }

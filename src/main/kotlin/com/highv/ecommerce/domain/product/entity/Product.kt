@@ -1,10 +1,13 @@
 package com.highv.ecommerce.domain.product.entity
 
+import com.highv.ecommerce.domain.shop.entity.Shop
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import java.time.LocalDateTime
 
 @Entity
@@ -36,8 +39,9 @@ class Product(
     @Column(name = "is_deleted")
     var isDeleted: Boolean,
 
-    @Column(name = "shop_id")
-    val shopId: Long,
+    @ManyToOne
+    @JoinColumn(name = "shop_id", nullable = false)
+    val shop: Shop,
 
     @Column(name = "category_id")
     var categoryId: Long,

@@ -4,7 +4,6 @@ import com.highv.ecommerce.domain.shop.dto.CreateShopRequest
 import com.highv.ecommerce.domain.shop.dto.ShopResponse
 import com.highv.ecommerce.domain.shop.entity.Shop
 import com.highv.ecommerce.domain.shop.repository.ShopRepository
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -23,7 +22,7 @@ class ShopService(private val shopRepository: ShopRepository) {
     }
 
     fun getShopById(sellerId: Long): ShopResponse {
-        val shop = shopRepository.findByIdOrNull(sellerId) ?: throw RuntimeException("Shop not found")
+        val shop = shopRepository.findShopBySellerId(sellerId)
         return ShopResponse.from(shop)
     }
 }
