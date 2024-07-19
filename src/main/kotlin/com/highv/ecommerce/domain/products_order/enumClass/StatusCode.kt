@@ -9,7 +9,5 @@ enum class StatusCode {
     SHIPPING,
     DELIVERED,
 
-    REFUND_REQUESTED,
-    REFUNDED,
-    REFUND_REJECTED,
+
 }

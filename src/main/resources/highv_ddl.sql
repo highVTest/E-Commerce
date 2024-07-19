@@ -104,7 +104,6 @@ CREATE TABLE buyer_history
 CREATE TABLE products_order
 (
     id                 BIGINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    buyer_id           BIGINT                            NOT NULL,
     status_code        TEXT                              NOT NULL,
     paid_yn            BOOLEAN                           NOT NULL,
     pay_dt             TIMESTAMP                         NOT NULL,
@@ -116,28 +115,21 @@ CREATE TABLE products_order
     is_deleted    BOOLEAN                         NOT NULL
 );
 
-CREATE TABLE products_order
+CREATE TABLE order_reject
 (
-    id                 BIGINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    buyer_id           BIGINT                            NOT NULL,
-    status_code        TEXT                              NOT NULL,
-    paid_yn            BOOLEAN                           NOT NULL,
-    pay_dt             TIMESTAMP                         NOT NULL,
-    total_price        INT                               NOT NULL,
-    delivery_start_at  TIMESTAMP                         NOT NULL,
-    delivery_end_at    TIMESTAMP                         NOT NULL,
-    cancel_yn          BOOLEAN                           NOT NULL,
-    cancel_dt          TIMESTAMP                         NOT NULL,
-    cancel_desc        TEXT                              NOT NULL,
-    refund_yn          BOOLEAN                           NOT NULL,
-    refund_dt          TIMESTAMP                         NOT NULL,
-    refund_desc        TEXT                              NOT NULL,
-    refund_reject_yn   BOOLEAN                           NOT NULL,
-    refund_reject_dt   TIMESTAMP                         NOT NULL,
-    refund_reject_desc TEXT                              NOT NULL,
-    reg_dt             TIMESTAMP                         NOT NULL,
-    deleted_at    TIMESTAMP,
-    is_deleted    BOOLEAN                         NOT NULL
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    reject_reason    TEXT                              NOT NULL,
+    buyer_yn         BOOLEAN,
+    buyer_dt         TIMESTAMP,
+    buyer_desc       TEXT,
+    seller_yn        BOOLEAN,
+    seller_dt        TIMESTAMP,
+    seller_desc      TEXT,
+    reg_dt           TIMESTAMP,
+    deleted_at       TIMESTAMP,
+    is_deleted       BOOLEAN                           NOT NULL,
+    item_cart_id     BIGINT                            NOT NULL,
+    products_order_id BIGINT                            NOT NULL
 );
 
 CREATE TABLE buyer
@@ -238,10 +230,6 @@ ALTER TABLE cart_item ADD CONSTRAINT fk_cart_item_buyer_id
 FOREIGN KEY (buyer_id)
 REFERENCES buyer (id);
 
-ALTER TABLE cart_item ADD CONSTRAINT fk_cart_item_order_id
-FOREIGN KEY (order_id)
-REFERENCES products_order (id);
-
 ALTER TABLE favorite ADD CONSTRAINT fk_favorite_product_id
     FOREIGN KEY (product_id)
         REFERENCES product (id);
@@ -254,3 +242,11 @@ ALTER TABLE comment ADD CONSTRAINT fk_comment_buyer_id
 FOREIGN KEY (buyer_id)
 REFERENCES buyer (id);
 
+
+ALTER TABLE order_reject ADD CONSTRAINT fk_order_reject_item_cart_id
+    FOREIGN KEY (item_cart_id)
+        REFERENCES cart_item (id);
+
+ALTER TABLE order_reject ADD CONSTRAINT fk_order_reject_products_order_id
+    FOREIGN KEY (products_order_id)
+        REFERENCES products_order (id);

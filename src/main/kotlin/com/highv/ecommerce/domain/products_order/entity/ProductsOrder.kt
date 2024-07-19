@@ -35,33 +35,6 @@ class ProductsOrder(
     @Column(name = "delivery_end_at", nullable = false)
     val deliveryEndAt: LocalDateTime,
 
-    @Column(name = "cancel_yn", nullable = false)
-    val isCancelled : Boolean,
-
-    @Column(name= "cancel_dt", nullable = false)
-    val cancelDate : LocalDateTime?,
-
-    @Column(name= "cancel_desc", nullable = false)
-    var cancelDescription : String?,
-
-    @Column(name="refund_yn", nullable = false)
-    val isRefund : Boolean,
-
-    @Column(name = "refund_dt", nullable = false)
-    val refundDate : LocalDateTime?,
-
-    @Column(name="refund_desc", nullable = false)
-    var refundDescription : String?,
-
-    @Column(name = "refund_reject_yn", nullable = false)
-    val isRefundReject : Boolean,
-
-    @Column(name = "refund_reject_dt")
-    val refundRejectDate : LocalDateTime?,
-
-    @Column(name="refund_reject_desc", nullable = false)
-    var refundRejectDescription : String?,
-
     @Column(name="reg_dt", nullable = false)
     val regDate : LocalDateTime,
 
@@ -72,24 +45,7 @@ class ProductsOrder(
     val isDeleted: Boolean
 ){
 
-    fun <T> update(request: T, statusCode: StatusCode?){
 
-        if(request is OrderStatusRequest) this.statusCode = request.statusCode
-        else if(request is DescriptionRequest){
-
-            this.statusCode = statusCode ?: throw RuntimeException("상태 정보를 입력해 주세요")
-
-            when(statusCode.name){
-                "refund" -> this.refundDescription = request.description
-                "refundReject" -> this.refundRejectDescription = request.description
-                "orderCanceled" -> this.cancelDescription = request.description
-                else -> throw RuntimeException("잘못된 조건이 입력 되었습니다")
-            }
-
-        }else{
-            throw RuntimeException("잘못된 조건이 입력 되었습니다")
-        }
-    }
 }
 
 //Refund
