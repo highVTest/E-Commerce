@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/seller")
 class InventoryManagementController(
     private val inventoryManagementService: InventoryManagementService
 ) {
-    //재고 수량 확인
-    @GetMapping("/{productId}")
-    fun getProductQuantity(
-        @PathVariable("productId") productId: Long
+    //각 상품별 재고 조회
+    @GetMapping("/{productId}/left-quantity")
+    fun getProducts(
+        @PathVariable productId: Long
     ): ResponseEntity<ProductBackOfficeResponse> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(inventoryManagementService.getProductQuantity(productId))
+        .body(inventoryManagementService.getProductsQuantity(productId))
 
     //재고 수량 변경
     @PatchMapping("/{productId}")

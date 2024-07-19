@@ -1,6 +1,5 @@
 package com.highv.ecommerce.domain.backoffice.service
 
-import com.highv.ecommerce.domain.backoffice.dto.salesstatics.ProductQuantityResponse
 import com.highv.ecommerce.domain.backoffice.dto.salesstatics.ProductSalesQuantityResponse
 import com.highv.ecommerce.domain.backoffice.dto.salesstatics.ProductSalesResponse
 import com.highv.ecommerce.domain.backoffice.dto.salesstatics.TotalSalesQuantityResponse
@@ -41,11 +40,5 @@ class SalesStatisticsService(
         val product = productBackOfficeRepository.findByIdOrNull(productId)
             ?: throw RuntimeException("Product with ID $productId not found")
         return ProductSalesResponse(productName.name, product.soldQuantity * product.price)
-    }
-
-    fun getProductsQuantity(productId: Long): ProductQuantityResponse {
-        val product = productBackOfficeRepository.findByIdOrNull(productId)
-            ?: throw RuntimeException("Product with ID $productId not found")
-        return ProductQuantityResponse(product.quantity, product.soldQuantity)
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 class InventoryManagementService(
     private val productBackOfficeRepository: ProductBackOfficeRepository,
 ) {
-    fun getProductQuantity(productId: Long): ProductBackOfficeResponse {
+    fun getProductsQuantity(productId: Long): ProductBackOfficeResponse {
         val product = productBackOfficeRepository.findByIdOrNull(productId)
             ?: throw IllegalArgumentException("Product not found")
         return ProductBackOfficeResponse(product.id, product.quantity, product.price)

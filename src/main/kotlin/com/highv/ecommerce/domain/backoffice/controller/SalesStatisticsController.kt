@@ -1,6 +1,5 @@
 package com.highv.ecommerce.domain.backoffice.controller
 
-import com.highv.ecommerce.domain.backoffice.dto.salesstatics.ProductQuantityResponse
 import com.highv.ecommerce.domain.backoffice.dto.salesstatics.ProductSalesQuantityResponse
 import com.highv.ecommerce.domain.backoffice.dto.salesstatics.ProductSalesResponse
 import com.highv.ecommerce.domain.backoffice.dto.salesstatics.TotalSalesQuantityResponse
@@ -31,7 +30,7 @@ class SalesStatisticsController(
         .body(salesStatisticsService.getTotalSalesAmount())
 
     //상품별 판매량 조회
-    @GetMapping("/{productId}")
+    @GetMapping("/{productId}/sales-quantity")
     fun getProductSales(
         @PathVariable productId: Long
     ): ResponseEntity<ProductSalesQuantityResponse> = ResponseEntity
@@ -45,12 +44,4 @@ class SalesStatisticsController(
     ): ResponseEntity<ProductSalesResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(salesStatisticsService.getProductSales(productId))
-
-    //각 상품별 재고 조회
-    @GetMapping("/{productId}/products")
-    fun getProducts(
-        @PathVariable productId: Long
-    ): ResponseEntity<ProductQuantityResponse> = ResponseEntity
-        .status(HttpStatus.OK)
-        .body(salesStatisticsService.getProductsQuantity(productId))
 }
