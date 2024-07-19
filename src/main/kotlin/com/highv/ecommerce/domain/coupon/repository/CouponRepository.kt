@@ -16,4 +16,8 @@ interface CouponRepository {
     fun findAllCouponIdWithBuyer(couponIdList: List<Long>): List<Coupon>
 
     fun existsByProductId(productId: Long): Boolean
+
+    fun findByIdAndSellerId(couponId: Long, sellerId: Long): Coupon?
+
+    fun findAllBySellerId(sellerId: Long): List<Coupon>
 }

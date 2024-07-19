@@ -46,6 +46,7 @@ class CouponService(
                 isDeleted = false,
                 deletedAt = null,
                 quantity = couponRequest.quantity,
+                sellerId = userPrincipal.id
             )
         )
 
@@ -75,14 +76,13 @@ class CouponService(
 
     fun getSellerCouponById(couponId: Long, userPrincipal: UserPrincipal): CouponResponse {
 
-        val coupon = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
-
+        val coupon = couponRepository.findByIdAndSellerId(couponId, userPrincipal.id) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
         return CouponResponse.from(coupon)
     }
 
-    fun getSellerCouponList(userPrincipal: UserPrincipal): List<CouponResponse>? {
-        return couponRepository.findAll().map{ CouponResponse.from(it) }
+    fun getSellerCouponList(userPrincipal: UserPrincipal): List<CouponResponse> {
+        return couponRepository.findAllBySellerId(userPrincipal.id).map{ CouponResponse.from(it) }
     }
 
     fun getBuyerCouponById(couponId: Long, userPrincipal: UserPrincipal): CouponResponse {

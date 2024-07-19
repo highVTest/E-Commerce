@@ -38,7 +38,10 @@ class Coupon(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
-    val product: Product
+    val product: Product,
+
+    @Column(name = "seller_id", nullable = false)
+    val sellerId: Long
 
 ){
 

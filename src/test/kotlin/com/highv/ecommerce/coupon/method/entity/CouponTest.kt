@@ -37,6 +37,7 @@ class CouponTest {
             createdAt = LocalDateTime.of(2024, 7, 1, 0, 0),
             deletedAt = null,
             isDeleted = false,
+            sellerId = 1L,
         )
     }
 

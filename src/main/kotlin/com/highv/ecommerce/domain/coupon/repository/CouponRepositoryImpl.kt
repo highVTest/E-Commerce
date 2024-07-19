@@ -19,7 +19,7 @@ class CouponRepositoryImpl(
 
     private val queryFactory: JPAQueryFactory = JPAQueryFactory(em)
     val coupon: QCoupon = QCoupon.coupon
-    val product = QProduct.product
+    val product: QProduct = QProduct.product
 
     override fun save(coupon: Coupon): Coupon {
         return couponJpaRepository.save(coupon)
@@ -49,5 +49,13 @@ class CouponRepositoryImpl(
 
     override fun existsByProductId(productId: Long): Boolean {
         return couponJpaRepository.existsByProductId(productId)
+    }
+
+    override fun findByIdAndSellerId(couponId: Long, sellerId: Long): Coupon? {
+        return couponJpaRepository.findByIdAndSellerId(couponId, sellerId)
+    }
+
+    override fun findAllBySellerId(sellerId: Long): List<Coupon> {
+        return couponJpaRepository.findAllBySellerId(sellerId)
     }
 }
