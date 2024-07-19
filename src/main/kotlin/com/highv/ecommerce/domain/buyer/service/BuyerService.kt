@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.buyer.service
 
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
+import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerResponse
 import com.highv.ecommerce.domain.buyer.entity.Buyer
@@ -43,6 +44,7 @@ class BuyerService(
 
         val buyer = buyerRepository.findByIdOrNull(userId) ?: throw RuntimeException("사용자가 존재하지 않습니다.")
 
+
         if (buyer.providerName != null) {
             throw RuntimeException("소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.")
         }
@@ -60,5 +62,14 @@ class BuyerService(
         }
 
         buyer.password = passwordEncoder.encode(request.newPassword)
+    }
+
+    fun changeProfileImage(request: UpdateBuyerImageRequest, userId: Long) {
+
+        val buyer = buyerRepository.findByIdOrNull(userId) ?: throw RuntimeException("사용자가 존재하지 않습니다.")
+
+        buyer.profileImage = request.imageUrl
+
+        buyerRepository.save(buyer)
     }
 }

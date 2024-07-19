@@ -2,6 +2,7 @@ package com.highv.ecommerce.domain.buyer.controller
 
 import com.highv.ecommerce.common.exception.LoginException
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
+import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerResponse
 import com.highv.ecommerce.domain.buyer.service.BuyerService
@@ -52,4 +53,13 @@ class BuyerController(private val buyerService: BuyerService) {
             .status(HttpStatus.OK)
             .body(buyerService.changePassword(request, user.id))
     }
+
+    @PreAuthorize("hasRole('BUYER')")
+    @PatchMapping("/profile/profile-image")
+    fun changeImage(
+        @RequestBody request: UpdateBuyerImageRequest,
+        @AuthenticationPrincipal user: UserPrincipal,
+    ): ResponseEntity<Unit> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(buyerService.changeProfileImage(request, user.id))
 }
