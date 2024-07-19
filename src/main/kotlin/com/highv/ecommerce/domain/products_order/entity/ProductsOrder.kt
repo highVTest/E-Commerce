@@ -44,8 +44,14 @@ class ProductsOrder(
     @Column(name = "is_deleted", nullable = false)
     val isDeleted: Boolean = false,
 ){
-    fun update(orderStatusRequest: OrderStatusRequest) {
-        statusCode = orderStatusRequest.statusCode
+    fun <T> update(orderStatusRequest: T) {
+
+        if(orderStatusRequest is OrderStatusRequest){
+            statusCode = orderStatusRequest.statusCode
+        }else if(orderStatusRequest is StatusCode){
+            statusCode = orderStatusRequest
+        }else throw RuntimeException("잘못된 값 입니다")
+
     }
 
 

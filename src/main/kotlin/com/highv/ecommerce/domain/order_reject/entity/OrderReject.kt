@@ -2,6 +2,7 @@ package com.highv.ecommerce.domain.order_reject.entity
 
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.order_reject.enumClass.RejectReason
+import com.highv.ecommerce.domain.products_order.dto.DescriptionRequest
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import jakarta.persistence.*
 import java.time.LocalDateTime
@@ -15,16 +16,16 @@ class OrderReject(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "reject_reason", nullable = false)
-    val rejectReason: RejectReason,
+    var rejectReason: RejectReason,
 
     @Column(name = "buyer_yn",nullable = false)
     val isBuyer: Boolean,
 
     @Column(name = "buyer_dt",nullable = true)
-    val buyerDateTime : LocalDateTime? = null,
+    var buyerDateTime : LocalDateTime? = null,
 
     @Column(name = "buyer_desc",nullable = true)
-    val buyerDescription : String? = null,
+    var buyerDescription : String? = null,
 
     @Column(name = "seller_reject_yn",nullable = false)
     val isSellerReject: Boolean,
@@ -44,5 +45,11 @@ class OrderReject(
     val productsOrder: ProductsOrder
 
 ){
+    fun buyerUpdate(rejectReason: RejectReason, descriptionRequest: DescriptionRequest) {
+
+        this.rejectReason = rejectReason
+        this.buyerDateTime = LocalDateTime.now()
+        this.buyerDescription = descriptionRequest.description
+    }
 
 }
