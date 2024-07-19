@@ -1,4 +1,4 @@
-package com.highv.ecommerce.domain.buyer.dto
+package com.highv.ecommerce.domain.buyer.dto.request
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
