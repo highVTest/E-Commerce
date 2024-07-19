@@ -1,5 +1,6 @@
 package com.highv.ecommerce.buyer
 
+import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
@@ -55,7 +56,7 @@ class BuyerServiceTest : BehaviorSpec({
             }
         }
 
-        When("변경할 비밀번호와 변경할 비밀번호 확인 값이 다르다면") {
+        When("새 비밀번호와 확인 비밀번호 값이 다르다면") {
 
             val request = UpdateBuyerPasswordRequest(
                 currentPassword = "testPassword",
@@ -75,7 +76,7 @@ class BuyerServiceTest : BehaviorSpec({
             }
         }
 
-        When("현재 비밀번호와 변경할 비밀번호가 같다면") {
+        When("변경 전 비밀번호와 변경 후 비밀번호가 같다면") {
             val request = UpdateBuyerPasswordRequest(
                 currentPassword = "testPassword",
                 newPassword = "testPassword",
@@ -95,7 +96,7 @@ class BuyerServiceTest : BehaviorSpec({
             }
         }
 
-        When("현재 비밀번호 확인도 맞고 변경할 비밀번호와 현재 비밀번호가 다르다면") {
+        When("모든 조건이 만족될 경우") {
             val request = UpdateBuyerPasswordRequest(
                 currentPassword = "testPassword",
                 newPassword = "testPassword1",
@@ -143,6 +144,55 @@ class BuyerServiceTest : BehaviorSpec({
                 }.apply {
                     message shouldBe "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다."
                 }
+            }
+        }
+
+    }
+
+    Given("회원이 이미지를 변경하면") {
+        val buyerId = 1L
+
+        When("소셜 회원이면") {
+            val buyer = Buyer(
+                nickname = "TestName",
+                email = "null",
+                profileImage = "testImage",
+                phoneNumber = "null",
+                address = "null",
+                password = "null",
+                providerId = 123132,
+                providerName = "naver"
+            )
+
+            val request = UpdateBuyerImageRequest("updateTestImage")
+
+            every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
+            every { buyerRepository.save(any()) } returns buyer
+
+            Then("이미지가 변경된다.") {
+                buyerService.changeProfileImage(request, buyerId)
+            }
+        }
+
+        When("일반 회원이면") {
+            val buyer = Buyer(
+                nickname = "TestName",
+                email = "test@test.com",
+                profileImage = "testImage",
+                phoneNumber = "010-1234-5678",
+                address = "서울시-용산구-용산로-용산2길 19",
+                password = "testPassword",
+                providerId = null,
+                providerName = null
+            )
+
+            val request = UpdateBuyerImageRequest("updateTestImage")
+
+            every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
+            every { buyerRepository.save(any()) } returns buyer
+
+            Then("이미지가 변경된다.") {
+                buyerService.changeProfileImage(request, buyerId)
             }
         }
 
