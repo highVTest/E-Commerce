@@ -94,9 +94,9 @@ class CouponService(
 
     fun getBuyerCouponList(userPrincipal: UserPrincipal): List<CouponResponse>? {
 
-        val couponIdList = couponToBuyerRepository.findAllProductIdWithBuyerId(userPrincipal.id)
-
-        return couponRepository.findAllCouponIdWithBuyer(couponIdList).map{ CouponResponse.from(it) }
+        return couponToBuyerRepository.findAllProductIdWithBuyerId(userPrincipal.id).let {
+            couponRepository.findAllCouponIdWithBuyer(it).map{ CouponResponse.from(it) }
+        }
     }
 
     @Transactional
