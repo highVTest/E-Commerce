@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/category")
+@RequestMapping("/api/v1/category")
 class CategoryController(
     private val categoryService: CategoryService
 ) {

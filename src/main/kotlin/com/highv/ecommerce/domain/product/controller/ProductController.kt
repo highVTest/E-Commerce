@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/v1/products")
 class ProductController(private val productService: ProductService) {
 
     //상품 등록
@@ -65,7 +65,7 @@ class ProductController(private val productService: ProductService) {
         .body(productService.getAllProducts(pageable))
 
     //카테고리별 상품보기
-    @GetMapping
+    @GetMapping("/category")
     fun getProductsByCategory(
         @RequestParam categoryId: Long,
         @PageableDefault(size = 10, page = 0) pageable: Pageable
