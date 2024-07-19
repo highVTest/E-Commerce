@@ -95,7 +95,7 @@ class CouponService(
     fun getBuyerCouponList(userPrincipal: UserPrincipal): List<CouponResponse>? {
 
         return couponToBuyerRepository.findAllProductIdWithBuyerId(userPrincipal.id).let {
-            couponRepository.findAllCouponIdWithBuyer(it).map{ CouponResponse.from(it) }
+            couponRepository.findAllCouponIdWithBuyer(it).map{ i -> CouponResponse.from(i) }
         }
     }
 
