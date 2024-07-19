@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.backoffice.controller
 
+import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdatePasswordRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateSellerRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateShopRequest
 import com.highv.ecommerce.domain.backoffice.service.SellerInfoService
@@ -40,4 +41,13 @@ class SellerInfoController(
     ): ResponseEntity<SellerResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(sellerInfoService.updateSellerInfo(seller.id, updateSellerRequest))
+
+    @PatchMapping("/myInfo/changePassword")
+    @PreAuthorize("hasRole('SELLER')")
+    fun changePassword(
+        @AuthenticationPrincipal seller: UserPrincipal,
+        updatePasswordRequest: UpdatePasswordRequest
+    ): ResponseEntity<String> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(sellerInfoService.changePassword(seller.id, updatePasswordRequest))
 }
