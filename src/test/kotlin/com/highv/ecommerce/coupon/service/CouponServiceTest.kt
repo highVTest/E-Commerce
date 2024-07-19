@@ -156,6 +156,8 @@ class CouponServiceTest {
     @Test
     fun `쿠폰이 정상적으로 업데이트가 되는지 확인`(){
 
+        every { userPrincipal.id } returns 1
+
         every { couponRepository.findByIdOrNull(any()) } returns coupon
 
         val result = couponService.updateCoupon(1L, updateCouponRequest, userPrincipal)
@@ -164,7 +166,24 @@ class CouponServiceTest {
     }
 
     @Test
+    fun `쿠폰이 다른 사용자가 업데이트 하려고 할 경우 RuntimeException`(){
+
+        every { userPrincipal.id } returns 2
+
+        every { couponRepository.findByIdOrNull(any()) } returns coupon
+
+        shouldThrow<RuntimeException> {
+            couponService.updateCoupon(1L, updateCouponRequest, userPrincipal)
+        }.let {
+            it.message shouldBe "다른 사용자는 해당 쿠폰을 수정할 수 없습니다"
+        }
+
+    }
+
+    @Test
     fun `쿠폰이 정상적으로 삭제가 되는지 확인`(){
+
+        every { userPrincipal.id } returns 1
 
         every { couponRepository.findByIdOrNull(any()) } returns coupon
         every { couponRepository.delete(any()) } returns Unit
@@ -172,6 +191,21 @@ class CouponServiceTest {
         val result = couponService.deleteCoupon(1L, userPrincipal)
 
         result shouldBe defaultResponse("쿠폰 삭제가 완료 되었습니다")
+    }
+
+    @Test
+    fun `쿠폰이 다른 사용자가 삭제 하려고 할 경우 RuntimeException`(){
+
+        every { userPrincipal.id } returns 2
+
+        every { couponRepository.findByIdOrNull(any()) } returns coupon
+
+        shouldThrow<RuntimeException> {
+            couponService.deleteCoupon(1L, userPrincipal)
+        }.let {
+            it.message shouldBe "다른 사용자는 해당 쿠폰을 삭제할 수 없습니다"
+        }
+
     }
 
     @Test

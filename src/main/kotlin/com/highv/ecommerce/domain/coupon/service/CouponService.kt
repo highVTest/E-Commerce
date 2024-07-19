@@ -70,7 +70,7 @@ class CouponService(
 
         val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
-        if(result.sellerId != userPrincipal.id) throw RuntimeException("다른 사용자는 해당 쿠폰을 수정할 수 없습니다")
+        if(result.sellerId != userPrincipal.id) throw RuntimeException("다른 사용자는 해당 쿠폰을 삭제할 수 없습니다")
 
         couponRepository.delete(result)
 
