@@ -45,7 +45,7 @@ class SellerInfoService(
         seller.apply {
             password = passwordEncoder.encode(updatePasswordRequest.newPassword)
         }
-        val updatePassword = sellerRepository.save(seller)
+        sellerRepository.save(seller)
         return "Password 변경 완료"
     }
 }
