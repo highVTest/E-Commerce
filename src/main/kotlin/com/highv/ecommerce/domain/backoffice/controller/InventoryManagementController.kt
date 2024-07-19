@@ -29,7 +29,7 @@ class InventoryManagementController(
         .body(inventoryManagementService.getProductsQuantity(seller.id, productId))
 
     //재고 수량 변경
-    @PatchMapping("/{productId}")
+    @PatchMapping("/{productId}/quantity")
     @PreAuthorize("hasRole('SELLER')")
     fun changeQuantity(
         @AuthenticationPrincipal seller: UserPrincipal,
@@ -40,7 +40,7 @@ class InventoryManagementController(
         .body(inventoryManagementService.changeQuantity(seller.id, productId, quantity))
 
     //상품 가격 변경
-    @PatchMapping("/{productId}")
+    @PatchMapping("/{productId}/price")
     @PreAuthorize("hasRole('SELLER')")
     fun changePrice(
         @AuthenticationPrincipal seller: UserPrincipal,
