@@ -2,6 +2,7 @@ package com.highv.ecommerce.buyer
 
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
+import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.buyer.service.BuyerService
@@ -196,6 +197,75 @@ class BuyerServiceTest : BehaviorSpec({
             }
         }
 
+    }
+
+    Given("프로필을 수정할 때") {
+
+        val buyerId = 1L
+
+        When("일반 로그인 유저이면") {
+            val buyer = Buyer(
+                nickname = "TestName",
+                email = "test@test.com",
+                profileImage = "testImage",
+                phoneNumber = "010-1234-5678",
+                address = "서울시-용산구-용산로-용산2길 19",
+                password = "testPassword",
+                providerId = null,
+                providerName = null
+            ).apply { id = buyerId }
+
+            val request: UpdateBuyerProfileRequest = UpdateBuyerProfileRequest(
+                nickname = "수정한 닉네임",
+                phoneNumber = "수정한 번호",
+                address = "수정한 주소"
+            )
+
+            every { buyerRepository.findByIdOrNull(any()) } returns buyer
+            every { buyerRepository.save(any()) } returns buyer
+
+            Then("닉네임, 핸드폰 번호, 주소가 수정된다.") {
+                val result = buyerService.changeProfile(request, buyerId)
+
+                result.nickname shouldBe "수정한 닉네임"
+                result.phoneNumber shouldBe "수정한 번호"
+                result.address shouldBe "수정한 주소"
+
+            }
+
+        }
+
+        When("소셜 로그인 유저면") {
+
+            val buyer = Buyer(
+                nickname = "TestName",
+                email = "null",
+                profileImage = "testImage",
+                phoneNumber = "null",
+                address = "null",
+                password = "testPassword",
+                providerId = 12345,
+                providerName = "kakao"
+            ).apply { id = buyerId }
+
+            val request: UpdateBuyerProfileRequest = UpdateBuyerProfileRequest(
+                nickname = "수정한 닉네임",
+                phoneNumber = "수정한 번호",
+                address = "수정한 주소"
+            )
+
+            every { buyerRepository.findByIdOrNull(any()) } returns buyer
+            every { buyerRepository.save(any()) } returns buyer
+
+            Then("핸드폰 번호, 주소만 수정된다.") {
+                val result = buyerService.changeProfile(request, buyerId)
+
+                result.nickname shouldBe "TestName"
+                result.phoneNumber shouldBe "수정한 번호"
+                result.address shouldBe "수정한 주소"
+            }
+
+        }
     }
 
 })
