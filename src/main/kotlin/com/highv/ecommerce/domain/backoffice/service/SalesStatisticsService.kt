@@ -1,8 +1,8 @@
 package com.highv.ecommerce.domain.backoffice.service
 
-import com.highv.ecommerce.domain.backoffice.dto.ProductQuantityResponse
-import com.highv.ecommerce.domain.backoffice.dto.ProductSalesResponse
-import com.highv.ecommerce.domain.backoffice.dto.TotalSalesResponse
+import com.highv.ecommerce.domain.backoffice.dto.salesstatics.ProductQuantityResponse
+import com.highv.ecommerce.domain.backoffice.dto.salesstatics.ProductSalesResponse
+import com.highv.ecommerce.domain.backoffice.dto.salesstatics.TotalSalesResponse
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import org.springframework.data.repository.findByIdOrNull

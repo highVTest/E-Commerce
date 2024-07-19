@@ -1,6 +1,6 @@
 package com.highv.ecommerce.domain.backoffice.service
 
-import com.highv.ecommerce.domain.backoffice.dto.ProductBackOfficeResponse
+import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.ProductBackOfficeResponse
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service

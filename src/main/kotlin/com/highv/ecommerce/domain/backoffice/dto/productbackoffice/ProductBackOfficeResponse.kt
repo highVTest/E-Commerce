@@ -1,4 +1,4 @@
-package com.highv.ecommerce.domain.backoffice.dto
+package com.highv.ecommerce.domain.backoffice.dto.productbackoffice
 
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 

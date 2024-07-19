@@ -1,4 +1,4 @@
-package com.highv.ecommerce.domain.backoffice.dto
+package com.highv.ecommerce.domain.backoffice.dto.salesstatics
 
 data class ProductQuantityResponse(
     val quantity: Int,

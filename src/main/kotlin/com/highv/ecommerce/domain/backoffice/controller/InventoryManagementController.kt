@@ -1,6 +1,6 @@
 package com.highv.ecommerce.domain.backoffice.controller
 
-import com.highv.ecommerce.domain.backoffice.dto.ProductBackOfficeResponse
+import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.ProductBackOfficeResponse
 import com.highv.ecommerce.domain.backoffice.service.InventoryManagementService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
