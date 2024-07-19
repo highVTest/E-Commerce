@@ -11,7 +11,9 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ProductRepository : JpaRepository<Product, Long>, ProductQueryDslRepository
+interface ProductRepository : JpaRepository<Product, Long>, ProductQueryDslRepository {
+    fun findAllByShopId(shopId: Long): List<Product>
+}
 
 interface ProductQueryDslRepository {
     fun findAllPaginated(pageable: Pageable): Page<Product>

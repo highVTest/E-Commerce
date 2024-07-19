@@ -15,32 +15,38 @@ class SalesStatisticsService(
     private val productRepository: ProductRepository
 ) {
     fun getTotalSalesQuantity(sellerId: Long): TotalSalesQuantityResponse {
-        val products = productBackOfficeRepository.findAllBySellerId(sellerId)
-        val totalSalesQuantity = products.sumOf { it.quantity }
+        val products = productRepository.findAllByShopId(sellerId)
+        val totalSalesQuantity = products.sumOf { product ->
+            val backOfficeEntry = productBackOfficeRepository.findByIdOrNull(product.id!!)
+            backOfficeEntry?.soldQuantity ?: 0
+        }
         return TotalSalesQuantityResponse(totalSalesQuantity)
     }
 
     fun getTotalSalesAmount(sellerId: Long): TotalSalesResponse {
-        val products = productBackOfficeRepository.findAllBySellerId(sellerId)
-        val totalSalesAmount = products.sumOf { it.soldQuantity * it.price }
+        val products = productRepository.findAllByShopId(sellerId)
+        val totalSalesAmount = products.sumOf { product ->
+            val backOfficeEntry = productBackOfficeRepository.findByIdOrNull(product.id!!)
+            (backOfficeEntry?.soldQuantity ?: 0) * (backOfficeEntry?.price ?: 0)
+        }
         return TotalSalesResponse(totalSalesAmount)
     }
 
     fun getProductSalesQuantity(sellerId: Long, productId: Long): ProductSalesQuantityResponse {
         val productName = productRepository.findByIdOrNull(productId)
             ?: throw IllegalArgumentException("Product with ID $productId not found")
+        if (productName.shopId != sellerId) throw IllegalArgumentException("No Authority")
         val product = productBackOfficeRepository.findByIdOrNull(productId)
             ?: throw IllegalArgumentException("Product with ID $productId not found")
-        if (productName.shopId != sellerId) throw IllegalArgumentException("No Authority")
         return ProductSalesQuantityResponse(productName.name, product.soldQuantity)
     }
 
     fun getProductSales(sellerId: Long, productId: Long): ProductSalesResponse {
         val productName = productRepository.findByIdOrNull(productId)
             ?: throw RuntimeException("Product with ID $productId not found")
+        if (productName.shopId != sellerId) throw IllegalArgumentException("No Authority")
         val product = productBackOfficeRepository.findByIdOrNull(productId)
             ?: throw RuntimeException("Product with ID $productId not found")
-        if (productName.shopId != sellerId) throw IllegalArgumentException("No Authority")
         return ProductSalesResponse(productName.name, product.soldQuantity * product.price)
     }
 }
