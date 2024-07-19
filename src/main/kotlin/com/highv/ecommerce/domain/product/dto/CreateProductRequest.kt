@@ -7,6 +7,5 @@ data class CreateProductRequest(
     val description: String,
     val productImage: String,
     val createdAt: LocalDateTime,
-    val shopId: Long,
     val categoryId: Long
 )

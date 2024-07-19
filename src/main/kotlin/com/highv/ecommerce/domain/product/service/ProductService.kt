@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 class ProductService(
     private val productRepository: ProductRepository
 ) {
-    fun createProduct(productRequest: CreateProductRequest): ProductResponse {
+    fun createProduct(sellerId: Long, productRequest: CreateProductRequest): ProductResponse {
         val product = Product(
             name = productRequest.name,
             description = productRequest.description,
@@ -26,15 +26,16 @@ class ProductService(
             isSoldOut = false,
             deletedAt = LocalDateTime.now(),
             isDeleted = false,
-            shopId = productRequest.shopId,
+            shopId = sellerId,
             categoryId = productRequest.categoryId
         )
         val savedProduct = productRepository.save(product)
         return ProductResponse.from(savedProduct)
     }
 
-    fun updateProduct(productId: Long, updateProductRequest: UpdateProductRequest): ProductResponse {
+    fun updateProduct(sellerId: Long, productId: Long, updateProductRequest: UpdateProductRequest): ProductResponse {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
+        if (product.shopId != sellerId) throw RuntimeException("No Authority")
         product.apply {
             name = updateProductRequest.name
             description = updateProductRequest.description
@@ -47,8 +48,9 @@ class ProductService(
         return ProductResponse.from(updatedProduct)
     }
 
-    fun deleteProduct(productId: Long) {
+    fun deleteProduct(sellerId: Long, productId: Long) {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
+        if (product.shopId != sellerId) throw RuntimeException("No Authority")
         product.apply {
             isDeleted = true
             deletedAt = LocalDateTime.now()
