@@ -91,11 +91,9 @@ class CouponService(
 
     fun getBuyerCouponById(couponId: Long, userPrincipal: UserPrincipal): CouponResponse {
 
-        couponToBuyerRepository.findByCouponIdAndBuyerId(couponId, userPrincipal.id) ?: throw RuntimeException("쿠폰을 가지고 있지 않습 니다")
+        val result = couponToBuyerRepository.findByCouponIdAndBuyerId(couponId, userPrincipal.id) ?: throw RuntimeException("쿠폰을 가지고 있지 않습 니다")
 
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
-
-        return CouponResponse.from(result)
+        return CouponResponse.from(result.coupon)
     }
 
     fun getBuyerCouponList(userPrincipal: UserPrincipal): List<CouponResponse>? {

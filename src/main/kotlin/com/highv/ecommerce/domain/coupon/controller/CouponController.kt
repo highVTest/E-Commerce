@@ -67,7 +67,7 @@ class CouponController(
         if(userPrincipal == null) throw RuntimeException()
 
         return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
+            .status(HttpStatus.OK)
             .body(couponService.deleteCoupon(couponId, userPrincipal))
     }
 
