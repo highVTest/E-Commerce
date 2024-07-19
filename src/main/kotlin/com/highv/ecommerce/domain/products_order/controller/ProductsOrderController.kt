@@ -14,67 +14,90 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import kotlin.io.encoding.Base64
 
 @RestController
 @RequestMapping("/api/v1/")
 class ProductsOrderController(
     private val productsOrderService: ProductsOrderService
-){
+) {
 
     @PreAuthorize("hasRole('BUYER')")
     @PostMapping("/payments/{cartId}")
     fun requestPayment(
         @PathVariable("cartId") cartId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
     )
-    :ResponseEntity<DefaultResponse>{
+            : ResponseEntity<DefaultResponse> {
+
+        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
 
         return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(cartId))
     }
+
     @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/order_status/{orderId}")
     fun updateOrderStatus(
         @PathVariable("orderId") orderId: Long,
         @RequestBody orderStatusRequest: OrderStatusRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal,
-    ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.updateOrderStatus(orderId, orderStatusRequest))
+        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
+    ): ResponseEntity<DefaultResponse> {
+
+        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
+
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.updateOrderStatus(orderId, orderStatusRequest))
+    }
 
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/refund/{orderId}")
     fun requestRefund(
         @PathVariable("orderId") orderId: Long,
         @RequestBody descriptionRequest: DescriptionRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal,
-    ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefund(orderId, descriptionRequest))
+        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
+    ): ResponseEntity<DefaultResponse> {
+        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
+
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefund(orderId, descriptionRequest))
+    }
 
     @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/refund/reject/{orderId}")
     fun requestRefundReject(
         @PathVariable("orderId") orderId: Long,
         @RequestBody descriptionRequest: DescriptionRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal,
-    ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefundReject(orderId, descriptionRequest))
+        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
+    ): ResponseEntity<DefaultResponse> {
+
+        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
+
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefundReject(orderId, descriptionRequest))
+    }
 
     @PreAuthorize("hasRole('SELLER') or hasRole('BUYER')")
     @GetMapping("/order_status/{orderId}")
     fun getOrderDetails(
         @PathVariable("orderId") orderId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        ): ResponseEntity<ProductsOrderResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.getOrderDetails(orderId))
+        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
+    ): ResponseEntity<ProductsOrderResponse> {
+
+        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
+
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.getOrderDetails(orderId))
+    }
 
 
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/order_cancelled/{orderId}")
     fun requestOrderCanceled(
         @PathVariable("orderId") orderId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestOrderCanceled(orderId))
+        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
+    ): ResponseEntity<DefaultResponse> {
+
+        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
+
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestOrderCanceled(orderId))
+    }
 
 
 }
