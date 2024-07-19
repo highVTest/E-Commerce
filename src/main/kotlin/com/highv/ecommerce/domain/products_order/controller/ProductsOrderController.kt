@@ -49,55 +49,7 @@ class ProductsOrderController(
         return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.updateOrderStatus(orderId, orderStatusRequest, userPrincipal))
     }
 
-    @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/refund/{orderId}")
-    fun requestRefund(
-        @PathVariable("orderId") orderId: Long,
-        @RequestBody descriptionRequest: DescriptionRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-    ): ResponseEntity<DefaultResponse> {
-        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
 
-        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefund(orderId, descriptionRequest, userPrincipal))
-    }
-
-    @PreAuthorize("hasRole('SELLER')")
-    @PatchMapping("/refund/reject/{orderId}")
-    fun requestRefundReject(
-        @PathVariable("orderId") orderId: Long,
-        @RequestBody descriptionRequest: DescriptionRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-    ): ResponseEntity<DefaultResponse> {
-
-        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
-
-        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefundReject(orderId, descriptionRequest, userPrincipal))
-    }
-
-    @PreAuthorize("hasRole('SELLER') or hasRole('BUYER')")
-    @GetMapping("/order_status/{orderId}")
-    fun getOrderDetails(
-        @PathVariable("orderId") orderId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-    ): ResponseEntity<ProductsOrderResponse> {
-
-        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
-
-        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.getOrderDetails(orderId, userPrincipal))
-    }
-
-
-    @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/order_cancelled/{orderId}")
-    fun requestOrderCanceled(
-        @PathVariable("orderId") orderId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-    ): ResponseEntity<DefaultResponse> {
-
-        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
-
-        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestOrderCanceled(orderId, userPrincipal))
-    }
 
 
 }

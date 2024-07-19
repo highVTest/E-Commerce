@@ -44,6 +44,9 @@ class ProductsOrder(
     @Column(name = "is_deleted", nullable = false)
     val isDeleted: Boolean = false,
 ){
+    fun update(orderStatusRequest: OrderStatusRequest) {
+        statusCode = orderStatusRequest.statusCode
+    }
 
 
 }

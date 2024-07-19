@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.products_order.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.order_reject.entity.OrderReject
 import com.highv.ecommerce.domain.order_reject.enumClass.RejectReason
@@ -11,6 +12,7 @@ import com.highv.ecommerce.domain.products_order.dto.ProductsOrderResponse
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
 import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
+import com.highv.ecommerce.infra.security.UserPrincipal
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -21,20 +23,20 @@ import java.time.LocalDateTime
 class ProductsOrderService(
     private val productsOrderRepository: ProductsOrderRepository,
     private val orderRejectRepository: OrderRejectRepository,
-    private val itemCartRepository: ItemCartRepository
+    private val itemCartRepository: ItemCartRepository,
 ){
 
     @Transactional
-    fun requestPayment(cartId: Long): DefaultResponse {
+    fun requestPayment(cartId: Long, userPrincipal: UserPrincipal): DefaultResponse {
         //TODO(카트 아이디 를 조회 해서 물건을 가져 온다 -> List<CartItem>)
-        val itemCart = itemCartRepository.findByIdOrNull(cartId) ?: throw RuntimeException("장바구니가 존재 하지 않습 니다")
+        val itemCart = itemCartRepository.findByIdAndBuyerId(cartId, userPrincipal.id) ?: throw RuntimeException("장바구니가 존재 하지 않습 니다")
 
         //TODO(만약에 CartItem 에 ProductId 가 Coupon 의 ProductId와 일치할 경우 CartItem 의 가격을 임시로 업데이트)
 
         val productsOrder = productsOrderRepository.saveAndFlush(
             ProductsOrder(
                 statusCode = StatusCode.ORDERED,
-                buyerId = 1L,
+                buyerId = userPrincipal.id,
                 isPaid = false,
                 payDate = LocalDateTime.now(),
                 totalPrice = itemCart.price,
@@ -59,34 +61,17 @@ class ProductsOrderService(
     }
 
     @Transactional
-    fun updateOrderStatus(orderId: Long, orderStatusRequest: OrderStatusRequest): DefaultResponse {
+    fun updateOrderStatus(orderId: Long, orderStatusRequest: OrderStatusRequest, userPrincipal: UserPrincipal): DefaultResponse {
 
         val order = productsOrderRepository.findByIdOrNull(orderId) ?: throw RuntimeException()
 
-        order.update(orderStatusRequest, null)
+        order.update(orderStatusRequest)
+
+        productsOrderRepository.save(order)
 
         return DefaultResponse.from("주문 상태 변경이 완료 되었습니다. 변경된 상태 : ${orderStatusRequest.statusCode.name}")
     }
 
-    @Transactional
-    fun requestRefund(orderId: Long, descriptionRequest: DescriptionRequest): DefaultResponse {
 
-        return DefaultResponse.from("환불 요청 완료 되었습니다")
-    }
-
-    @Transactional
-    fun requestRefundReject(orderId: Long, descriptionRequest: DescriptionRequest): DefaultResponse {
-
-        return DefaultResponse.from("환불 거절 요청 완료 되었습니다")
-    }
-
-    fun getOrderDetails(orderId: Long): ProductsOrderResponse {
-        TODO("정보 내려 주기")
-    }
-
-    @Transactional
-    fun requestOrderCanceled(orderId: Long): DefaultResponse {
-        return DefaultResponse.from("주문 취소가 완료 되었습니다")
-    }
 
 }
