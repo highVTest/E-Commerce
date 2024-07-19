@@ -58,6 +58,8 @@ class CouponService(
 
         val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
+        if(result.sellerId != userPrincipal.id) throw RuntimeException("다른 사용자는 해당 쿠폰을 수정할 수 없습니다")
+
         result.update(updateCouponRequest)
 
         return DefaultResponse.from("쿠폰 업데이트가 완료 되었습니다")
@@ -67,6 +69,8 @@ class CouponService(
     fun deleteCoupon(couponId: Long, userPrincipal: UserPrincipal): DefaultResponse {
 
         val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
+
+        if(result.sellerId != userPrincipal.id) throw RuntimeException("다른 사용자는 해당 쿠폰을 수정할 수 없습니다")
 
         couponRepository.delete(result)
 

@@ -4,9 +4,13 @@ import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import com.highv.ecommerce.domain.product.entity.Product
 import jakarta.persistence.*
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.SQLRestriction
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
+@SQLDelete(sql = "UPDATE coupon SET deleted_at = CURRENT_TIMESTAMP and is_deleted = true WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 @Entity
 @Table(name = "coupon")
 class Coupon(
