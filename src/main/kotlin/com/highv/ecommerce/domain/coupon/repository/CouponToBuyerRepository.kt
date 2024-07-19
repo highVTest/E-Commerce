@@ -9,4 +9,6 @@ interface CouponToBuyerRepository {
     fun existsByCouponIdAndBuyerId(couponId: Long, buyerId: Long): Boolean
 
     fun save(coupon: CouponToBuyer): CouponToBuyer
+
+    fun findByCouponIdAndBuyerId(couponId: Long, buyerId: Long): CouponToBuyer?
 }

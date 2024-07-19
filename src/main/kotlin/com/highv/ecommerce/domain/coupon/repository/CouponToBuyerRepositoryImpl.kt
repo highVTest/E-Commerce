@@ -34,4 +34,8 @@ class CouponToBuyerRepositoryImpl(
     override fun save(coupon: CouponToBuyer): CouponToBuyer {
         return couponToBuyerJpaRepository.save(coupon)
     }
+
+    override fun findByCouponIdAndBuyerId(couponId: Long, buyerId: Long): CouponToBuyer? {
+        return couponToBuyerJpaRepository.findByCouponIdAndBuyerId(couponId, buyerId)
+    }
 }

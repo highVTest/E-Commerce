@@ -7,4 +7,6 @@ interface CouponToBuyerJpaRepository: JpaRepository<CouponToBuyer, Long> {
 
     fun existsByCouponIdAndBuyerId(couponId: Long, buyerId: Long): Boolean
 
+    fun findByCouponIdAndBuyerId(couponId: Long, buyerId: Long): CouponToBuyer?
+
 }
