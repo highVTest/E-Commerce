@@ -218,6 +218,11 @@ class CouponServiceTest {
 
     @Test
     fun `구메자가 쿠폰을 단건 조회 할 수 있게 확인`(){
+
+        coupon.product.id = 1L
+        every { userPrincipal.id } returns 1
+        every { couponRepository.findByIdAndSellerId(any(), any()) } returns coupon
+        every { couponToBuyerRepository.findByCouponIdAndBuyerId(any(), any()) } returns couponToBuyer
         every { couponRepository.findByIdOrNull(any()) } returns coupon
 
         val result = couponService.getSellerCouponById(1L, userPrincipal)
@@ -225,7 +230,7 @@ class CouponServiceTest {
 
         result.productId shouldBe 1L
         result.expiredAt shouldBe LocalDateTime.of(2024, 8, 1, 0, 0)
-        result.discountPolicy shouldBe DiscountPolicy.DISCOUNT_PRICE
+        result.discountPolicy shouldBe DiscountPolicy.DISCOUNT_PRICE.name
         result.discount shouldBe 30000
     }
 
