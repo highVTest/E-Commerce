@@ -39,10 +39,10 @@ class ProductsOrder(
     val regDate : LocalDateTime,
 
     @Column(name="deleted_at", nullable = false)
-    val deletedAt: LocalDateTime?,
+    val deletedAt: LocalDateTime? = null,
 
     @Column(name = "is_deleted", nullable = false)
-    val isDeleted: Boolean
+    val isDeleted: Boolean = false,
 ){
 
 

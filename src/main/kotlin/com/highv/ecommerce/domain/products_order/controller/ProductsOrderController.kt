@@ -7,8 +7,12 @@ import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.products_order.dto.ProductsOrderResponse
 import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
 import com.highv.ecommerce.domain.products_order.service.ProductsOrderService
+import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import kotlin.io.encoding.Base64
 
@@ -18,37 +22,58 @@ class ProductsOrderController(
     private val productsOrderService: ProductsOrderService
 ){
 
+    @PreAuthorize("hasRole('BUYER')")
     @PostMapping("/payments/{cartId}")
-    fun requestPayment(@PathVariable("cartId") cartId: Long): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(cartId))
+    fun requestPayment(
+        @PathVariable("cartId") cartId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+    )
+    :ResponseEntity<DefaultResponse>{
 
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(cartId))
+    }
+    @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/order_status/{orderId}")
     fun updateOrderStatus(
         @PathVariable("orderId") orderId: Long,
-        @RequestBody orderStatusRequest: OrderStatusRequest
+        @RequestBody orderStatusRequest: OrderStatusRequest,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<DefaultResponse>
         = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.updateOrderStatus(orderId, orderStatusRequest))
 
+    @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/refund/{orderId}")
     fun requestRefund(
         @PathVariable("orderId") orderId: Long,
-        @RequestBody descriptionRequest: DescriptionRequest
+        @RequestBody descriptionRequest: DescriptionRequest,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<DefaultResponse>
         = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefund(orderId, descriptionRequest))
 
+    @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/refund/reject/{orderId}")
     fun requestRefundReject(
         @PathVariable("orderId") orderId: Long,
-        @RequestBody descriptionRequest: DescriptionRequest
+        @RequestBody descriptionRequest: DescriptionRequest,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<DefaultResponse>
         = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestRefundReject(orderId, descriptionRequest))
 
+    @PreAuthorize("hasRole('SELLER') or hasRole('BUYER')")
     @GetMapping("/order_status/{orderId}")
-    fun getOrderDetails(@PathVariable("orderId") orderId: Long,): ResponseEntity<ProductsOrderResponse>
+    fun getOrderDetails(
+        @PathVariable("orderId") orderId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+        ): ResponseEntity<ProductsOrderResponse>
         = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.getOrderDetails(orderId))
 
+
+    @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/order_cancelled/{orderId}")
-    fun requestOrderCanceled(@PathVariable("orderId") orderId: Long): ResponseEntity<DefaultResponse>
+    fun requestOrderCanceled(
+        @PathVariable("orderId") orderId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+        ): ResponseEntity<DefaultResponse>
         = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestOrderCanceled(orderId))
 
 

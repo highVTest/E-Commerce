@@ -2,6 +2,7 @@ package com.highv.ecommerce.domain.order_reject.entity
 
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.order_reject.enumClass.RejectReason
+import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -19,20 +20,20 @@ class OrderReject(
     @Column(name = "buyer_yn",nullable = false)
     val isBuyer: Boolean,
 
-    @Column(name = "buyer_dt",nullable = false)
-    val buyerDateTime : LocalDateTime,
+    @Column(name = "buyer_dt",nullable = true)
+    val buyerDateTime : LocalDateTime? = null,
 
-    @Column(name = "buyer_desc",nullable = false)
-    val buyerDescription : String,
+    @Column(name = "buyer_desc",nullable = true)
+    val buyerDescription : String? = null,
 
     @Column(name = "seller_reject_yn",nullable = false)
     val isSellerReject: Boolean,
 
-    @Column(name = "seller_reject_dt",nullable = false)
-    val sellerDateTime : LocalDateTime,
+    @Column(name = "seller_reject_dt",nullable = true)
+    val sellerDateTime : LocalDateTime? = null,
 
-    @Column(name = "seller_reject_desc",nullable = false)
-    val sellerDescription : String,
+    @Column(name = "seller_reject_desc",nullable = true)
+    val sellerDescription : String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_cart_id", nullable = false)
@@ -40,7 +41,7 @@ class OrderReject(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "products_order_id", nullable = false)
-    val productsOrderId: ItemCart
+    val productsOrder: ProductsOrder
 
 ){
 
