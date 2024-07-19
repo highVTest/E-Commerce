@@ -31,10 +31,10 @@ class OrderReject(
     val isSellerReject: Boolean,
 
     @Column(name = "seller_reject_dt",nullable = true)
-    val sellerDateTime : LocalDateTime? = null,
+    var sellerDateTime : LocalDateTime? = null,
 
     @Column(name = "seller_reject_desc",nullable = true)
-    val sellerDescription : String? = null,
+    var sellerDescription : String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_cart_id", nullable = false)
@@ -50,6 +50,12 @@ class OrderReject(
         this.rejectReason = rejectReason
         this.buyerDateTime = LocalDateTime.now()
         this.buyerDescription = descriptionRequest.description
+    }
+
+    fun sellerUpdate(rejectReason: RejectReason, descriptionRequest: DescriptionRequest) {
+        this.rejectReason = rejectReason
+        this.sellerDateTime = LocalDateTime.now()
+        this.sellerDescription = descriptionRequest.description
     }
 
 }

@@ -21,13 +21,11 @@ class OrderRejectService(
 ){
 
     @Transactional
-    fun requestRefund(orderId: Long, descriptionRequest: DescriptionRequest, userPrincipal: UserPrincipal): DefaultResponse {
+    fun requestRefund(orderRejectId: Long, descriptionRequest: DescriptionRequest, userPrincipal: UserPrincipal): DefaultResponse {
 
-        val productsOrder = productsOrderRepository.findByIdOrNull(orderId)?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
+        val orderReject = orderRejectRepository.findByIdOrNull(orderRejectId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
 
-        val orderReject = orderRejectRepository.findByProductsOrder(productsOrder)
-
-        productsOrder.update(StatusCode.PENDING)
+        orderReject.productsOrder.update(StatusCode.PENDING)
 
         orderReject.buyerUpdate(RejectReason.REFUND_REQUESTED, descriptionRequest)
 
@@ -37,13 +35,23 @@ class OrderRejectService(
     }
 
     @Transactional
-    fun requestRefundReject(orderId: Long, descriptionRequest: DescriptionRequest, userPrincipal: UserPrincipal): DefaultResponse {
+    fun requestRefundReject(orderRejectId: Long, descriptionRequest: DescriptionRequest, userPrincipal: UserPrincipal): DefaultResponse {
+
+        val orderReject = orderRejectRepository.findByIdOrNull(orderRejectId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
+
+        orderReject.productsOrder.update(StatusCode.PENDING)
+
+        orderReject.sellerUpdate(RejectReason.REFUND_REJECTED, descriptionRequest)
+
+        orderRejectRepository.save(orderReject)
 
         return DefaultResponse.from("환불 거절 요청 완료 되었습니다")
     }
 
-    fun getOrderDetails(orderId: Long, userPrincipal: UserPrincipal): ProductsOrderResponse {
-        TODO("정보 내려 주기")
+    fun getOrderDetails(orderRejectId: Long, userPrincipal: UserPrincipal): ProductsOrderResponse {
+        val orderReject = orderRejectRepository.findByIdOrNull(orderRejectId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
+
+        return ProductsOrderResponse.from(orderReject)
     }
 
     @Transactional
