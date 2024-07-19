@@ -43,8 +43,9 @@ CREATE TABLE coupon
     discount_price BIGINT,
     expired_at     TIMESTAMP                         NOT NULL,
     created_at     TIMESTAMP                         NOT NULL,
-    deleted_at    TIMESTAMP,
-    is_deleted    BOOLEAN                         NOT NULL,
+    deleted_at     TIMESTAMP,
+    is_deleted     BOOLEAN                           NOT NULL,
+    seller_id      BIGINT                            NOT NULL,
 
     product_id     BIGINT                            NOT NULL
 );
