@@ -1,7 +1,7 @@
 package com.highv.ecommerce.domain.products_order.dto
 
-import com.highv.ecommerce.domain.order_reject.entity.OrderReject
-import com.highv.ecommerce.domain.order_reject.enumClass.RejectReason
+import com.highv.ecommerce.domain.order_status.entity.OrderStatus
+import com.highv.ecommerce.domain.order_status.enumClass.RejectReason
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
 import java.time.LocalDateTime
 
@@ -15,7 +15,7 @@ data class ProductsOrderResponse(
     val totalPrice : Int,
 ){
     companion object{
-        fun from(orderReject: OrderReject): ProductsOrderResponse{
+        fun from(orderReject: OrderStatus): ProductsOrderResponse{
             return ProductsOrderResponse(
                 id = orderReject.productsOrder.id!!,
                 statusCode = orderReject.productsOrder.statusCode,

@@ -11,9 +11,6 @@ class Product(
     @Column(name="description")
     var description:String,
 
-    @Column(name="price")
-    var price: Int,
-
     @Column(name="product_image")
     var productImage:String,
 
@@ -26,17 +23,14 @@ class Product(
     @Column(name="updated_at")
     var updatedAt:LocalDateTime,
 
-    @Column(name="quantity")
-    var quantity:Int,
-
     @Column(name="is_sold_out")
     var isSoldOut:Boolean,
 
     @Column(name="deleted_at")
-    var deletedAt: LocalDateTime,
+    var deletedAt: LocalDateTime? = null,
 
     @Column(name="is_deleted")
-    var isDeleted:Boolean,
+    var isDeleted:Boolean = false,
 
     @Column(name="shop_id")
     val shopId:Long,

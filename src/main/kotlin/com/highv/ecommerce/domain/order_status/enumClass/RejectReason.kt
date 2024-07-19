@@ -1,4 +1,4 @@
-package com.highv.ecommerce.domain.order_reject.enumClass
+package com.highv.ecommerce.domain.order_status.enumClass
 
 
 enum class RejectReason {

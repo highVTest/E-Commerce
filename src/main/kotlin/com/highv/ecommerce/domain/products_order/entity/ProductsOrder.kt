@@ -4,6 +4,7 @@ import com.highv.ecommerce.domain.products_order.dto.DescriptionRequest
 import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
 import jakarta.persistence.*
+import org.springframework.boot.context.properties.bind.DefaultValue
 import java.time.LocalDateTime
 
 @Entity
@@ -41,8 +42,9 @@ class ProductsOrder(
     @Column(name="deleted_at", nullable = false)
     val deletedAt: LocalDateTime? = null,
 
+    @DefaultValue("false")
     @Column(name = "is_deleted", nullable = false)
-    val isDeleted: Boolean = false,
+    val isDeleted: Boolean = false
 ){
     fun <T> update(orderStatusRequest: T) {
 
@@ -53,6 +55,8 @@ class ProductsOrder(
         }else throw RuntimeException("잘못된 값 입니다")
 
     }
+
+
 
 
 }

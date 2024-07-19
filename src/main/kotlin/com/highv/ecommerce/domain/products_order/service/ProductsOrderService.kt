@@ -1,19 +1,15 @@
 package com.highv.ecommerce.domain.products_order.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
-import com.highv.ecommerce.domain.order_reject.entity.OrderReject
-import com.highv.ecommerce.domain.order_reject.enumClass.RejectReason
-import com.highv.ecommerce.domain.order_reject.repository.OrderRejectRepository
-import com.highv.ecommerce.domain.products_order.dto.DescriptionRequest
+import com.highv.ecommerce.domain.order_status.entity.OrderStatus
+import com.highv.ecommerce.domain.order_status.enumClass.RejectReason
+import com.highv.ecommerce.domain.order_status.repository.OrderStatusRepository
 import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
-import com.highv.ecommerce.domain.products_order.dto.ProductsOrderResponse
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
 import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
 import com.highv.ecommerce.infra.security.UserPrincipal
-import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,7 +18,7 @@ import java.time.LocalDateTime
 @Service
 class ProductsOrderService(
     private val productsOrderRepository: ProductsOrderRepository,
-    private val orderRejectRepository: OrderRejectRepository,
+    private val orderRejectRepository: OrderStatusRepository,
     private val itemCartRepository: ItemCartRepository,
 ){
 
@@ -47,7 +43,7 @@ class ProductsOrderService(
         )
 
         orderRejectRepository.save(
-            OrderReject(
+            OrderStatus(
                 rejectReason = RejectReason.NONE,
                 isBuyer = false,
                 isSellerReject = false,

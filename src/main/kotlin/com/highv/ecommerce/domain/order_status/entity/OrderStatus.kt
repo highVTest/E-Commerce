@@ -1,15 +1,15 @@
-package com.highv.ecommerce.domain.order_reject.entity
+package com.highv.ecommerce.domain.order_status.entity
 
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
-import com.highv.ecommerce.domain.order_reject.enumClass.RejectReason
+import com.highv.ecommerce.domain.order_status.enumClass.RejectReason
 import com.highv.ecommerce.domain.products_order.dto.DescriptionRequest
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "order_reject")
-class OrderReject(
+@Table(name = "order_status")
+class OrderStatus(
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id : Long? = null,
@@ -42,7 +42,13 @@ class OrderReject(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "products_order_id", nullable = false)
-    val productsOrder: ProductsOrder
+    val productsOrder: ProductsOrder,
+
+    @Column(name = "deleted_at", nullable = true)
+    val deletedAt: LocalDateTime? = null,
+
+    @Column(name = "is_deleted", nullable = false)
+    var isDeleted: Boolean = false
 
 ){
     fun buyerUpdate(rejectReason: RejectReason, descriptionRequest: DescriptionRequest) {
