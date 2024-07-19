@@ -18,7 +18,7 @@ class SellerInfoService(
     private val passwordEncoder: PasswordEncoder
 ) {
     fun updateShopInfo(sellerId: Long, updateShopRequest: UpdateShopRequest): ShopResponse {
-        val shop = shopRepository.findByIdOrNull(sellerId) ?: throw RuntimeException("Shop not found")
+        val shop = shopRepository.findShopBySellerId(sellerId)
         shop.apply {
             description = updateShopRequest.description
             shopImage = updateShopRequest.shopImage
@@ -41,7 +41,11 @@ class SellerInfoService(
 
     fun changePassword(sellerId: Long, updatePasswordRequest: UpdatePasswordRequest): String {
         val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw RuntimeException("Seller not found")
-        if (updatePasswordRequest.oldPassword != seller.password) throw RuntimeException("Old password not matched")
+        if (passwordEncoder.matches(
+                passwordEncoder.encode(updatePasswordRequest.oldPassword),
+                seller.password
+            )
+        ) throw RuntimeException("Old password not matched")
         seller.apply {
             password = passwordEncoder.encode(updatePasswordRequest.newPassword)
         }
