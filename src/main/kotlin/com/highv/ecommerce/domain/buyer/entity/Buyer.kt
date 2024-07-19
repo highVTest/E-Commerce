@@ -23,5 +23,5 @@ class Buyer(
    @Column(name = "provider_name")
    val providerName: String?,
    @Column(name = "provider_id")
-   val providerId: Long?
+   val providerId: String?
 )
