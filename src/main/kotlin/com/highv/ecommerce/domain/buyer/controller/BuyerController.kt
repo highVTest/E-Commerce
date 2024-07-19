@@ -4,6 +4,7 @@ import com.highv.ecommerce.common.exception.LoginException
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
+import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerResponse
 import com.highv.ecommerce.domain.buyer.service.BuyerService
 import com.highv.ecommerce.infra.security.UserPrincipal
@@ -15,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -62,4 +64,13 @@ class BuyerController(private val buyerService: BuyerService) {
     ): ResponseEntity<Unit> = ResponseEntity
         .status(HttpStatus.OK)
         .body(buyerService.changeProfileImage(request, user.id))
+
+    @PreAuthorize("hasRole('BUYER')")
+    @PutMapping("/profile")
+    fun changeProfile(
+        @RequestBody request: UpdateBuyerProfileRequest,
+        @AuthenticationPrincipal user: UserPrincipal,
+    ): ResponseEntity<BuyerResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(buyerService.changeProfile(request, user.id))
 }
