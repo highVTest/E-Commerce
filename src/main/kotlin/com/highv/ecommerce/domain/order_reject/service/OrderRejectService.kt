@@ -49,6 +49,7 @@ class OrderRejectService(
     }
 
     fun getOrderDetails(orderRejectId: Long, userPrincipal: UserPrincipal): ProductsOrderResponse {
+
         val orderReject = orderRejectRepository.findByIdOrNull(orderRejectId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
 
         return ProductsOrderResponse.from(orderReject)

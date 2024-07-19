@@ -18,7 +18,7 @@ class OrderRejectController(
 ){
 
     @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/refund/{orderId}")
+    @PatchMapping("/buyer/refund/{orderId}")
     fun requestRefund(
         @PathVariable("orderId") orderId: Long,
         @RequestBody descriptionRequest: DescriptionRequest,
@@ -30,7 +30,7 @@ class OrderRejectController(
     }
 
     @PreAuthorize("hasRole('SELLER')")
-    @PatchMapping("/refund/reject/{orderId}")
+    @PatchMapping("/seller/refund/reject/{orderId}")
     fun requestRefundReject(
         @PathVariable("orderId") orderId: Long,
         @RequestBody descriptionRequest: DescriptionRequest,
@@ -56,7 +56,7 @@ class OrderRejectController(
 
 
     @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/order_cancelled/{orderId}")
+    @PatchMapping("/buyer/order_cancelled/{orderId}")
     fun requestOrderCanceled(
         @PathVariable("orderId") orderId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal?,
