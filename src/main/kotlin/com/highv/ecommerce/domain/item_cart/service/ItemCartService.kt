@@ -24,15 +24,24 @@ class ItemCartService(
         val product: Product =
             productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
 
-        val item: ItemCart = ItemCart(
-            productId = productId,
-            productName = product.name,
-            price = 3000 * request.quantity, // 추후 프로덕트에서 price 관련된 게 생길 예정
-            quantity = request.quantity,
-            buyerId = buyerId
-        )
+        val existsCart: ItemCart? = itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(productId, buyerId)
 
-        itemCartRepository.save(item)
+        if (existsCart != null) {
+            val quantity: Int = existsCart.quantity + request.quantity
+            existsCart.updateQuantityAndPrice(quantity, 3000)
+
+            itemCartRepository.save(existsCart)
+        } else {
+            val item: ItemCart = ItemCart(
+                productId = productId,
+                productName = product.name,
+                price = 3000 * request.quantity, // 추후 프로덕트에서 price 관련된 게 생길 예정
+                quantity = request.quantity,
+                buyerId = buyerId
+            )
+
+            itemCartRepository.save(item)
+        }
     }
 
     @Transactional(readOnly = true)
