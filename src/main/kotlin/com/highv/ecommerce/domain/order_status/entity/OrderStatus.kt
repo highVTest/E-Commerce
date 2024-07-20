@@ -2,7 +2,7 @@ package com.highv.ecommerce.domain.order_status.entity
 
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.order_status.enumClass.RejectReason
-import com.highv.ecommerce.domain.products_order.dto.DescriptionRequest
+import com.highv.ecommerce.domain.order_status.dto.OrderRejectRequest
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import com.highv.ecommerce.domain.products_order.enumClass.OrderStatusType
 import jakarta.persistence.*
@@ -59,7 +59,7 @@ class OrderStatus(
         }
 
         this.buyerDateTime = LocalDateTime.now()
-        if(description is DescriptionRequest){
+        if(description is OrderRejectRequest){
             this.buyerDescription = description.description
         }else if(description is String){
             this.buyerDescription = description
@@ -74,7 +74,7 @@ class OrderStatus(
             "REFUND" -> this.rejectReason = RejectReason.REFUND_REJECTED
         }
         this.sellerDateTime = LocalDateTime.now()
-        if(description is DescriptionRequest){
+        if(description is OrderRejectRequest){
             this.sellerDescription = description.description
         }else if(description is String){
             this.sellerDescription = description

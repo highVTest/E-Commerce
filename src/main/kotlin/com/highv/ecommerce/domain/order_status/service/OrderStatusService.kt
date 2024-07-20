@@ -4,7 +4,7 @@ import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_status.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_status.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.order_status.repository.OrderStatusRepository
-import com.highv.ecommerce.domain.products_order.dto.DescriptionRequest
+import com.highv.ecommerce.domain.order_status.dto.OrderRejectRequest
 import com.highv.ecommerce.domain.products_order.dto.ProductsOrderResponse
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
@@ -20,9 +20,11 @@ class OrderStatusService(
 
 
     @Transactional
-    fun requestOrderStatusChange(orderStatusId: Long, descriptionRequest: DescriptionRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
+    fun requestOrderStatusChange(itemCartId: Long, descriptionRequest: OrderRejectRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
 
-        val orderStatus = orderStatusRepository.findByIdAndBuyerId(orderStatusId, userPrincipal.id) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
+        // descriptionRequest -> 환불 or 교환
+
+        val orderStatus = orderStatusRepository.findByItemCartIdAndBuyerId(itemCartId, userPrincipal.id) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
 
         orderStatus.productsOrder.update(StatusCode.PENDING)
 
@@ -34,7 +36,7 @@ class OrderStatusService(
     }
 
     @Transactional
-    fun requestOrderStatusReject(orderStatusId: Long, shopId: Long, descriptionRequest: DescriptionRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
+    fun requestOrderStatusReject(orderStatusId: Long, shopId: Long, descriptionRequest: OrderRejectRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
 
 //        val seller = sellerRepository.findByEmail(userPrincipal.email) ?: throw RuntimeException()
 

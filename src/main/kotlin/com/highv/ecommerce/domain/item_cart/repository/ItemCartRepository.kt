@@ -8,5 +8,5 @@ interface ItemCartRepository : JpaRepository<ItemCart, Long> {
 
     fun findByBuyerIdAndIsDeletedFalse(buyerId: Long): List<ItemCart>
 
-    fun findAllByBuyerId(buyerId: Long): List<ItemCart>
+    fun findAllByBuyerIdAndIsDeletedFalse(buyerId: Long): List<ItemCart>
 }

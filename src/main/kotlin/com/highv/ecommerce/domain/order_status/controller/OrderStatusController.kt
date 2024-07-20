@@ -2,7 +2,7 @@ package com.highv.ecommerce.domain.order_status.controller
 
 import com.highv.ecommerce.domain.order_status.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_status.service.OrderStatusService
-import com.highv.ecommerce.domain.products_order.dto.DescriptionRequest
+import com.highv.ecommerce.domain.order_status.dto.OrderRejectRequest
 import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_status.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.products_order.dto.ProductsOrderResponse
@@ -20,21 +20,21 @@ class OrderStatusController(
 ){
 
     @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/buyer/order-status/{orderId}")
+    @PatchMapping("/buyer/order-status/{itemCartId}")
     fun requestOrderStatusChange(
-        @PathVariable("orderId") orderId: Long,
-        @RequestBody descriptionRequest: DescriptionRequest,
+        @PathVariable("itemCartId") itemCartId: Long,
+        @RequestBody descriptionRequest: OrderRejectRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse>
-         = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChange(orderId, descriptionRequest, userPrincipal))
+         = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChange(itemCartId, descriptionRequest, userPrincipal))
 
 
     @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/seller/order-status/{shopId}/{orderId}")
     fun requestOrderStatusReject(
-        @PathVariable("shopId") shopId: Long, // 추후 변경 예정
+        @PathVariable("shopId") shopId: Long, // Shop 추가 시 논의 후에 삭제 예정
         @PathVariable("orderId") orderId: Long,
-        @RequestBody descriptionRequest: DescriptionRequest,
+        @RequestBody descriptionRequest: OrderRejectRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse>
         = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusReject(orderId, shopId, descriptionRequest, userPrincipal))

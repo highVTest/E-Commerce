@@ -28,7 +28,7 @@ class ProductsOrderService(
     @Transactional
     fun requestPayment(userPrincipal: UserPrincipal): DefaultResponse {
         //TODO(카트 아이디 를 조회 해서 물건을 가져 온다 -> List<CartItem>)
-        val itemCart = itemCartRepository.findAllByBuyerId(userPrincipal.id)
+        val itemCart = itemCartRepository.findAllByBuyerIdAndIsDeletedFalse(userPrincipal.id)
         val price = itemCart.sumOf { it.price }
 
         //TODO(만약에 CartItem 에 ProductId 가 Coupon 의 ProductId와 일치할 경우 CartItem 의 가격을 임시로 업데이트)

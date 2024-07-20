@@ -7,7 +7,6 @@ import com.highv.ecommerce.domain.products_order.entity.QProductsOrder
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -23,14 +22,17 @@ class OrderStatusRepositoryImpl(
     private val cartItem = QItemCart.itemCart
 
     override fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderStatus> {
-        return orderStatusJpaRepository.findAllByShopIdAndBuyerId(shopId, buyerId)
+        return orderStatusJpaRepository.findAllByShopIdAndBuyerIdIsDeletedFalse(shopId, buyerId)
     }
 
     override fun findAllByBuyerId(id: Long): List<OrderStatus> {
 
         val query = queryFactory
             .selectFrom(orderStatus)
-            .where(orderStatus.buyerId.eq(id))
+            .where(
+                orderStatus.buyerId.eq(id),
+                orderStatus.isDeleted.eq(false)
+            )
             .leftJoin(orderStatus.productsOrder(),productsOrder).fetchJoin()
             .leftJoin(orderStatus.itemCart(), cartItem).fetchJoin()
             .fetch()
@@ -49,7 +51,10 @@ class OrderStatusRepositoryImpl(
     override fun findAllByShopId(shopId: Long): List<OrderStatus> {
         val query = queryFactory
             .selectFrom(orderStatus)
-            .where(orderStatus.shopId.eq(shopId))
+            .where(
+                orderStatus.shopId.eq(shopId),
+                orderStatus.isDeleted.eq(false)
+            )
             .leftJoin(orderStatus.productsOrder(),productsOrder).fetchJoin()
             .leftJoin(orderStatus.itemCart(), cartItem).fetchJoin()
             .fetch()
@@ -57,11 +62,11 @@ class OrderStatusRepositoryImpl(
         return query
     }
 
-    override fun findByIdAndBuyerId(orderStatusId: Long, buyerId: Long): OrderStatus? {
-        return orderStatusJpaRepository.findByIdAndBuyerId(orderStatusId, buyerId)
+    override fun findByItemCartIdAndBuyerId(orderStatusId: Long, buyerId: Long): OrderStatus? {
+        return orderStatusJpaRepository.findByItemCartIdAndBuyerIdIsDeletedFalse(orderStatusId, buyerId)
     }
 
     override fun findByIdAndShopId(orderStatusId: Long, shopId: Long): OrderStatus? {
-        return orderStatusJpaRepository.findByIdAndShopId(orderStatusId, shopId)
+        return orderStatusJpaRepository.findByIdAndShopIdIsDeletedFalse(orderStatusId, shopId)
     }
 }
