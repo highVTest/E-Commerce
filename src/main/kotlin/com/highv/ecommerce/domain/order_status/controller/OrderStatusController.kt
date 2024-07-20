@@ -24,71 +24,52 @@ class OrderStatusController(
     fun requestOrderStatusChange(
         @PathVariable("orderId") orderId: Long,
         @RequestBody descriptionRequest: DescriptionRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-    ): ResponseEntity<OrderStatusResponse> {
-        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+    ): ResponseEntity<OrderStatusResponse>
+         = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChange(orderId, descriptionRequest, userPrincipal))
 
-        return ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChange(orderId, descriptionRequest, userPrincipal))
-    }
 
     @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/seller/order-status/{orderId}")
     fun requestOrderStatusReject(
         @PathVariable("orderId") orderId: Long,
         @RequestBody descriptionRequest: DescriptionRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-    ): ResponseEntity<OrderStatusResponse> {
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+    ): ResponseEntity<OrderStatusResponse>
+        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusReject(orderId, descriptionRequest, userPrincipal))
 
-        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
-
-        return ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusReject(orderId, descriptionRequest, userPrincipal))
-    }
 
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/buyer/order-status")
     fun requestOrderStatusChangeList(
         @RequestBody buyerOrderStatusRequest: BuyerOrderStatusRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-    ): ResponseEntity<OrderStatusResponse> {
-        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
-
-        return ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChangeList(buyerOrderStatusRequest, userPrincipal))
-    }
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+    ): ResponseEntity<OrderStatusResponse>
+        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChangeList(buyerOrderStatusRequest, userPrincipal))
 
     @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/seller/order-status")
     fun requestOrderStatusRejectList(
         @RequestBody sellerOrderStatusRequest: SellerOrderStatusRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-    ): ResponseEntity<OrderStatusResponse> {
-
-        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
-
-        return ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusRejectList(sellerOrderStatusRequest, userPrincipal))
-    }
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+    ): ResponseEntity<OrderStatusResponse>
+        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusRejectList(sellerOrderStatusRequest, userPrincipal))
 
     @PreAuthorize("hasRole('BUYER')")
     @GetMapping("/order_details/buyer")
     fun getBuyerOrderDetails(
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-    ): ResponseEntity<List<ProductsOrderResponse>> {
-
-        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
-
-        return ResponseEntity.status(HttpStatus.OK).body(orderStatusService.getBuyerOrderDetails(userPrincipal))
-    }
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+    ): ResponseEntity<List<ProductsOrderResponse>>
+        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.getBuyerOrderDetails(userPrincipal))
 
     @PreAuthorize("hasRole('SELLER')")
     @GetMapping("/order_details/seller/{shopId}")
     fun getSellerOrderDetails(
         @PathVariable("shopId") shopId: Long,  // Shop 추가 시 논의 후에 삭제 예정
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-    ): ResponseEntity<List<ProductsOrderResponse>> {
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+    ): ResponseEntity<List<ProductsOrderResponse>>
+        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.getSellerOrderDetails(shopId, userPrincipal))
 
-        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
-
-        return ResponseEntity.status(HttpStatus.OK).body(orderStatusService.getSellerOrderDetails(shopId, userPrincipal))
-    }
 
 
 
