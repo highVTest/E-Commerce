@@ -7,6 +7,7 @@ import com.highv.ecommerce.domain.order_status.repository.OrderStatusRepository
 import com.highv.ecommerce.domain.products_order.dto.DescriptionRequest
 import com.highv.ecommerce.domain.products_order.dto.ProductsOrderResponse
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
+import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,13 +15,14 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class OrderStatusService(
     private val orderStatusRepository: OrderStatusRepository,
+    private val sellerRepository: SellerRepository,
 ){
 
 
     @Transactional
     fun requestOrderStatusChange(orderStatusId: Long, descriptionRequest: DescriptionRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
 
-        val orderStatus = orderStatusRepository.findByIdOrNull(orderStatusId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
+        val orderStatus = orderStatusRepository.findByIdAndBuyerId(orderStatusId, userPrincipal.id) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
 
         orderStatus.productsOrder.update(StatusCode.PENDING)
 
@@ -32,9 +34,13 @@ class OrderStatusService(
     }
 
     @Transactional
-    fun requestOrderStatusReject(orderStatusId: Long, descriptionRequest: DescriptionRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
+    fun requestOrderStatusReject(orderStatusId: Long, shopId: Long, descriptionRequest: DescriptionRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
 
-        val orderStatus = orderStatusRepository.findByIdOrNull(orderStatusId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
+//        val seller = sellerRepository.findByEmail(userPrincipal.email) ?: throw RuntimeException()
+
+//        if(seller.Shop.id != sellerOrderStatusRequest.shopId) ?: throw RuntimeException()
+
+        val orderStatus = orderStatusRepository.findByIdAndShopId(orderStatusId, shopId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
 
         orderStatus.productsOrder.update(StatusCode.PENDING)
 
@@ -53,6 +59,10 @@ class OrderStatusService(
     }
 
     fun getSellerOrderDetails(shopId: Long , userPrincipal: UserPrincipal): List<ProductsOrderResponse> {
+
+//        val seller = sellerRepository.findByEmail(userPrincipal.email) ?: throw RuntimeException()
+
+//        if(seller.Shop.id != sellerOrderStatusRequest.shopId) ?: throw RuntimeException()
 
         val orderStatus = orderStatusRepository.findAllByShopId(shopId)
 
@@ -80,7 +90,11 @@ class OrderStatusService(
     @Transactional
     fun requestOrderStatusRejectList(sellerOrderStatusRequest: SellerOrderStatusRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
 
-        val orderStatus = orderStatusRepository.findAllByShopIdAndBuyerId(sellerOrderStatusRequest.shopId, sellerOrderStatusRequest.shopId)
+//        val seller = sellerRepository.findByEmail(userPrincipal.email) ?: throw RuntimeException()
+
+//        if(seller.Shop.id != sellerOrderStatusRequest.shopId) ?: throw RuntimeException()
+
+        val orderStatus = orderStatusRepository.findAllByShopIdAndBuyerId(sellerOrderStatusRequest.shopId, sellerOrderStatusRequest.buyerId)
 
         orderStatus.map {
             it.sellerUpdate(sellerOrderStatusRequest.orderStatusType, sellerOrderStatusRequest.description)

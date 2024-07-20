@@ -38,10 +38,6 @@ class OrderStatusRepositoryImpl(
         return query
     }
 
-    override fun findByIdOrNull(id: Long): OrderStatus? {
-        return orderStatusJpaRepository.findByIdOrNull(id)
-    }
-
     override fun save(orderStatus: OrderStatus): OrderStatus {
         return orderStatusJpaRepository.save(orderStatus)
     }
@@ -59,5 +55,13 @@ class OrderStatusRepositoryImpl(
             .fetch()
 
         return query
+    }
+
+    override fun findByIdAndBuyerId(orderStatusId: Long, buyerId: Long): OrderStatus? {
+        return orderStatusJpaRepository.findByIdAndBuyerId(orderStatusId, buyerId)
+    }
+
+    override fun findByIdAndShopId(orderStatusId: Long, shopId: Long): OrderStatus? {
+        return orderStatusJpaRepository.findByIdAndShopId(orderStatusId, shopId)
     }
 }

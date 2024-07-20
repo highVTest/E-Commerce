@@ -7,5 +7,7 @@ interface OrderStatusJpaRepository: JpaRepository<OrderStatus, Long> {
 
     fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderStatus>
 
-    fun findAllByBuyerId(id: Long): List<OrderStatus>
+    fun findByIdAndBuyerId(orderId: Long, buyerId: Long): OrderStatus?
+
+    fun findByIdAndShopId(orderId: Long, shopId: Long): OrderStatus?
 }

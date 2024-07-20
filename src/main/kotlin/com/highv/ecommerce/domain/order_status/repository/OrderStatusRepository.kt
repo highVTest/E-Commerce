@@ -8,11 +8,13 @@ interface OrderStatusRepository {
 
     fun findAllByBuyerId(id: Long): List<OrderStatus>
 
-    fun findByIdOrNull(id: Long): OrderStatus?
-
     fun save(orderStatus: OrderStatus): OrderStatus
 
     fun saveAll(orderStatuses: List<OrderStatus>): List<OrderStatus>
 
     fun findAllByShopId(shopId: Long): List<OrderStatus>
+
+    fun findByIdAndBuyerId(orderStatusId: Long, buyerId: Long): OrderStatus?
+
+    fun findByIdAndShopId(orderStatusId: Long, shopId: Long): OrderStatus?
 }

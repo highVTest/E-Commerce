@@ -30,13 +30,14 @@ class OrderStatusController(
 
 
     @PreAuthorize("hasRole('SELLER')")
-    @PatchMapping("/seller/order-status/{orderId}")
+    @PatchMapping("/seller/order-status/{shopId}/{orderId}")
     fun requestOrderStatusReject(
+        @PathVariable("shopId") shopId: Long, // 추후 변경 예정
         @PathVariable("orderId") orderId: Long,
         @RequestBody descriptionRequest: DescriptionRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusReject(orderId, descriptionRequest, userPrincipal))
+        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusReject(orderId, shopId, descriptionRequest, userPrincipal))
 
 
     @PreAuthorize("hasRole('BUYER')")
