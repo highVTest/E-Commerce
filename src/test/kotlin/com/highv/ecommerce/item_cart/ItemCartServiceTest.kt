@@ -6,6 +6,8 @@ import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.item_cart.service.ItemCartService
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
+import com.highv.ecommerce.domain.shop.entity.QShop.shop
+import com.highv.ecommerce.domain.shop.entity.Shop
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -32,6 +34,14 @@ class ItemCartServiceTest : BehaviorSpec() {
 
             val buyerId = 1L
 
+            val shop = Shop(
+                sellerId = 1L,
+                name = "testName",
+                description = "testDescription",
+                shopImage = "testImage",
+                rate = 0.0f
+            )
+
             val product = Product(
                 name = "Test Product",
                 description = "Test Description",
@@ -42,7 +52,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                 isSoldOut = false,
                 deletedAt = LocalDateTime.now(),
                 isDeleted = false,
-                shopId = 1L,
+                shop = shop,
                 categoryId = 1L
             ).apply { id = 1L }
 
@@ -103,6 +113,14 @@ class ItemCartServiceTest : BehaviorSpec() {
 
             val buyerId = 1L
 
+            val shop = Shop(
+                sellerId = 1L,
+                name = "testName",
+                description = "testDescription",
+                shopImage = "testImage",
+                rate = 0.0f
+            )
+
             val product = Product(
                 name = "Test Product",
                 description = "Test Description",
@@ -113,7 +131,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                 isSoldOut = false,
                 deletedAt = LocalDateTime.now(),
                 isDeleted = false,
-                shopId = 1L,
+                shop = shop,
                 categoryId = 1L
             ).apply { id = 1L }
 
