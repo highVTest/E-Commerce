@@ -1,14 +1,22 @@
 package com.highv.ecommerce.domain.buyer.controller
 
 import com.highv.ecommerce.common.exception.LoginException
-import com.highv.ecommerce.domain.buyer.dto.BuyerResponse
-import com.highv.ecommerce.domain.buyer.dto.CreateBuyerRequest
+import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
+import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
+import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
+import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
+import com.highv.ecommerce.domain.buyer.dto.response.BuyerResponse
 import com.highv.ecommerce.domain.buyer.service.BuyerService
+import com.highv.ecommerce.infra.security.UserPrincipal
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -30,4 +38,39 @@ class BuyerController(private val buyerService: BuyerService) {
             .status(HttpStatus.CREATED)
             .body(buyerService.signUp(request))
     }
+
+    @PreAuthorize("hasRole('BUYER')")
+    @PatchMapping("/profile/password")
+    fun changePassword(
+        @Valid @RequestBody request: UpdateBuyerPasswordRequest,
+        bindingResult: BindingResult,
+        @AuthenticationPrincipal user: UserPrincipal,
+    ): ResponseEntity<Unit> {
+
+        if (bindingResult.hasErrors()) {
+            throw RuntimeException(bindingResult.fieldError?.defaultMessage.toString())
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(buyerService.changePassword(request, user.id))
+    }
+
+    @PreAuthorize("hasRole('BUYER')")
+    @PatchMapping("/profile/profile-image")
+    fun changeImage(
+        @RequestBody request: UpdateBuyerImageRequest,
+        @AuthenticationPrincipal user: UserPrincipal,
+    ): ResponseEntity<Unit> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(buyerService.changeProfileImage(request, user.id))
+
+    @PreAuthorize("hasRole('BUYER')")
+    @PutMapping("/profile")
+    fun changeProfile(
+        @RequestBody request: UpdateBuyerProfileRequest,
+        @AuthenticationPrincipal user: UserPrincipal,
+    ): ResponseEntity<BuyerResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(buyerService.changeProfile(request, user.id))
 }

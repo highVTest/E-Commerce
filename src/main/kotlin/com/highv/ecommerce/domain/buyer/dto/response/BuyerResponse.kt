@@ -1,4 +1,4 @@
-package com.highv.ecommerce.domain.buyer.dto
+package com.highv.ecommerce.domain.buyer.dto.response
 
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 
