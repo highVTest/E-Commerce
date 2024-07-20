@@ -4,6 +4,7 @@ import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.order_status.enumClass.RejectReason
 import com.highv.ecommerce.domain.products_order.dto.DescriptionRequest
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
+import com.highv.ecommerce.domain.products_order.enumClass.OrderStatusType
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -48,18 +49,34 @@ class OrderStatus(
     val deletedAt: LocalDateTime? = null,
 
     @Column(name = "is_deleted", nullable = false)
-    var isDeleted: Boolean = false
+    var isDeleted: Boolean = false,
 
+    @Column(name = "shop_id", nullable = false)
+    val shopId : Long,
+
+    @Column(name = "buyer_id", nullable = false)
+    val buyerId: Long,
 ){
-    fun buyerUpdate(rejectReason: RejectReason, descriptionRequest: DescriptionRequest) {
+    fun <T> buyerUpdate(orderStatusType: OrderStatusType, description: T) {
 
-        this.rejectReason = rejectReason
+        when (orderStatusType.name) {
+            "EXCHANGE" -> this.rejectReason = RejectReason.EXCHANGE_REQUESTED
+            "REFUND" -> this.rejectReason = RejectReason.REFUND_REQUESTED
+        }
+
         this.buyerDateTime = LocalDateTime.now()
-        this.buyerDescription = descriptionRequest.description
+        if(description is DescriptionRequest){
+            this.buyerDescription = description.description
+        }else if(description is String){
+            this.buyerDescription = description
+        }
     }
 
-    fun sellerUpdate(rejectReason: RejectReason, descriptionRequest: DescriptionRequest) {
-        this.rejectReason = rejectReason
+    fun sellerUpdate(orderStatusType: OrderStatusType, descriptionRequest: DescriptionRequest) {
+        when (orderStatusType.name) {
+            "EXCHANGE" -> this.rejectReason = RejectReason.EXCHANGE_REJECTED
+            "REFUND" -> this.rejectReason = RejectReason.REFUND_REJECTED
+        }
         this.sellerDateTime = LocalDateTime.now()
         this.sellerDescription = descriptionRequest.description
     }

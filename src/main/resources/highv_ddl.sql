@@ -115,7 +115,7 @@ CREATE TABLE products_order
     is_deleted    BOOLEAN                         NOT NULL
 );
 
-CREATE TABLE order_reject
+CREATE TABLE order_status
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     reject_reason    TEXT                              NOT NULL,
@@ -125,6 +125,7 @@ CREATE TABLE order_reject
     seller_yn        BOOLEAN,
     seller_dt        TIMESTAMP,
     seller_desc      TEXT,
+    shop_id          BIGINT NOT NULL,
     reg_dt           TIMESTAMP,
     deleted_at       TIMESTAMP,
     is_deleted       BOOLEAN                           NOT NULL,

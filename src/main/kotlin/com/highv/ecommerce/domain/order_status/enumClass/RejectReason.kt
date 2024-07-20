@@ -4,10 +4,10 @@ package com.highv.ecommerce.domain.order_status.enumClass
 enum class RejectReason {
     NONE,
 
-    CANCEL_REQUESTED,
-    CANCELLING,
-    CANCELLED,
-    CANCEL_REJECTED,
+//    CANCEL_REQUESTED,
+//    CANCELLING,
+//    CANCELLED,
+//    CANCEL_REJECTED,
 
     REFUND_REQUESTED,
     REFUNDING,

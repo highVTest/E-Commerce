@@ -1,21 +1,14 @@
 package com.highv.ecommerce.domain.products_order.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.domain.product.entity.Product
-import com.highv.ecommerce.domain.products_order.dto.DescriptionRequest
-import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
-import com.highv.ecommerce.domain.products_order.dto.ProductsOrderResponse
-import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
+import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.products_order.service.ProductsOrderService
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
-import kotlin.io.encoding.Base64
 
 @RestController
 @RequestMapping("/api/v1/")
@@ -40,7 +33,7 @@ class ProductsOrderController(
     @PatchMapping("/order_status/{orderId}")
     fun updateOrderStatus(
         @PathVariable("orderId") orderId: Long,
-        @RequestBody orderStatusRequest: OrderStatusRequest,
+        @RequestBody orderStatusRequest: BuyerOrderStatusRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal?,
     ): ResponseEntity<DefaultResponse> {
 

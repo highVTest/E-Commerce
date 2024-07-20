@@ -5,7 +5,7 @@ import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.order_status.entity.OrderStatus
 import com.highv.ecommerce.domain.order_status.enumClass.RejectReason
 import com.highv.ecommerce.domain.order_status.repository.OrderStatusRepository
-import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
+import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
 import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
@@ -25,7 +25,8 @@ class ProductsOrderService(
     @Transactional
     fun requestPayment(cartId: Long, userPrincipal: UserPrincipal): DefaultResponse {
         //TODO(카트 아이디 를 조회 해서 물건을 가져 온다 -> List<CartItem>)
-        val itemCart = itemCartRepository.findByIdAndBuyerId(cartId, userPrincipal.id) ?: throw RuntimeException("장바구니가 존재 하지 않습 니다")
+        val itemCart = itemCartRepository.findAllByBuyerId(userPrincipal.id)
+        val price = itemCart.sumOf { it.price }
 
         //TODO(만약에 CartItem 에 ProductId 가 Coupon 의 ProductId와 일치할 경우 CartItem 의 가격을 임시로 업데이트)
 
@@ -35,21 +36,24 @@ class ProductsOrderService(
                 buyerId = userPrincipal.id,
                 isPaid = false,
                 payDate = LocalDateTime.now(),
-                totalPrice = itemCart.price,
+                totalPrice = price,
                 deliveryStartAt = LocalDateTime.now(),
                 deliveryEndAt = LocalDateTime.now(),
                 regDate = LocalDateTime.now(),
             )
         )
 
-        orderRejectRepository.save(
-            OrderStatus(
-                rejectReason = RejectReason.NONE,
-                isBuyer = false,
-                isSellerReject = false,
-                itemCart = itemCart,
-                productsOrder = productsOrder
-            )
+        orderRejectRepository.saveAll(
+            itemCart.map {
+                OrderStatus(
+                    rejectReason = RejectReason.NONE,
+                    isBuyer = false,
+                    isSellerReject = false,
+                    itemCart = it,
+                    productsOrder = productsOrder
+                )
+            }
+
         )
 
 
@@ -57,7 +61,7 @@ class ProductsOrderService(
     }
 
     @Transactional
-    fun updateOrderStatus(orderId: Long, orderStatusRequest: OrderStatusRequest, userPrincipal: UserPrincipal): DefaultResponse {
+    fun updateOrderStatus(orderId: Long, orderStatusRequest: BuyerOrderStatusRequest, userPrincipal: UserPrincipal): DefaultResponse {
 
         val order = productsOrderRepository.findByIdOrNull(orderId) ?: throw RuntimeException()
 

@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface OrderStatusRepository: JpaRepository<OrderStatus, Long> {
 
     fun findByProductsOrder(productsOrder: ProductsOrder) : OrderStatus
+
+    fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderStatus>
 }
