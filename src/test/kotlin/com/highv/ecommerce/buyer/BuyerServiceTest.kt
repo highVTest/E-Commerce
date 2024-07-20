@@ -41,7 +41,7 @@ class BuyerServiceTest : BehaviorSpec({
         When("현재 비밀번호와 확인 비밀번호가 일치하지 않는다면") {
 
             val request = UpdateBuyerPasswordRequest(
-                currentPassword = "testPassword",
+                currentPassword = "testPassword1",
                 newPassword = "NewPassword",
                 confirmNewPassword = "NewPassword"
             )
@@ -116,7 +116,7 @@ class BuyerServiceTest : BehaviorSpec({
 
     }
 
-    Given("비밀번호를 바꿀때") {
+    Given("소셜 로그인 이용자가") {
 
         val buyerId = 1L
         val buyer = Buyer(
@@ -130,7 +130,7 @@ class BuyerServiceTest : BehaviorSpec({
             providerName = "naver"
         )
 
-        When("소셜 로그인 사용자이면") {
+        When("비밀번호를 바꿀때") {
 
             val request = UpdateBuyerPasswordRequest(
                 currentPassword = "testPassword",
@@ -150,7 +150,7 @@ class BuyerServiceTest : BehaviorSpec({
 
     }
 
-    Given("회원이 이미지를 변경하면") {
+    Given("회원이 프로필 이미지를 변경하면") {
         val buyerId = 1L
 
         When("소셜 회원이면") {
