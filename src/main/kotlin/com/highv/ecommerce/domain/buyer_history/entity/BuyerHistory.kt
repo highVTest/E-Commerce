@@ -10,9 +10,8 @@ class BuyerHistory(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "buyer_id")
-    val buyer: Buyer,
+    @Column(name= "buyer_id", nullable = false)
+    val buyerId: Long,
 
     @Column(name= "order_id", nullable = false)
     val orderId: Long,

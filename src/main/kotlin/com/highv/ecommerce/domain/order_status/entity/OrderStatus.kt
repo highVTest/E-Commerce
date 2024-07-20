@@ -19,17 +19,11 @@ class OrderStatus(
     @Column(name = "reject_reason", nullable = false)
     var rejectReason: RejectReason,
 
-    @Column(name = "buyer_yn",nullable = false)
-    val isBuyer: Boolean,
-
     @Column(name = "buyer_dt",nullable = true)
     var buyerDateTime : LocalDateTime? = null,
 
     @Column(name = "buyer_desc",nullable = true)
     var buyerDescription : String? = null,
-
-    @Column(name = "seller_reject_yn",nullable = false)
-    val isSellerReject: Boolean,
 
     @Column(name = "seller_reject_dt",nullable = true)
     var sellerDateTime : LocalDateTime? = null,

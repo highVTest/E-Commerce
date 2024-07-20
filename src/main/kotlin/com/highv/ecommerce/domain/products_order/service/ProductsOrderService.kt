@@ -1,11 +1,12 @@
 package com.highv.ecommerce.domain.products_order.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.domain.buyer_history.entity.BuyerHistory
+import com.highv.ecommerce.domain.buyer_history.repository.BuyerHistoryRepository
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.order_status.entity.OrderStatus
 import com.highv.ecommerce.domain.order_status.enumClass.RejectReason
-import com.highv.ecommerce.domain.order_status.repository.OrderStatusRepository
-import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
+import com.highv.ecommerce.domain.order_status.repository.OrderStatusJpaRepository
 import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
@@ -19,8 +20,9 @@ import java.time.LocalDateTime
 @Service
 class ProductsOrderService(
     private val productsOrderRepository: ProductsOrderRepository,
-    private val orderRejectRepository: OrderStatusRepository,
+    private val orderStatusRepository: OrderStatusJpaRepository,
     private val itemCartRepository: ItemCartRepository,
+    private val buyerHistoryRepository: BuyerHistoryRepository,
 ){
 
     @Transactional
@@ -29,8 +31,6 @@ class ProductsOrderService(
         val itemCart = itemCartRepository.findAllByBuyerId(userPrincipal.id)
         val price = itemCart.sumOf { it.price }
 
-
-        //TODO(ITEM 카트 DB 얻데이트 -> products_orderId , is_deleted = true , deleted_at 업데이트 )
         //TODO(만약에 CartItem 에 ProductId 가 Coupon 의 ProductId와 일치할 경우 CartItem 의 가격을 임시로 업데이트)
 
         val productsOrder = productsOrderRepository.saveAndFlush(
@@ -48,12 +48,17 @@ class ProductsOrderService(
 
         itemCart.map { it.paymentUpdate(productsOrder.id!!) }
 
-        orderRejectRepository.saveAll(
+        buyerHistoryRepository.save(
+            BuyerHistory(
+                orderId = productsOrder.id!!,
+                buyerId = userPrincipal.id
+            )
+        )
+
+        orderStatusRepository.saveAll(
             itemCart.map {
                 OrderStatus(
                     rejectReason = RejectReason.NONE,
-                    isBuyer = false,
-                    isSellerReject = false,
                     itemCart = it,
                     productsOrder = productsOrder,
                     shopId = 1L,

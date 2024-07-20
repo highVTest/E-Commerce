@@ -67,16 +67,15 @@ class OrderStatusController(
         return ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusRejectList(sellerOrderStatusRequest, userPrincipal))
     }
 
-    @PreAuthorize("hasRole('SELLER') or hasRole('BUYER')")
-    @GetMapping("/order_details/{orderId}")
-    fun getOrderDetails(
-        @PathVariable("orderId") orderId: Long,
+    @PreAuthorize("hasRole('BUYER')")
+    @GetMapping("/order_details/buyer")
+    fun getBuyerOrderDetails(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-    ): ResponseEntity<ProductsOrderResponse> {
+    ): ResponseEntity<List<ProductsOrderResponse>> {
 
         if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
 
-        return ResponseEntity.status(HttpStatus.OK).body(orderStatusService.getOrderDetails(orderId, userPrincipal))
+        return ResponseEntity.status(HttpStatus.OK).body(orderStatusService.getBuyerOrderDetails(userPrincipal))
     }
 
 

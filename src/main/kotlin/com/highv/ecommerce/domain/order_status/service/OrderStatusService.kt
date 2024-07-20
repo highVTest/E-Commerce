@@ -1,10 +1,9 @@
 package com.highv.ecommerce.domain.order_status.service
 
 import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
-import com.highv.ecommerce.domain.order_status.dto.OrderListRequest
 import com.highv.ecommerce.domain.order_status.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_status.dto.SellerOrderStatusRequest
-import com.highv.ecommerce.domain.order_status.repository.OrderStatusRepository
+import com.highv.ecommerce.domain.order_status.repository.OrderStatusJpaRepository
 import com.highv.ecommerce.domain.products_order.dto.DescriptionRequest
 import com.highv.ecommerce.domain.products_order.dto.ProductsOrderResponse
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
@@ -15,20 +14,20 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OrderStatusService(
-    private val orderStatusRepository: OrderStatusRepository,
+    private val orderStatusRepository: OrderStatusJpaRepository,
 ){
 
 
     @Transactional
     fun requestOrderStatusChange(orderStatusId: Long, descriptionRequest: DescriptionRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
 
-        val orderReject = orderStatusRepository.findByIdOrNull(orderStatusId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
+        val orderStatus = orderStatusRepository.findByIdOrNull(orderStatusId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
 
-        orderReject.productsOrder.update(StatusCode.PENDING)
+        orderStatus.productsOrder.update(StatusCode.PENDING)
 
-        orderReject.buyerUpdate(descriptionRequest.orderStatusType, descriptionRequest)
+        orderStatus.buyerUpdate(descriptionRequest.orderStatusType, descriptionRequest)
 
-        orderStatusRepository.save(orderReject)
+        orderStatusRepository.save(orderStatus)
 
         return OrderStatusResponse.from(descriptionRequest.orderStatusType,"요청 완료 되었습니다")
     }
@@ -47,17 +46,21 @@ class OrderStatusService(
         return OrderStatusResponse.from(descriptionRequest.orderStatusType ,"요청 거절 완료 되었습니다")
     }
 
-    fun getOrderDetails(orderStatusId: Long, userPrincipal: UserPrincipal): ProductsOrderResponse {
+    fun getBuyerOrderDetails(userPrincipal: UserPrincipal): List<ProductsOrderResponse> {
 
-        val orderStatus = orderStatusRepository.findByIdOrNull(orderStatusId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
+        val orderStatus = orderStatusRepository.findAllByBuyerId(userPrincipal.id)
 
-        return ProductsOrderResponse.from(orderStatus)
+        return orderStatus.map { ProductsOrderResponse.from(it) }
     }
 
     @Transactional
     fun requestOrderStatusChangeList(buyerOrderStatusRequest: BuyerOrderStatusRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
 
         val orderStatus = orderStatusRepository.findAllByShopIdAndBuyerId(buyerOrderStatusRequest.shopId, userPrincipal.id)
+
+        orderStatus.map {
+            it.productsOrder.statusCode = StatusCode.PENDING
+        }
 
         orderStatus.map {
             it.buyerUpdate(buyerOrderStatusRequest.orderStatusType, buyerOrderStatusRequest.description)
