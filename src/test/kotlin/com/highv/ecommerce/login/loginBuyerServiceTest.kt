@@ -1,6 +1,6 @@
 package com.highv.ecommerce.login
 
-import com.highv.ecommerce.domain.buyer.dto.CreateBuyerRequest
+import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.buyer.service.BuyerService
