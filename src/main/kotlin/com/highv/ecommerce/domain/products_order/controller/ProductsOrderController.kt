@@ -20,27 +20,20 @@ class ProductsOrderController(
     @PreAuthorize("hasRole('BUYER')")
     @PostMapping("/payments")
     fun requestPayment(
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-    )
-            : ResponseEntity<DefaultResponse> {
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+    ): ResponseEntity<DefaultResponse>
+        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal))
 
-        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
-
-        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal))
-    }
 
     @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/order_status/{orderId}")
     fun updateOrderStatus(
         @PathVariable("orderId") orderId: Long,
         @RequestBody orderStatusRequest: OrderStatusRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
-    ): ResponseEntity<DefaultResponse> {
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+    ): ResponseEntity<DefaultResponse>
+        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.updateOrderStatus(orderId, orderStatusRequest, userPrincipal))
 
-        if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
-
-        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.updateOrderStatus(orderId, orderStatusRequest, userPrincipal))
-    }
 
 
 
