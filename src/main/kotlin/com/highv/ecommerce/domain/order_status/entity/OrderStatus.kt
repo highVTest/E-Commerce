@@ -69,16 +69,24 @@ class OrderStatus(
             this.buyerDescription = description.description
         }else if(description is String){
             this.buyerDescription = description
+        }else{
+            throw RuntimeException("잘못된 접근 입니다")
         }
     }
 
-    fun sellerUpdate(orderStatusType: OrderStatusType, descriptionRequest: DescriptionRequest) {
+    fun <T> sellerUpdate(orderStatusType: OrderStatusType, description: T) {
         when (orderStatusType.name) {
             "EXCHANGE" -> this.rejectReason = RejectReason.EXCHANGE_REJECTED
             "REFUND" -> this.rejectReason = RejectReason.REFUND_REJECTED
         }
         this.sellerDateTime = LocalDateTime.now()
-        this.sellerDescription = descriptionRequest.description
+        if(description is DescriptionRequest){
+            this.sellerDescription = description.description
+        }else if(description is String){
+            this.sellerDescription = description
+        }else{
+            throw RuntimeException("잘못된 접근 입니다")
+        }
     }
 
 }
