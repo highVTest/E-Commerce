@@ -1,6 +1,11 @@
 package com.highv.ecommerce.domain.seller.entity
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 
 @Entity
 @Table(name = "seller")
@@ -8,15 +13,15 @@ class Seller(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @Column(name = "nickname")
-    val nickname: String,
+    var nickname: String,
     @Column(name = "password")
-    val password: String,
+    var password: String,
     @Column(name = "email")
     val email: String,
     @Column(name = "profile_image")
-    val profileImage: String,
+    var profileImage: String,
     @Column(name = "phone_number")
-    val phoneNumber: String,
+    var phoneNumber: String,
     @Column(name = "address")
-    val address: String,
+    var address: String,
 )
