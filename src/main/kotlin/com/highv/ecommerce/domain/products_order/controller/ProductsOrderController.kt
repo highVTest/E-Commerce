@@ -2,6 +2,7 @@ package com.highv.ecommerce.domain.products_order.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
+import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.products_order.service.ProductsOrderService
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
@@ -17,23 +18,22 @@ class ProductsOrderController(
 ) {
 
     @PreAuthorize("hasRole('BUYER')")
-    @PostMapping("/payments/{cartId}")
+    @PostMapping("/payments")
     fun requestPayment(
-        @PathVariable("cartId") cartId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal?,
     )
             : ResponseEntity<DefaultResponse> {
 
         if (userPrincipal == null) throw RuntimeException("로그인 실패!!")
 
-        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(cartId, userPrincipal))
+        return ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal))
     }
 
     @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/order_status/{orderId}")
     fun updateOrderStatus(
         @PathVariable("orderId") orderId: Long,
-        @RequestBody orderStatusRequest: BuyerOrderStatusRequest,
+        @RequestBody orderStatusRequest: OrderStatusRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal?,
     ): ResponseEntity<DefaultResponse> {
 

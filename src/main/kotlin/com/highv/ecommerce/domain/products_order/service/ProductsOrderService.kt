@@ -6,6 +6,7 @@ import com.highv.ecommerce.domain.order_status.entity.OrderStatus
 import com.highv.ecommerce.domain.order_status.enumClass.RejectReason
 import com.highv.ecommerce.domain.order_status.repository.OrderStatusRepository
 import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
+import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
 import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
@@ -23,11 +24,13 @@ class ProductsOrderService(
 ){
 
     @Transactional
-    fun requestPayment(cartId: Long, userPrincipal: UserPrincipal): DefaultResponse {
+    fun requestPayment(userPrincipal: UserPrincipal): DefaultResponse {
         //TODO(카트 아이디 를 조회 해서 물건을 가져 온다 -> List<CartItem>)
         val itemCart = itemCartRepository.findAllByBuyerId(userPrincipal.id)
         val price = itemCart.sumOf { it.price }
 
+
+        //TODO(ITEM 카트 DB 얻데이트 -> products_orderId , is_deleted = true , deleted_at 업데이트 )
         //TODO(만약에 CartItem 에 ProductId 가 Coupon 의 ProductId와 일치할 경우 CartItem 의 가격을 임시로 업데이트)
 
         val productsOrder = productsOrderRepository.saveAndFlush(
@@ -43,6 +46,8 @@ class ProductsOrderService(
             )
         )
 
+        itemCart.map { it.paymentUpdate(productsOrder.id!!) }
+
         orderRejectRepository.saveAll(
             itemCart.map {
                 OrderStatus(
@@ -50,7 +55,9 @@ class ProductsOrderService(
                     isBuyer = false,
                     isSellerReject = false,
                     itemCart = it,
-                    productsOrder = productsOrder
+                    productsOrder = productsOrder,
+                    shopId = 1L,
+                    buyerId = userPrincipal.id
                 )
             }
 
@@ -61,7 +68,7 @@ class ProductsOrderService(
     }
 
     @Transactional
-    fun updateOrderStatus(orderId: Long, orderStatusRequest: BuyerOrderStatusRequest, userPrincipal: UserPrincipal): DefaultResponse {
+    fun updateOrderStatus(orderId: Long, orderStatusRequest: OrderStatusRequest, userPrincipal: UserPrincipal): DefaultResponse {
 
         val order = productsOrderRepository.findByIdOrNull(orderId) ?: throw RuntimeException()
 

@@ -48,4 +48,10 @@ class ItemCart(
         this.quantity = quantity
         price = this.quantity * productPrice
     }
+
+    fun paymentUpdate(productsOrderId: Long) {
+        this.orderId = productsOrderId
+        this.deletedAt = LocalDateTime.now()
+        this.isDeleted = true
+    }
 }

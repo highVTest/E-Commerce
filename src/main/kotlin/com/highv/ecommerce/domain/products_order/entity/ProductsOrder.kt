@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.products_order.entity
 
 import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
+import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
 import jakarta.persistence.*
 import org.springframework.boot.context.properties.bind.DefaultValue
@@ -47,11 +48,17 @@ class ProductsOrder(
 ){
     fun <T> update(orderStatusRequest: T) {
 
-        if(orderStatusRequest is BuyerOrderStatusRequest){
-            statusCode = orderStatusRequest.statusCode
-        }else if(orderStatusRequest is StatusCode){
-            statusCode = orderStatusRequest
-        }else throw RuntimeException("잘못된 값 입니다")
+        statusCode = when (orderStatusRequest) {
+            is OrderStatusRequest -> {
+                orderStatusRequest.statusCode
+            }
+
+            is StatusCode -> {
+                orderStatusRequest
+            }
+
+            else -> throw RuntimeException("잘못된 값 입니다")
+        }
 
     }
 
