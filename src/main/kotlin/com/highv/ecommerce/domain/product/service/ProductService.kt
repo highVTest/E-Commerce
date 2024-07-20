@@ -1,5 +1,7 @@
 package com.highv.ecommerce.domain.product.service
 
+import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
+import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
 import com.highv.ecommerce.domain.product.dto.CreateProductRequest
 import com.highv.ecommerce.domain.product.dto.ProductResponse
 import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
@@ -15,7 +17,8 @@ import java.time.LocalDateTime
 @Service
 class ProductService(
     private val productRepository: ProductRepository,
-    private val shopRepository: ShopRepository
+    private val shopRepository: ShopRepository,
+    private val productBackOfficeRepository: ProductBackOfficeRepository
 ) {
     fun createProduct(sellerId: Long, productRequest: CreateProductRequest): ProductResponse {
         val shop = shopRepository.findShopBySellerId(sellerId)
@@ -30,9 +33,19 @@ class ProductService(
             deletedAt = LocalDateTime.now(),
             isDeleted = false,
             shop = shop,
-            categoryId = productRequest.categoryId
+            categoryId = productRequest.categoryId,
+            productBackOffice = null
         )
         val savedProduct = productRepository.save(product)
+
+        val productBackOffice = ProductBackOffice(
+            quantity = 0,
+            price = 0,
+            soldQuantity = 0,
+            product = savedProduct
+        )
+        savedProduct.productBackOffice = productBackOffice
+        productBackOfficeRepository.save(productBackOffice)
         return ProductResponse.from(savedProduct)
     }
 

@@ -36,8 +36,7 @@ class SalesStatisticsService(
         val productName = productRepository.findByIdOrNull(productId)
             ?: throw IllegalArgumentException("Product with ID $productId not found")
         if (productName.shop.sellerId != sellerId) throw IllegalArgumentException("No Authority")
-        val product = productBackOfficeRepository.findByIdOrNull(productId)
-            ?: throw IllegalArgumentException("Product with ID $productId not found")
+        val product = productBackOfficeRepository.findProductBackOfficesByProductId(productId)
         return ProductSalesQuantityResponse(productName.name, product.soldQuantity)
     }
 
@@ -45,8 +44,7 @@ class SalesStatisticsService(
         val productName = productRepository.findByIdOrNull(productId)
             ?: throw RuntimeException("Product with ID $productId not found")
         if (productName.shop.sellerId != sellerId) throw IllegalArgumentException("No Authority")
-        val product = productBackOfficeRepository.findByIdOrNull(productId)
-            ?: throw RuntimeException("Product with ID $productId not found")
+        val product = productBackOfficeRepository.findProductBackOfficesByProductId(productId)
         return ProductSalesResponse(productName.name, product.soldQuantity * product.price)
     }
 }

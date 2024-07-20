@@ -14,7 +14,7 @@ class InventoryManagementService(
 ) {
     fun getProductsQuantity(sellerId: Long, productId: Long): ProductBackOfficeResponse {
         val product = validateProduct(sellerId, productId)
-        return ProductBackOfficeResponse(product.id, product.quantity, product.price)
+        return ProductBackOfficeResponse(product.quantity, product.price)
     }
 
     fun changeQuantity(sellerId: Long, productId: Long, quantity: Int): ProductBackOfficeResponse {
@@ -34,8 +34,8 @@ class InventoryManagementService(
     private fun validateProduct(sellerId: Long, productId: Long): ProductBackOffice {
         val productName = productRepository.findByIdOrNull(productId)
             ?: throw IllegalArgumentException("Product with id $productId not found")
-        val product = productBackOfficeRepository.findByIdOrNull(productId)
-            ?: throw RuntimeException("Product with ID $productId not found")
+        val product =
+            productBackOfficeRepository.findProductBackOfficesByProductId(productName.productBackOffice?.product?.id!!)
         if (productName.shop.sellerId != sellerId) throw IllegalArgumentException("No Authority")
         return product
     }
