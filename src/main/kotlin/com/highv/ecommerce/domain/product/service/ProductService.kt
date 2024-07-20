@@ -1,19 +1,27 @@
 package com.highv.ecommerce.domain.product.service
 
+import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
+import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
 import com.highv.ecommerce.domain.product.dto.CreateProductRequest
 import com.highv.ecommerce.domain.product.dto.ProductResponse
 import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
+import com.highv.ecommerce.domain.shop.repository.ShopRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
 class ProductService(
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val shopRepository: ShopRepository,
+    private val productBackOfficeRepository: ProductBackOfficeRepository
 ) {
-    fun createProduct(productRequest: CreateProductRequest): ProductResponse {
+    fun createProduct(sellerId: Long, productRequest: CreateProductRequest): ProductResponse {
+        val shop = shopRepository.findShopBySellerId(sellerId)
         val product = Product(
             name = productRequest.name,
             description = productRequest.description,
@@ -24,15 +32,26 @@ class ProductService(
             isSoldOut = false,
             deletedAt = LocalDateTime.now(),
             isDeleted = false,
-            shopId = productRequest.shopId,
-            categoryId = productRequest.categoryId
+            shop = shop,
+            categoryId = productRequest.categoryId,
+            productBackOffice = null
         )
         val savedProduct = productRepository.save(product)
+
+        val productBackOffice = ProductBackOffice(
+            quantity = 0,
+            price = 0,
+            soldQuantity = 0,
+            product = savedProduct
+        )
+        savedProduct.productBackOffice = productBackOffice
+        productBackOfficeRepository.save(productBackOffice)
         return ProductResponse.from(savedProduct)
     }
 
-    fun updateProduct(productId: Long, updateProductRequest: UpdateProductRequest): ProductResponse {
+    fun updateProduct(sellerId: Long, productId: Long, updateProductRequest: UpdateProductRequest): ProductResponse {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
+        if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")
         product.apply {
             name = updateProductRequest.name
             description = updateProductRequest.description
@@ -45,8 +64,9 @@ class ProductService(
         return ProductResponse.from(updatedProduct)
     }
 
-    fun deleteProduct(productId: Long) {
+    fun deleteProduct(sellerId: Long, productId: Long) {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
+        if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")
         product.apply {
             isDeleted = true
             deletedAt = LocalDateTime.now()
@@ -57,5 +77,23 @@ class ProductService(
     fun getProductById(productId: Long): ProductResponse {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
         return ProductResponse.from(product)
+    }
+
+    fun getAllProducts(pageable: Pageable): Page<ProductResponse> {
+        val products = productRepository.findAllPaginated(pageable)
+        return products.map { ProductResponse.from(it) }
+    }
+
+    fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductResponse> {
+        val products = productRepository.findByCategoryPaginated(categoryId, pageable)
+        return products.map { ProductResponse.from(it) }
+    }
+
+    fun searchProduct(keyword: String, pageable: Pageable): Page<ProductResponse> {
+        val products = productRepository.searchByKeywordPaginated(keyword, pageable)
+        if (products.hasContent()) {
+            return products.map { ProductResponse.from(it) }
+        }
+        return Page.empty(pageable)
     }
 }

@@ -1,5 +1,7 @@
 package com.highv.ecommerce.domain.product.entity
 
+import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
+import com.highv.ecommerce.domain.shop.entity.Shop
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -27,17 +29,22 @@ class Product(
     var isSoldOut: Boolean,
 
     @Column(name = "deleted_at")
-    var deletedAt: LocalDateTime?,
+    var deletedAt: LocalDateTime,
 
     @Column(name = "is_deleted")
     var isDeleted: Boolean,
 
-    @Column(name = "shop_id")
-    val shopId: Long,
+    @ManyToOne
+    @JoinColumn(name = "shop_id", nullable = false)
+    val shop: Shop,
 
     @Column(name = "category_id")
     var categoryId: Long,
-){
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @OneToOne(mappedBy = "product", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, optional = false)
+    var productBackOffice: ProductBackOffice? = null
+) {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 }
