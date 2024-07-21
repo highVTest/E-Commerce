@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.coupon.repository
 
 import com.highv.ecommerce.domain.coupon.entity.Coupon
+import org.springframework.data.repository.query.Param
 
 
 interface CouponRepository {
@@ -20,4 +21,8 @@ interface CouponRepository {
     fun findByIdAndSellerId(couponId: Long, sellerId: Long): Coupon?
 
     fun findAllBySellerId(sellerId: Long): List<Coupon>
+
+    fun getLock(name: String, time: Int):Int
+
+    fun releaseLock(name: String): Int
 }

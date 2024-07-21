@@ -106,26 +106,37 @@ class CouponService(
     @Transactional
     fun issuedCoupon(couponId: Long, userPrincipal: UserPrincipal): DefaultResponse {
 
+        val getLock = couponRepository.getLock("lock_$couponId", 10) == 1
+
+        if(!getLock) throw RuntimeException("락이 걸려있지 않습니다")
+
         val buyer = buyerRepository.findByEmail(userPrincipal.email) ?: throw RuntimeException("바이어가 존재 하지 않습니다")
 
-        val coupon = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
+        kotlin.runCatching {
+            val coupon = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
-        if(couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw RuntimeException("동일한 쿠폰은 지급 받을 수 없습니다")
+            if(couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw RuntimeException("동일한 쿠폰은 지급 받을 수 없습니다")
 
 
 
-        coupon.validExpiredAt()
+            coupon.validExpiredAt()
 
-        couponToBuyerRepository.save(
-            CouponToBuyer(
-                buyer = buyer,
-                coupon = coupon
+            couponToBuyerRepository.save(
+                CouponToBuyer(
+                    buyer = buyer,
+                    coupon = coupon
+                )
             )
-        )
 
-        coupon.spendCoupon()
+            coupon.spendCoupon()
 
-        couponRepository.save(coupon)
+            couponRepository.save(coupon)
+        }.onFailure {
+            throw RuntimeException()
+        }.also {
+            couponRepository.releaseLock("lock_$couponId")
+        }
+
 
         return DefaultResponse.from("쿠폰이 지급 되었습니다")
     }

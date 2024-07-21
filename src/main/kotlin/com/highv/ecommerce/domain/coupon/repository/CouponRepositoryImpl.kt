@@ -56,4 +56,12 @@ class CouponRepositoryImpl(
     override fun findAllBySellerId(sellerId: Long): List<Coupon> {
         return couponJpaRepository.findAllBySellerId(sellerId)
     }
+
+    override fun getLock(name: String, time: Int): Int {
+        return couponJpaRepository.getLock(name, time)
+    }
+
+    override fun releaseLock(name: String): Int {
+        return couponJpaRepository.releaseLock(name)
+    }
 }
