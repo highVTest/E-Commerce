@@ -13,13 +13,19 @@ import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.coupon.service.CouponService
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
+import com.highv.ecommerce.domain.shop.entity.Shop
 import com.highv.ecommerce.infra.security.UserPrincipal
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
+import org.aspectj.runtime.internal.cflowstack.ThreadCounter
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDateTime
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 
 class CouponServiceTest {
@@ -31,97 +37,7 @@ class CouponServiceTest {
     private val couponService = CouponService(couponRepository, productRepository, couponToBuyerRepository, buyerRepository)
     private val userPrincipal = mockk<UserPrincipal>()
 
-    //Given
-    companion object{
 
-        private val product = Product(
-            name = "Test product name",
-            description = "Test product description",
-            productImage = "test",
-            favorite = 1,
-            createdAt = LocalDateTime.of(2021, 1, 1, 1, 1, 0),
-            updatedAt = LocalDateTime.of(2021, 1, 1, 1, 1, 0),
-            isSoldOut = false,
-            deletedAt = null,
-            isDeleted = false,
-            shopId = 1L,
-            categoryId = 1L,
-        )
-        private var createCouponRequest = CreateCouponRequest(
-            productId = 1,
-            discountPolicy = DiscountPolicy.DISCOUNT_PRICE,
-            discount = 30000,
-            expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
-            quantity = 1
-        )
-
-        private val updateCouponRequest = UpdateCouponRequest(
-            discountPolicy = DiscountPolicy.DISCOUNT_PRICE,
-            discount = 30000,
-            expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
-            quantity = 1
-        )
-
-        private val coupon = Coupon(
-            id = 1L,
-            product = product,
-            discountPolicy = DiscountPolicy.DISCOUNT_PRICE,
-            discount = 30000,
-            expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
-            quantity = 1,
-            createdAt = LocalDateTime.of(2024, 7, 1, 0, 0),
-            deletedAt = null,
-            isDeleted = false,
-            sellerId = 1L
-        )
-
-        private val coupon2 = Coupon(
-            id = 2L,
-            product = product,
-            discountPolicy = DiscountPolicy.DISCOUNT_RATE,
-            discount = 50,
-            expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
-            quantity = 1,
-            createdAt = LocalDateTime.of(2024, 7, 1, 0, 0),
-            deletedAt = null,
-            isDeleted = false,
-            sellerId = 1L
-        )
-
-        private val coupon3 = Coupon(
-            id = 3L,
-            product = product,
-            discountPolicy = DiscountPolicy.DISCOUNT_RATE,
-            discount = 50,
-            expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
-            quantity = 1,
-            createdAt = LocalDateTime.of(2024, 7, 1, 0, 0),
-            deletedAt = null,
-            isDeleted = false,
-            sellerId = 2L
-        )
-
-        private val buyer1 = Buyer(
-            id = 1L,
-            nickname = "eeee",
-            password = "test",
-            email = "eeeeee@eee.com",
-            profileImage = "test",
-            phoneNumber = "1234567890",
-            address = "address",
-            providerName = null,
-            providerId = null,
-        )
-
-        val couponToBuyer = CouponToBuyer(
-            id = 1L,
-            coupon = coupon,
-            buyer = buyer1,
-        )
-
-
-        fun defaultResponse(msg: String) = DefaultResponse(msg)
-    }
 
     @Test
     fun `쿠폰의 정책이 DISCOUNT_RATE 이고 CreateCouponRequest 의 값이 100 이상일 경우 RuntimeException을 벌생`() {
@@ -311,24 +227,149 @@ class CouponServiceTest {
         }
     }
 
+
+    // 잘 모르 겠음
     @Test
     fun `쿠폰이 발급될 경우에 정상적 으로 발급이 되는지 확인`(){
 
+        val threadCount = 10
+
+        val executorService = Executors.newFixedThreadPool(threadCount)
+        val barrier = CyclicBarrier(threadCount)
+
         every { userPrincipal.email } returns "eeeeee@eee.com"
+
+        every { couponRepository.getLock(any(), any()) } returns 1
 
         every { buyerRepository.findByEmail(any()) } returns buyer1
 
-        every { couponRepository.findByIdOrNull(any()) } returns coupon
 
-        every { couponToBuyerRepository.existsByCouponIdAndBuyerId(any(), any()) } returns false
+        repeat(threadCount){
+            executorService.execute{
+                try {
+                    barrier.await()
+                    kotlin.runCatching {
+                        every { couponRepository.findByIdOrNull(1L) } returns coupon
+                        couponService.issuedCoupon(1L, userPrincipal)
+                        println("쿠폰 발급")
+                    }.onFailure {
+                        println("쿠폰 발급 실패")
+                    }
+                }catch(e: Exception){
+                    e.printStackTrace()
+                }
 
-        every { couponToBuyerRepository.save(any()) } returns couponToBuyer
 
-        every { couponRepository.save(any()) } returns coupon
+            }
+        }
+        executorService.shutdown()
+        executorService.awaitTermination(5, TimeUnit.SECONDS)
 
-        val result = couponService.issuedCoupon(1L, userPrincipal)
 
-        result shouldBe defaultResponse("쿠폰이 지급 되었습니다")
+        verify{ couponRepository.findByIdOrNull(1L)!!.quantity shouldBe 90 }
+        verify(exactly = threadCount) { couponRepository.getLock(any(),any()) }
+        verify(exactly = threadCount) { couponRepository.releaseLock(any()) }
+    }
+
+
+
+    //Given
+    companion object{
+        private val shop = Shop(
+            sellerId = 1L,
+            name = "name",
+            description = "description",
+            shopImage = "shopImage",
+            rate = 10f
+        )
+
+        private val product = Product(
+            name = "Test product name",
+            description = "Test product description",
+            productImage = "test",
+            favorite = 1,
+            createdAt = LocalDateTime.of(2021, 1, 1, 1, 1, 0),
+            updatedAt = LocalDateTime.of(2021, 1, 1, 1, 1, 0),
+            isSoldOut = false,
+            deletedAt = null,
+            isDeleted = false,
+            shop = shop,
+            categoryId = 1L,
+        )
+        private var createCouponRequest = CreateCouponRequest(
+            productId = 1,
+            discountPolicy = DiscountPolicy.DISCOUNT_PRICE,
+            discount = 30000,
+            expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
+            quantity = 1
+        )
+
+        private val updateCouponRequest = UpdateCouponRequest(
+            discountPolicy = DiscountPolicy.DISCOUNT_PRICE,
+            discount = 30000,
+            expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
+            quantity = 1
+        )
+
+        private val coupon = Coupon(
+            id = 1L,
+            product = product,
+            discountPolicy = DiscountPolicy.DISCOUNT_PRICE,
+            discount = 30000,
+            expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
+            quantity = 100,
+            createdAt = LocalDateTime.of(2024, 7, 1, 0, 0),
+            deletedAt = null,
+            isDeleted = false,
+            sellerId = 1L
+        )
+
+        private val coupon2 = Coupon(
+            id = 2L,
+            product = product,
+            discountPolicy = DiscountPolicy.DISCOUNT_RATE,
+            discount = 50,
+            expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
+            quantity = 1,
+            createdAt = LocalDateTime.of(2024, 7, 1, 0, 0),
+            deletedAt = null,
+            isDeleted = false,
+            sellerId = 1L
+        )
+
+        private val coupon3 = Coupon(
+            id = 3L,
+            product = product,
+            discountPolicy = DiscountPolicy.DISCOUNT_RATE,
+            discount = 50,
+            expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
+            quantity = 1,
+            createdAt = LocalDateTime.of(2024, 7, 1, 0, 0),
+            deletedAt = null,
+            isDeleted = false,
+            sellerId = 2L
+        )
+
+        private val buyer1 = Buyer(
+            id = 1L,
+            nickname = "eeee",
+            password = "test",
+            email = "eeeeee@eee.com",
+            profileImage = "test",
+            phoneNumber = "1234567890",
+            address = "address",
+            providerName = null,
+            providerId = null,
+        )
+
+        val couponToBuyer = CouponToBuyer(
+            id = 1L,
+            coupon = coupon,
+            buyer = buyer1,
+        )
+
+
+        fun defaultResponse(msg: String) = DefaultResponse(msg)
     }
 
 

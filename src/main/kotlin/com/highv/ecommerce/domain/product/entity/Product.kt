@@ -29,7 +29,7 @@ class Product(
     var isSoldOut: Boolean,
 
     @Column(name = "deleted_at")
-    var deletedAt: LocalDateTime,
+    var deletedAt: LocalDateTime?,
 
     @Column(name = "is_deleted")
     var isDeleted: Boolean,

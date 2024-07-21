@@ -4,6 +4,7 @@ import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import com.highv.ecommerce.domain.coupon.entity.Coupon
 import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import com.highv.ecommerce.domain.product.entity.Product
+import com.highv.ecommerce.domain.shop.entity.Shop
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
@@ -13,6 +14,14 @@ class CouponTest {
 
     //Given
     companion object{
+        private val shop = Shop(
+            sellerId = 1L,
+            name = "name",
+            description = "description",
+            shopImage = "shopImage",
+            rate = 10f
+        )
+
         private val product = Product(
             name = "Test product name",
             description = "Test product description",
@@ -23,7 +32,7 @@ class CouponTest {
             isSoldOut = false,
             deletedAt = null,
             isDeleted = false,
-            shopId = 1L,
+            shop = shop,
             categoryId = 1L,
         )
 
