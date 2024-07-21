@@ -4,16 +4,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 
 @Component
-class MailService(
+class EmailUtils(
     private val emailSender: JavaMailSender
 ) {
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    @Transactional
     fun sendEmail(
         toEmail: String,
         title: String,
