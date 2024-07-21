@@ -1,8 +1,8 @@
-package com.highv.ecommerce.domain.login.service
+package com.highv.ecommerce.domain.auth.service
 
 import com.highv.ecommerce.common.dto.AccessTokenResponse
+import com.highv.ecommerce.domain.auth.dto.LoginRequest
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
-import com.highv.ecommerce.domain.login.dto.LoginRequest
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.infra.security.jwt.JwtPlugin
 import org.springframework.security.crypto.password.PasswordEncoder

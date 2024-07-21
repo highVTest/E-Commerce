@@ -1,10 +1,8 @@
-package com.highv.ecommerce.domain.login.controller
+package com.highv.ecommerce.domain.auth.controller
 
 import com.highv.ecommerce.common.dto.AccessTokenResponse
-import com.highv.ecommerce.domain.buyer.service.BuyerService
-import com.highv.ecommerce.domain.login.dto.LoginRequest
-import com.highv.ecommerce.domain.login.service.UserService
-import com.highv.ecommerce.domain.seller.service.SellerService
+import com.highv.ecommerce.domain.auth.dto.LoginRequest
+import com.highv.ecommerce.domain.auth.service.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

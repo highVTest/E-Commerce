@@ -1,4 +1,4 @@
-package com.highv.ecommerce.domain.login.dto
+package com.highv.ecommerce.domain.auth.dto
 
 data class LoginRequest(
     val email: String,
