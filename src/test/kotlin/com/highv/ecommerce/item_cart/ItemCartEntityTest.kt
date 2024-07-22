@@ -18,7 +18,7 @@ class ItemCartEntityTest : AnnotationSpec() {
         ).apply { id = 1L }
 
         shouldThrow<RuntimeException> {
-            cart.updateQuantity(0, 500)
+            cart.updateQuantity(0)
         }.let {
             it.message shouldBe "물품의 수량이 0보다 작거나 같을 수 없습니다."
         }
@@ -34,6 +34,6 @@ class ItemCartEntityTest : AnnotationSpec() {
             buyerId = 1L
         ).apply { id = 1L }
 
-        cart.updateQuantity(6, 500)
+        cart.updateQuantity(6)
     }
 }
