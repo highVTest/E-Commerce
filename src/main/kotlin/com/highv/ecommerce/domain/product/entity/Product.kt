@@ -34,14 +34,14 @@ class Product(
     @Column(name = "is_deleted")
     var isDeleted:Boolean = false,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id", nullable = false)
     val shop: Shop,
 
     @Column(name = "category_id")
     var categoryId: Long,
 
-    @OneToOne(mappedBy = "product", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, optional = false)
+    @OneToOne(mappedBy = "product", fetch = FetchType.LAZY, optional = false)
     var productBackOffice: ProductBackOffice? = null
 ) {
     @Id

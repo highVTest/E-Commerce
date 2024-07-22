@@ -36,5 +36,6 @@ class Buyer(
     val providerName: String? = null,
 
     @Column(name = "provider_id")
-    val providerId: Long? = null
+    val providerId: String? = null
+
 )
