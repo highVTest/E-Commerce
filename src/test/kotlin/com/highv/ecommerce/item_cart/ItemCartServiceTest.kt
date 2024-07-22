@@ -6,7 +6,6 @@ import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.item_cart.service.ItemCartService
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
-import com.highv.ecommerce.domain.shop.entity.QShop.shop
 import com.highv.ecommerce.domain.shop.entity.Shop
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -60,7 +59,7 @@ class ItemCartServiceTest : BehaviorSpec() {
             When("상품 수량이 1개 이상이면") {
                 val request: SelectProductQuantity = SelectProductQuantity(quantity = 1)
                 val itemCart = ItemCart(
-                    productId = 1L,
+                    product = product,
                     productName = product.name,
                     price = 3000 * request.quantity, // 추후 프로덕트에서 price 관련된 게 생길 예정
                     quantity = request.quantity,
@@ -136,7 +135,7 @@ class ItemCartServiceTest : BehaviorSpec() {
             ).apply { id = 1L }
 
             val itemCart: ItemCart = ItemCart(
-                productId = 1L,
+                product = product,
                 productName = product.name,
                 price = 3000,
                 quantity = 5,
