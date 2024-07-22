@@ -1,19 +1,16 @@
 package com.highv.ecommerce.domain.item_cart.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import com.highv.ecommerce.domain.product.entity.Product
+import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
 @Table(name = "cart_item")
 class ItemCart(
 
-    @Column(name = "product_id", nullable = false)
-    val productId: Long,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    val product: Product,
 
     @Column(name = "product_name", nullable = false)
     var productName: String,
@@ -42,10 +39,16 @@ class ItemCart(
     @Column(name = "deleted_at", nullable = true)
     var deletedAt: LocalDateTime? = null
 
-    fun updateQuantityAndPrice(quantity: Int, productPrice: Int) {
+    fun updateQuantity(quantity: Int) {
+
         if (quantity <= 0) throw RuntimeException("물품의 수량이 0보다 작거나 같을 수 없습니다.")
 
         this.quantity = quantity
-        price = this.quantity * productPrice
+    }
+
+    fun paymentUpdate(productsOrderId: Long) {
+        this.orderId = productsOrderId
+        this.deletedAt = LocalDateTime.now()
+        this.isDeleted = true
     }
 }

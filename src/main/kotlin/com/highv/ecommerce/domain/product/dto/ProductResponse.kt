@@ -12,7 +12,7 @@ data class ProductResponse(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val isSoldOut: Boolean,
-    val deletedAt: LocalDateTime,
+    val deletedAt: LocalDateTime?,
     val isDeleted: Boolean,
     val shopId: Long,
     val categoryId: Long,
@@ -27,9 +27,9 @@ data class ProductResponse(
             createdAt = product.createdAt,
             updatedAt = product.updatedAt,
             isSoldOut = product.isSoldOut,
-            deletedAt = product.deletedAt,
+            deletedAt = null,
             isDeleted = product.isDeleted,
-            shopId = product.shop.sellerId,
+            shopId = product.shopId,
             categoryId = product.categoryId,
         )
     }
