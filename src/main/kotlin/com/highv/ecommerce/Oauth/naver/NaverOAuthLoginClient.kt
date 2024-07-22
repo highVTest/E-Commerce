@@ -18,8 +18,8 @@ class NaverOAuthLoginClient(
     @Value("\${oauth2.naver.client_id}") val clientId: String,
     @Value("\${oauth2.naver.client_secret}") val clientSecret: String,
     @Value("\${oauth2.naver.redirect_url}") val redirectUrl: String,
-    @Value("\${oauth2.naver.auth_base_url") val authBaseUrl: String,
-    @Value("\${oauth.naver.resource_server_base_url") val resourceBaseUrl: String,
+    @Value("\${oauth2.naver.auth_server_base_url}") val authBaseUrl: String,
+    @Value("\${oauth2.naver.resource_server_base_url}") val resourceBaseUrl: String,
   private val restClient: RestClient
 
 ) : OAuthClient {
