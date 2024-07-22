@@ -1,16 +1,17 @@
 package com.highv.ecommerce.login
 
+import com.highv.ecommerce.domain.auth.dto.LoginRequest
+import com.highv.ecommerce.domain.auth.service.UserService
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
-import com.highv.ecommerce.domain.login.dto.LoginRequest
-import com.highv.ecommerce.domain.login.service.UserService
 import com.highv.ecommerce.domain.seller.entity.Seller
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.infra.security.jwt.JwtPlugin
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import org.springframework.security.crypto.password.PasswordEncoder
 
 class loginUserServiceTest {
