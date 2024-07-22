@@ -10,7 +10,7 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "buyer")
 class Buyer(
-
+  
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
@@ -36,5 +36,6 @@ class Buyer(
     val providerName: String? = null,
 
     @Column(name = "provider_id")
-    val providerId: Long? = null
+    val providerId: String? = null
+
 )

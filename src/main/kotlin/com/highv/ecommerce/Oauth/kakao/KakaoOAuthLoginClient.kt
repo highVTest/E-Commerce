@@ -1,7 +1,9 @@
-package com.highv.ecommerce.Oauth.client
+package com.highv.ecommerce.Oauth.kakao
 
-import com.highv.ecommerce.Oauth.client.dto.KakaoLoginUserInfoResponse
-import com.highv.ecommerce.Oauth.client.dto.KakaoTokenResponse
+import com.highv.ecommerce.Oauth.OAuthClient
+import com.highv.ecommerce.Oauth.kakao.dto.KakaoLoginUserInfoResponse
+import com.highv.ecommerce.Oauth.kakao.dto.KakaoTokenResponse
+import com.highv.ecommerce.common.type.OAuthProvider
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
@@ -18,9 +20,9 @@ class KakaoOAuthLoginClient(
     @Value("\${oauth2.kakao.resource_server_base_url}") val resourceServerBaseUrl: String,
     private val restClient: RestClient
 
-) {
+): OAuthClient {
 
-    fun generateLoginUrl(): String {
+    override fun generateLoginUrl(): String {
         return StringBuilder(authServerBaseUrl)
             .append("/oauth/authorize")
             .append("?client_id=").append(clientId)
@@ -29,7 +31,7 @@ class KakaoOAuthLoginClient(
             .toString()
     }
 
-    fun getAccessToken(code: String): String {
+    override fun getAccessToken(code: String): String {
         val requestData = mutableMapOf(
             "grant_type" to "authorization_code",
             "client_id" to clientId,
@@ -48,7 +50,7 @@ class KakaoOAuthLoginClient(
             ?: throw RuntimeException("카카오 AccessToken 조회 실패")
     }
 
-    fun retrieveUserInfo(accessToken: String): KakaoLoginUserInfoResponse {
+    override fun retrieveUserInfo(accessToken: String): KakaoLoginUserInfoResponse {
         return restClient.get()
             .uri("$resourceServerBaseUrl/v2/user/me")
             .header("Authorization", "Bearer $accessToken")
@@ -58,5 +60,9 @@ class KakaoOAuthLoginClient(
             }
             .body<KakaoLoginUserInfoResponse>()
             ?: throw RuntimeException("카카오 UserInfo 조회 실패")
+    }
+
+    override fun supports(provider: OAuthProvider): Boolean {
+        return provider == OAuthProvider.KAKAO
     }
 }
