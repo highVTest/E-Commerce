@@ -3,7 +3,6 @@ package com.highv.ecommerce.domain.order_status.entity
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_status.enumClass.RejectReason
-import com.highv.ecommerce.domain.order_status.dto.OrderRejectRequest
 import com.highv.ecommerce.domain.order_status.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import com.highv.ecommerce.domain.products_order.enumClass.OrderStatusType

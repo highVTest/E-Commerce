@@ -3,7 +3,6 @@ package com.highv.ecommerce.domain.order_status.controller
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.order_status.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_status.service.OrderStatusService
-import com.highv.ecommerce.domain.order_status.dto.OrderRejectRequest
 import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_status.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.products_order.dto.ProductsOrderResponse
