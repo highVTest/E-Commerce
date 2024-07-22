@@ -29,10 +29,10 @@ class Product(
     var isSoldOut: Boolean,
 
     @Column(name = "deleted_at")
-    var deletedAt: LocalDateTime?,
+    var deletedAt: LocalDateTime? = null,
 
     @Column(name = "is_deleted")
-    var isDeleted: Boolean,
+    var isDeleted:Boolean = false,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id", nullable = false)

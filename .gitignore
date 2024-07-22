@@ -40,5 +40,4 @@ out/
 .kotlin
 application.yml
 
-
-*.sql
+highv_ddl.sql

@@ -10,7 +10,7 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "buyer")
 class Buyer(
-  
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
