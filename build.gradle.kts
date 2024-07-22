@@ -41,6 +41,8 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-mail:3.3.0")
+    implementation("org.redisson:redisson-spring-boot-starter:3.33.0")
+
 
     // 추가된 부분: JSON 웹 토큰(JWT) 관련 의존성
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")

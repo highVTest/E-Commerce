@@ -10,7 +10,7 @@ build/
 .classpath
 .factorypath
 .project
-.settings
+.settingshighv_ddl.sql
 .springBeans
 .sts4-cache
 bin/
@@ -39,6 +39,5 @@ out/
 ### Kotlin ###
 .kotlin
 application.yml
-
 
 highv_ddl.sql
