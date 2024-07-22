@@ -65,6 +65,8 @@ class UserService(
 
     fun verifyCode(email: String, code: String, role: UserRole): Boolean {
 
+        // email이랑 code가 공백인 경우 추후 예외처리
+
         duplicateEmail(email, role)
 
         val redisAuthCode: String = redisUtils.getStringData("${AUTH_CODE_PREFIX}${email}")
@@ -87,12 +89,16 @@ class UserService(
 
     private fun duplicateEmail(email: String, role: UserRole) {
 
-        if (role == UserRole.BUYER && buyerRepository.existsByEmail(email)) {
-            throw RuntimeException("이미 존재하는 이메일입니다.")
+        if (role == UserRole.BUYER) {
+            if (buyerRepository.existsByEmail(email)) {
+                throw RuntimeException("이미 존재하는 이메일입니다.")
+            }
         }
 
-        if (role == UserRole.SELLER && sellerRepository.existsByEmail(email)) {
-            throw RuntimeException("이미 존재하는 이메일입니다.")
+        if (role == UserRole.SELLER) {
+            if (sellerRepository.existsByEmail(email)) {
+                throw RuntimeException("이미 존재하는 이메일입니다.")
+            }
         }
     }
 
