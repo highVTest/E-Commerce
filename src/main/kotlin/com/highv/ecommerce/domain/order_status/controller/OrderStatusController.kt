@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.order_status.controller
 
+import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.order_status.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_status.service.OrderStatusService
 import com.highv.ecommerce.domain.order_status.dto.OrderRejectRequest
@@ -23,10 +24,10 @@ class OrderStatusController(
     @PatchMapping("/buyer/order-status/{itemCartId}")
     fun requestOrderStatusChange(
         @PathVariable("itemCartId") itemCartId: Long,
-        @RequestBody descriptionRequest: OrderRejectRequest,
+        @RequestBody buyerOrderStatusRequest: BuyerOrderStatusRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse>
-         = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChange(itemCartId, descriptionRequest, userPrincipal))
+         = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChange(itemCartId, buyerOrderStatusRequest, userPrincipal))
 
 
     @PreAuthorize("hasRole('SELLER')")
@@ -34,10 +35,10 @@ class OrderStatusController(
     fun requestOrderStatusReject(
         @PathVariable("shopId") shopId: Long, // Shop 추가 시 논의 후에 삭제 예정
         @PathVariable("orderId") orderId: Long,
-        @RequestBody descriptionRequest: OrderRejectRequest,
+        @RequestBody sellerOrderStatusRequest: SellerOrderStatusRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusReject(orderId, shopId, descriptionRequest, userPrincipal))
+        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusReject(orderId, shopId, sellerOrderStatusRequest, userPrincipal))
 
 
     @PreAuthorize("hasRole('BUYER')")

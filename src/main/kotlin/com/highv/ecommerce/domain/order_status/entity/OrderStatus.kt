@@ -1,8 +1,10 @@
 package com.highv.ecommerce.domain.order_status.entity
 
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
+import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_status.enumClass.RejectReason
 import com.highv.ecommerce.domain.order_status.dto.OrderRejectRequest
+import com.highv.ecommerce.domain.order_status.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import com.highv.ecommerce.domain.products_order.enumClass.OrderStatusType
 import jakarta.persistence.*
@@ -51,36 +53,24 @@ class OrderStatus(
     @Column(name = "buyer_id", nullable = false)
     val buyerId: Long,
 ){
-    fun <T> buyerUpdate(orderStatusType: OrderStatusType, description: T) {
+    fun buyerUpdate(buyerOrderStatusRequest: BuyerOrderStatusRequest) {
 
-        when (orderStatusType.name) {
+        when (buyerOrderStatusRequest.orderStatusType.name) {
             "EXCHANGE" -> this.rejectReason = RejectReason.EXCHANGE_REQUESTED
             "REFUND" -> this.rejectReason = RejectReason.REFUND_REQUESTED
         }
 
         this.buyerDateTime = LocalDateTime.now()
-        if(description is OrderRejectRequest){
-            this.buyerDescription = description.description
-        }else if(description is String){
-            this.buyerDescription = description
-        }else{
-            throw RuntimeException("잘못된 접근 입니다")
-        }
+        this.buyerDescription = buyerOrderStatusRequest.description
     }
 
-    fun <T> sellerUpdate(orderStatusType: OrderStatusType, description: T) {
-        when (orderStatusType.name) {
+    fun sellerUpdate(sellerOrderStatusRequest: SellerOrderStatusRequest) {
+        when (sellerOrderStatusRequest.orderStatusType.name) {
             "EXCHANGE" -> this.rejectReason = RejectReason.EXCHANGE_REJECTED
             "REFUND" -> this.rejectReason = RejectReason.REFUND_REJECTED
         }
         this.sellerDateTime = LocalDateTime.now()
-        if(description is OrderRejectRequest){
-            this.sellerDescription = description.description
-        }else if(description is String){
-            this.sellerDescription = description
-        }else{
-            throw RuntimeException("잘못된 접근 입니다")
-        }
+        this.sellerDescription = sellerOrderStatusRequest.description
     }
 
 }

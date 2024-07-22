@@ -15,42 +15,35 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class OrderStatusService(
     private val orderStatusRepository: OrderStatusRepository,
-    private val sellerRepository: SellerRepository,
 ){
 
 
     @Transactional
-    fun requestOrderStatusChange(itemCartId: Long, descriptionRequest: OrderRejectRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
-
-        // descriptionRequest -> 환불 or 교환
+    fun requestOrderStatusChange(itemCartId: Long, buyerOrderStatusRequest: BuyerOrderStatusRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
 
         val orderStatus = orderStatusRepository.findByItemCartIdAndBuyerId(itemCartId, userPrincipal.id) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
 
         orderStatus.productsOrder.update(StatusCode.PENDING)
 
-        orderStatus.buyerUpdate(descriptionRequest.orderStatusType, descriptionRequest)
+        orderStatus.buyerUpdate(buyerOrderStatusRequest)
 
         orderStatusRepository.save(orderStatus)
 
-        return OrderStatusResponse.from(descriptionRequest.orderStatusType,"요청 완료 되었습니다")
+        return OrderStatusResponse.from(buyerOrderStatusRequest.orderStatusType,"요청 완료 되었습니다")
     }
 
     @Transactional
-    fun requestOrderStatusReject(orderStatusId: Long, shopId: Long, descriptionRequest: OrderRejectRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
-
-//        val seller = sellerRepository.findByEmail(userPrincipal.email) ?: throw RuntimeException()
-
-//        if(seller.Shop.id != sellerOrderStatusRequest.shopId) ?: throw RuntimeException()
+    fun requestOrderStatusReject(orderStatusId: Long, shopId: Long, sellerOrderStatusRequest: SellerOrderStatusRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
 
         val orderStatus = orderStatusRepository.findByIdAndShopId(orderStatusId, shopId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
 
         orderStatus.productsOrder.update(StatusCode.PENDING)
 
-        orderStatus.sellerUpdate(descriptionRequest.orderStatusType, descriptionRequest)
+        orderStatus.sellerUpdate(sellerOrderStatusRequest)
 
         orderStatusRepository.save(orderStatus)
 
-        return OrderStatusResponse.from(descriptionRequest.orderStatusType ,"요청 거절 완료 되었습니다")
+        return OrderStatusResponse.from(sellerOrderStatusRequest.orderStatusType ,"요청 거절 완료 되었습니다")
     }
 
     fun getBuyerOrderDetails(userPrincipal: UserPrincipal): List<ProductsOrderResponse> {
@@ -61,10 +54,6 @@ class OrderStatusService(
     }
 
     fun getSellerOrderDetails(shopId: Long , userPrincipal: UserPrincipal): List<ProductsOrderResponse> {
-
-//        val seller = sellerRepository.findByEmail(userPrincipal.email) ?: throw RuntimeException()
-
-//        if(seller.Shop.id != sellerOrderStatusRequest.shopId) ?: throw RuntimeException()
 
         val orderStatus = orderStatusRepository.findAllByShopId(shopId)
 
@@ -81,7 +70,7 @@ class OrderStatusService(
         }
 
         orderStatus.map {
-            it.buyerUpdate(buyerOrderStatusRequest.orderStatusType, buyerOrderStatusRequest.description)
+            it.buyerUpdate(buyerOrderStatusRequest)
         }
 
         orderStatusRepository.saveAll(orderStatus)
@@ -92,14 +81,10 @@ class OrderStatusService(
     @Transactional
     fun requestOrderStatusRejectList(sellerOrderStatusRequest: SellerOrderStatusRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
 
-//        val seller = sellerRepository.findByEmail(userPrincipal.email) ?: throw RuntimeException()
-
-//        if(seller.Shop.id != sellerOrderStatusRequest.shopId) ?: throw RuntimeException()
-
         val orderStatus = orderStatusRepository.findAllByShopIdAndBuyerId(sellerOrderStatusRequest.shopId, sellerOrderStatusRequest.buyerId)
 
         orderStatus.map {
-            it.sellerUpdate(sellerOrderStatusRequest.orderStatusType, sellerOrderStatusRequest.description)
+            it.sellerUpdate(sellerOrderStatusRequest)
         }
 
         orderStatusRepository.saveAll(orderStatus)
