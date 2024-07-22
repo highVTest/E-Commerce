@@ -18,9 +18,9 @@ class OrderStatusService(
 
 
     @Transactional
-    fun requestOrderStatusChange(itemCartId: Long, buyerOrderStatusRequest: BuyerOrderStatusRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
+    fun requestOrderStatusChange(itemCartId: Long, buyerOrderStatusRequest: BuyerOrderStatusRequest, buyerId: Long): OrderStatusResponse {
 
-        val orderStatus = orderStatusRepository.findByItemCartIdAndBuyerId(itemCartId, userPrincipal.id) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
+        val orderStatus = orderStatusRepository.findByItemCartIdAndBuyerId(itemCartId, buyerId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
 
         orderStatus.productsOrder.update(StatusCode.PENDING)
 
@@ -32,7 +32,7 @@ class OrderStatusService(
     }
 
     @Transactional
-    fun requestOrderStatusReject(orderStatusId: Long, shopId: Long, sellerOrderStatusRequest: SellerOrderStatusRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
+    fun requestOrderStatusReject(orderStatusId: Long, shopId: Long, sellerOrderStatusRequest: SellerOrderStatusRequest, sellerId: Long): OrderStatusResponse {
 
         val orderStatus = orderStatusRepository.findByIdAndShopId(orderStatusId, shopId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
 
@@ -45,14 +45,14 @@ class OrderStatusService(
         return OrderStatusResponse.from(sellerOrderStatusRequest.orderStatusType ,"요청 거절 완료 되었습니다")
     }
 
-    fun getBuyerOrderDetails(userPrincipal: UserPrincipal): List<ProductsOrderResponse> {
+    fun getBuyerOrderDetails(buyerId: Long): List<ProductsOrderResponse> {
 
-        val orderStatus = orderStatusRepository.findAllByBuyerId(userPrincipal.id)
+        val orderStatus = orderStatusRepository.findAllByBuyerId(buyerId)
 
         return orderStatus.map { ProductsOrderResponse.from(it) }
     }
 
-    fun getSellerOrderDetails(shopId: Long , userPrincipal: UserPrincipal): List<ProductsOrderResponse> {
+    fun getSellerOrderDetails(shopId: Long , sellerId: Long): List<ProductsOrderResponse> {
 
         val orderStatus = orderStatusRepository.findAllByShopId(shopId)
 
@@ -60,15 +60,12 @@ class OrderStatusService(
     }
 
     @Transactional
-    fun requestOrderStatusChangeList(buyerOrderStatusRequest: BuyerOrderStatusRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
+    fun requestOrderStatusChangeList(buyerOrderStatusRequest: BuyerOrderStatusRequest, buyerId: Long): OrderStatusResponse {
 
-        val orderStatus = orderStatusRepository.findAllByShopIdAndBuyerId(buyerOrderStatusRequest.shopId, userPrincipal.id)
+        val orderStatus = orderStatusRepository.findAllByShopIdAndBuyerId(buyerOrderStatusRequest.shopId, buyerId)
 
         orderStatus.map {
             it.productsOrder.statusCode = StatusCode.PENDING
-        }
-
-        orderStatus.map {
             it.buyerUpdate(buyerOrderStatusRequest)
         }
 
@@ -78,7 +75,7 @@ class OrderStatusService(
     }
 
     @Transactional
-    fun requestOrderStatusRejectList(sellerOrderStatusRequest: SellerOrderStatusRequest, userPrincipal: UserPrincipal): OrderStatusResponse {
+    fun requestOrderStatusRejectList(sellerOrderStatusRequest: SellerOrderStatusRequest, sellerId: Long): OrderStatusResponse {
 
         val orderStatus = orderStatusRepository.findAllByShopIdAndBuyerId(sellerOrderStatusRequest.shopId, sellerOrderStatusRequest.buyerId)
 

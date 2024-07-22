@@ -22,7 +22,7 @@ class ProductsOrderController(
     fun requestPayment(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal))
+        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal.id))
 
 
     @PreAuthorize("hasRole('SELLER')")
@@ -32,7 +32,7 @@ class ProductsOrderController(
         @RequestBody orderStatusRequest: OrderStatusRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.updateOrderStatus(orderId, orderStatusRequest, userPrincipal))
+        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.updateOrderStatus(orderId, orderStatusRequest, userPrincipal.id))
 
 
 

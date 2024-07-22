@@ -31,11 +31,11 @@ class ProductsOrderService(
 ){
 
     @Transactional
-    fun requestPayment(userPrincipal: UserPrincipal): DefaultResponse {
+    fun requestPayment(buyerId: Long): DefaultResponse {
         //TODO(카트 아이디 를 조회 해서 물건을 가져 온다 -> List<CartItem>)
-        val itemCart = itemCartRepository.findAllByBuyerIdAndIsDeletedFalse(userPrincipal.id)
+        val itemCart = itemCartRepository.findAllByBuyerIdAndIsDeletedFalse(buyerId)
         val price = itemCart.sumOf { it.price * it.quantity }
-        val buyer = buyerRepository.findByIdOrNull(userPrincipal.id)!!
+        val buyer = buyerRepository.findByIdOrNull(buyerId)!!
 
 
         //TODO(만약에 CartItem 에 ProductId 가 Coupon 의 ProductId와 일치할 경우 CartItem 의 가격을 임시로 업데이트)
@@ -43,7 +43,7 @@ class ProductsOrderService(
         val productsOrder = productsOrderRepository.saveAndFlush(
             ProductsOrder(
                 statusCode = StatusCode.ORDERED,
-                buyerId = userPrincipal.id,
+                buyerId = buyerId,
                 isPaid = false,
                 payDate = LocalDateTime.now(),
                 totalPrice = price,
@@ -58,7 +58,7 @@ class ProductsOrderService(
         buyerHistoryRepository.save(
             BuyerHistory(
                 orderId = productsOrder.id!!,
-                buyerId = userPrincipal.id
+                buyerId = buyerId
             )
         )
 
@@ -79,7 +79,7 @@ class ProductsOrderService(
                     itemCart = it,
                     productsOrder = productsOrder,
                     shopId = it.product.shop.id!!,
-                    buyerId = userPrincipal.id
+                    buyerId = buyerId
                 )
             }
 
@@ -90,7 +90,7 @@ class ProductsOrderService(
     }
 
     @Transactional
-    fun updateOrderStatus(orderId: Long, orderStatusRequest: OrderStatusRequest, userPrincipal: UserPrincipal): DefaultResponse {
+    fun updateOrderStatus(orderId: Long, orderStatusRequest: OrderStatusRequest, sellerId: Long): DefaultResponse {
 
         val order = productsOrderRepository.findByIdOrNull(orderId) ?: throw RuntimeException()
 

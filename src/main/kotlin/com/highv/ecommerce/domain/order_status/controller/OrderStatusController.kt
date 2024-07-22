@@ -26,8 +26,7 @@ class OrderStatusController(
         @RequestBody buyerOrderStatusRequest: BuyerOrderStatusRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse>
-         = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChange(itemCartId, buyerOrderStatusRequest, userPrincipal))
-
+         = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChange(itemCartId, buyerOrderStatusRequest, userPrincipal.id))
 
     @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/seller/order-status/{shopId}/{orderId}")
@@ -37,8 +36,7 @@ class OrderStatusController(
         @RequestBody sellerOrderStatusRequest: SellerOrderStatusRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusReject(orderId, shopId, sellerOrderStatusRequest, userPrincipal))
-
+        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusReject(orderId, shopId, sellerOrderStatusRequest, userPrincipal.id))
 
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/buyer/order-status")
@@ -46,7 +44,7 @@ class OrderStatusController(
         @RequestBody buyerOrderStatusRequest: BuyerOrderStatusRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChangeList(buyerOrderStatusRequest, userPrincipal))
+        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChangeList(buyerOrderStatusRequest, userPrincipal.id))
 
     @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/seller/order-status")
@@ -54,14 +52,14 @@ class OrderStatusController(
         @RequestBody sellerOrderStatusRequest: SellerOrderStatusRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusRejectList(sellerOrderStatusRequest, userPrincipal))
+        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusRejectList(sellerOrderStatusRequest, userPrincipal.id))
 
     @PreAuthorize("hasRole('BUYER')")
     @GetMapping("/order_details/buyer")
     fun getBuyerOrderDetails(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<List<ProductsOrderResponse>>
-        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.getBuyerOrderDetails(userPrincipal))
+        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.getBuyerOrderDetails(userPrincipal.id))
 
     @PreAuthorize("hasRole('SELLER')")
     @GetMapping("/order_details/seller/{shopId}")
@@ -69,7 +67,7 @@ class OrderStatusController(
         @PathVariable("shopId") shopId: Long,  // Shop 추가 시 논의 후에 삭제 예정
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<List<ProductsOrderResponse>>
-        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.getSellerOrderDetails(shopId, userPrincipal))
+        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.getSellerOrderDetails(shopId, userPrincipal.id))
 
 
 
