@@ -126,7 +126,7 @@ class BuyerServiceTest : BehaviorSpec({
             phoneNumber = "null",
             address = "null",
             password = "null",
-            providerId = "123132",
+            providerId = "123321",
             providerName = "naver"
         )
 
@@ -161,7 +161,7 @@ class BuyerServiceTest : BehaviorSpec({
                 phoneNumber = "null",
                 address = "null",
                 password = "null",
-                providerId = "123132",
+                providerId = "123321",
                 providerName = "naver"
             )
 
@@ -244,7 +244,7 @@ class BuyerServiceTest : BehaviorSpec({
                 phoneNumber = "null",
                 address = "null",
                 password = "testPassword",
-                providerId = "12345",
+                providerId = "123321",
                 providerName = "kakao"
             ).apply { id = buyerId }
 
