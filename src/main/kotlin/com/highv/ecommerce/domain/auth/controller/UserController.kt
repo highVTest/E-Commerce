@@ -2,6 +2,7 @@ package com.highv.ecommerce.domain.auth.controller
 
 import com.highv.ecommerce.common.dto.AccessTokenResponse
 import com.highv.ecommerce.domain.auth.dto.LoginRequest
+import com.highv.ecommerce.domain.auth.dto.UserRole
 import com.highv.ecommerce.domain.auth.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -17,9 +18,13 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(
     private val userService: UserService
 ) {
-    @PostMapping("/login")
-    fun signIn(@RequestBody loginRequest: LoginRequest): ResponseEntity<AccessTokenResponse> =
-        ResponseEntity.ok().body(userService.login(loginRequest))
+    @PostMapping("/login/seller")
+    fun loginSeller(@RequestBody loginRequest: LoginRequest): ResponseEntity<AccessTokenResponse> =
+        ResponseEntity.ok().body(userService.loginSeller(loginRequest))
+
+    @PostMapping("/login/buyer")
+    fun loginBuyer(@RequestBody loginRequest: LoginRequest): ResponseEntity<AccessTokenResponse> =
+        ResponseEntity.ok().body(userService.loginBuyer(loginRequest))
 
     @PostMapping("/emails/verification-request")
     fun sendMail(

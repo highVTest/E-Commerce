@@ -1,8 +1,8 @@
 package com.highv.ecommerce.domain.auth.service
 
 import com.highv.ecommerce.common.dto.AccessTokenResponse
-import com.highv.ecommerce.domain.auth.controller.UserRole
 import com.highv.ecommerce.domain.auth.dto.LoginRequest
+import com.highv.ecommerce.domain.auth.dto.UserRole
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.infra.email.EmailUtils
@@ -24,30 +24,31 @@ class UserService(
     @Value("\${spring.mail.auth-code-expiration-millis}")
     private val expirationMillis: Long
 ) {
-    fun login(loginRequest: LoginRequest): AccessTokenResponse {
+    fun loginSeller(loginRequest: LoginRequest): AccessTokenResponse {
 
-        if (loginRequest.role == "BUYER") {
+        val seller = sellerRepository.findByEmail(loginRequest.email)
+        if (seller != null && passwordEncoder.matches(loginRequest.password, seller.password)) {
+            val token = jwtPlugin.generateAccessToken(seller.id.toString(), seller.email, "SELLER")
+            return AccessTokenResponse(token)
+        }
+        throw RuntimeException("판매자 로그인 실패")
+    }
 
-            val buyer = buyerRepository.findByEmail(loginRequest.email)
-            if (buyer != null && passwordEncoder.matches(loginRequest.password, buyer.password)) {
-                val token = jwtPlugin.generateAccessToken(buyer.id.toString(), buyer.email, "BUYER")
-                return AccessTokenResponse(token)
-            }
-        } else if (loginRequest.role == "SELLER") {
-
-            val seller = sellerRepository.findByEmail(loginRequest.email)
-            if (seller != null && passwordEncoder.matches(loginRequest.password, seller.password)) {
-                val token = jwtPlugin.generateAccessToken(seller.id.toString(), seller.email, "SELLER")
-                return AccessTokenResponse(token)
-            }
+    fun loginBuyer(loginRequest: LoginRequest): AccessTokenResponse {
+        val buyer = buyerRepository.findByEmail(loginRequest.email)
+        if (buyer != null && passwordEncoder.matches(loginRequest.password, buyer.password)) {
+            val token = jwtPlugin.generateAccessToken(buyer.id.toString(), buyer.email, "BUYER")
+            return AccessTokenResponse(token)
         }
 
-        throw IllegalArgumentException("Invalid email or password")
+        throw RuntimeException("구매자 로그인 실패")
     }
 
     fun sendMail(toEmail: String, role: UserRole): String {
 
-        duplicateEmail(toEmail, role)
+        if (duplicateEmail(toEmail, role)) {
+            throw RuntimeException("이미 존재하는 이메일입니다.")
+        }
 
         val title = "HighV 이메일 인증"
         val authCode = createCode()
@@ -67,7 +68,9 @@ class UserService(
 
         // email이랑 code가 공백인 경우 추후 예외처리
 
-        duplicateEmail(email, role)
+        if (duplicateEmail(email, role)) {
+            throw RuntimeException("이미 존재하는 이메일입니다.")
+        }
 
         val redisAuthCode: String = redisUtils.getStringData("${AUTH_CODE_PREFIX}${email}")
         val authCodeIsTrue: Boolean = code == redisAuthCode
@@ -87,19 +90,19 @@ class UserService(
             .joinToString("")
     }
 
-    private fun duplicateEmail(email: String, role: UserRole) {
+    private fun duplicateEmail(email: String, role: UserRole): Boolean {
 
         if (role == UserRole.BUYER) {
             if (buyerRepository.existsByEmail(email)) {
-                throw RuntimeException("이미 존재하는 이메일입니다.")
+                return true
+            }
+        } else if (role == UserRole.SELLER) {
+            if (sellerRepository.existsByEmail(email)) {
+                return true
             }
         }
 
-        if (role == UserRole.SELLER) {
-            if (sellerRepository.existsByEmail(email)) {
-                throw RuntimeException("이미 존재하는 이메일입니다.")
-            }
-        }
+        return false
     }
 
     companion object {

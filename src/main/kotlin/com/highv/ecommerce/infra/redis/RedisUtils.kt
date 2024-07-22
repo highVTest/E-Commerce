@@ -18,10 +18,6 @@ class RedisUtils(
         return redisTemplate.opsForValue()[key] as? String? ?: "존재하지 않는 값입니다."
     }
 
-    fun getStringDataAndDel(key: String): String {
-        return redisTemplate.opsForValue().getAndDelete(key) as? String? ?: "존재하지 않는 값입니다."
-    }
-
     fun deleteStringData(key: String) {
         redisTemplate.delete(key)
     }
