@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -78,7 +77,7 @@ class ProductController(private val productService: ProductService) {
     //카테고리별 상품보기
     @GetMapping("/category")
     fun getProductsByCategory(
-        @RequestParam categoryId: Long,
+        categoryId: Long,
         @PageableDefault(size = 10, page = 0) pageable: Pageable
     ): ResponseEntity<Page<ProductResponse>> = ResponseEntity
         .status(HttpStatus.OK)
@@ -87,7 +86,7 @@ class ProductController(private val productService: ProductService) {
     //상품 검색하기
     @GetMapping("/search")
     fun searchProduct(
-        @RequestParam keyword: String,
+        keyword: String,
         @PageableDefault(size = 10, page = 0) pageable: Pageable
     ): ResponseEntity<Page<ProductResponse>> = ResponseEntity
         .status(HttpStatus.OK)

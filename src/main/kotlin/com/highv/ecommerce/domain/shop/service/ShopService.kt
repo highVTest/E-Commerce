@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service
 class ShopService(private val shopRepository: ShopRepository) {
 
     fun createShop(sellerId: Long, createShopRequest: CreateShopRequest): ShopResponse {
+        if (shopRepository.existsBySellerId(sellerId)) throw RuntimeException("Shop with seller id $sellerId already exists")
         val shop = Shop(
             sellerId = sellerId,
             name = createShopRequest.name,

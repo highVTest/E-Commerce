@@ -32,11 +32,11 @@ class InventoryManagementService(
     }
 
     private fun validateProduct(sellerId: Long, productId: Long): ProductBackOffice {
-        val productName = productRepository.findByIdOrNull(productId)
+        val product = productRepository.findByIdOrNull(productId)?.productBackOffice?.product
             ?: throw IllegalArgumentException("Product with id $productId not found")
-        val product =
-            productBackOfficeRepository.findProductBackOfficesByProductId(productName.productBackOffice?.product?.id!!)
-        if (productName.shop.sellerId != sellerId) throw IllegalArgumentException("No Authority")
-        return product
+        if (product.shop.sellerId != sellerId) throw IllegalArgumentException("No Authority")
+        val productBackOffice = productBackOfficeRepository.findProductBackOfficesByProductId(product.id!!)
+            ?: throw IllegalArgumentException("Product not found for seller $sellerId")
+        return productBackOffice
     }
 }

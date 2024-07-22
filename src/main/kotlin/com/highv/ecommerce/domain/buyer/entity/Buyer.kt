@@ -32,8 +32,10 @@ class Buyer(
     @Column(name = "address")
     var address: String,
 
-   @Column(name = "provider_name")
-   val providerName: String?,
-   @Column(name = "provider_id")
-   val providerId: String?
+    @Column(name = "provider_name")
+    val providerName: String? = null,
+
+    @Column(name = "provider_id")
+    val providerId: String? = null
+
 )
