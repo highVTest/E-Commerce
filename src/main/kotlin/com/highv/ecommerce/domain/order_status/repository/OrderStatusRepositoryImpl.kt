@@ -22,7 +22,7 @@ class OrderStatusRepositoryImpl(
     private val cartItem = QItemCart.itemCart
 
     override fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderStatus> {
-        return orderStatusJpaRepository.findAllByShopIdAndBuyerIdIsDeletedFalse(shopId, buyerId)
+        return orderStatusJpaRepository.findAllByShopIdAndBuyerIdAndIsDeletedFalse(shopId, buyerId)
     }
 
     override fun findAllByBuyerId(id: Long): List<OrderStatus> {
@@ -63,10 +63,10 @@ class OrderStatusRepositoryImpl(
     }
 
     override fun findByItemCartIdAndBuyerId(orderStatusId: Long, buyerId: Long): OrderStatus? {
-        return orderStatusJpaRepository.findByItemCartIdAndBuyerIdIsDeletedFalse(orderStatusId, buyerId)
+        return orderStatusJpaRepository.findByItemCartIdAndBuyerIdAndIsDeletedFalse(orderStatusId, buyerId)
     }
 
     override fun findByIdAndShopId(orderStatusId: Long, shopId: Long): OrderStatus? {
-        return orderStatusJpaRepository.findByIdAndShopIdIsDeletedFalse(orderStatusId, shopId)
+        return orderStatusJpaRepository.findByIdAndShopIdAndIsDeletedFalse(shopId, orderStatusId)
     }
 }

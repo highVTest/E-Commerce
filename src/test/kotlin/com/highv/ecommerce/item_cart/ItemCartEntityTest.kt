@@ -84,4 +84,25 @@ class ItemCartEntityTest : AnnotationSpec() {
 
         cart.updateQuantity(6)
     }
+
+    companion object{
+        private val shop = Shop(
+            sellerId = 1L,
+            name = "testName",
+            description = "testDescription",
+            shopImage = "testImage",
+            rate = 1f
+        )
+        private val product = Product(
+            name = "productName",
+            description = "productDescription",
+            productImage = "image",
+            favorite = 1,
+            createdAt = LocalDateTime.of(2021, 1, 1, 1, 1, 0),
+            updatedAt = LocalDateTime.of(2021, 1, 1, 1, 1, 1),
+            isSoldOut = false,
+            shop = shop,
+            categoryId = 1L
+        )
+    }
 }
