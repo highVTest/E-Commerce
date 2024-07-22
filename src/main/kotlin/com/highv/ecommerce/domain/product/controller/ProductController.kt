@@ -53,7 +53,7 @@ class ProductController(private val productService: ProductService) {
         .status(HttpStatus.NO_CONTENT)
         .body(productService.deleteProduct(seller.id, productId))
 
-    //상품 상세보기
+    //상품 상세 보기
     @GetMapping("/{productId}")
     fun getProductById(
         @PathVariable("productId") productId: Long

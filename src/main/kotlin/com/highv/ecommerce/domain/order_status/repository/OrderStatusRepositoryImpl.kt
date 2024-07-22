@@ -21,8 +21,8 @@ class OrderStatusRepositoryImpl(
     private val productsOrder = QProductsOrder.productsOrder
     private val cartItem = QItemCart.itemCart
 
-    override fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderStatus> {
-        return orderStatusJpaRepository.findAllByShopIdAndBuyerIdAndIsDeletedFalse(shopId, buyerId)
+    override fun findAllByShopIdAndProductsOrderId(shopId: Long, buyerId: Long): List<OrderStatus> {
+        return orderStatusJpaRepository.findAllByShopIdAndProductsOrderIdAndIsDeletedFalse(shopId, buyerId)
     }
 
     override fun findAllByBuyerId(id: Long): List<OrderStatus> {

@@ -6,8 +6,6 @@ import com.highv.ecommerce.domain.order_status.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.order_status.repository.OrderStatusRepository
 import com.highv.ecommerce.domain.products_order.dto.ProductsOrderResponse
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
-import com.highv.ecommerce.domain.seller.repository.SellerRepository
-import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -36,7 +34,7 @@ class OrderStatusService(
 
         val orderStatus = orderStatusRepository.findByIdAndShopId(orderStatusId, shopId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
 
-        orderStatus.productsOrder.update(StatusCode.PENDING)
+        orderStatus.productsOrder.update(StatusCode.ORDERED)
 
         orderStatus.sellerUpdate(sellerOrderStatusRequest)
 
@@ -62,7 +60,7 @@ class OrderStatusService(
     @Transactional
     fun requestOrderStatusChangeList(buyerOrderStatusRequest: BuyerOrderStatusRequest, buyerId: Long): OrderStatusResponse {
 
-        val orderStatus = orderStatusRepository.findAllByShopIdAndBuyerId(buyerOrderStatusRequest.shopId, buyerId)
+        val orderStatus = orderStatusRepository.findAllByShopIdAndProductsOrderId(buyerOrderStatusRequest.shopId, buyerId)
 
         orderStatus.map {
             it.productsOrder.statusCode = StatusCode.PENDING
@@ -77,9 +75,10 @@ class OrderStatusService(
     @Transactional
     fun requestOrderStatusRejectList(sellerOrderStatusRequest: SellerOrderStatusRequest, sellerId: Long): OrderStatusResponse {
 
-        val orderStatus = orderStatusRepository.findAllByShopIdAndBuyerId(sellerOrderStatusRequest.shopId, sellerOrderStatusRequest.buyerId)
+        val orderStatus = orderStatusRepository.findAllByShopIdAndProductsOrderId(sellerOrderStatusRequest.shopId, sellerOrderStatusRequest.buyerId)
 
         orderStatus.map {
+            it.productsOrder.statusCode = StatusCode.ORDERED
             it.sellerUpdate(sellerOrderStatusRequest)
         }
 

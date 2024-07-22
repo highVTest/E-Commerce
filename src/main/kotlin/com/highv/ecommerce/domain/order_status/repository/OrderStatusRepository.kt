@@ -4,7 +4,7 @@ import com.highv.ecommerce.domain.order_status.entity.OrderStatus
 
 interface OrderStatusRepository {
 
-    fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderStatus>
+    fun findAllByShopIdAndProductsOrderId(shopId: Long, buyerId: Long): List<OrderStatus>
 
     fun findAllByBuyerId(id: Long): List<OrderStatus>
 

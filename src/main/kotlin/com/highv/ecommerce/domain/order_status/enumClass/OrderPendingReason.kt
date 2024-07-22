@@ -1,7 +1,8 @@
 package com.highv.ecommerce.domain.order_status.enumClass
 
 
-enum class RejectReason {
+enum class OrderPendingReason {
+
     NONE,
 
 //    CANCEL_REQUESTED,
@@ -15,8 +16,8 @@ enum class RejectReason {
     REFUND_REJECTED,
 
     EXCHANGE_REQUESTED,
-    EXCHANGED,
     EXCHANGING,
+    EXCHANGED,
     EXCHANGE_REJECTED,
 
 }
