@@ -29,7 +29,7 @@ data class ProductResponse(
             isSoldOut = product.isSoldOut,
             deletedAt = null,
             isDeleted = product.isDeleted,
-            shopId = product.shopId,
+            shopId = product.shop.id!!,
             categoryId = product.categoryId,
         )
     }
