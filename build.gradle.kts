@@ -25,6 +25,7 @@ configurations {
 repositories {
     mavenCentral()
 }
+val queryDslVersion = "5.0.0"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -37,6 +38,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security") //security 사용 가능
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+    implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")
+    kapt("com.querydsl:querydsl-apt:$queryDslVersion:jakarta")
 
     // 추가된 부분: JSON 웹 토큰(JWT) 관련 의존성
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
