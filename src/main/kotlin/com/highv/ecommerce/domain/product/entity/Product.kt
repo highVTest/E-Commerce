@@ -2,7 +2,6 @@ package com.highv.ecommerce.domain.product.entity
 
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.shop.entity.Shop
-import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -43,14 +42,14 @@ class Product(
     @Column(name = "is_deleted")
     var isDeleted: Boolean,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id", nullable = false)
     val shop: Shop,
 
     @Column(name = "category_id")
     var categoryId: Long,
 
-    @OneToOne(mappedBy = "product", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, optional = false)
+    @OneToOne(mappedBy = "product", fetch = FetchType.LAZY, optional = false)
     var productBackOffice: ProductBackOffice? = null
 ) {
     @Id
