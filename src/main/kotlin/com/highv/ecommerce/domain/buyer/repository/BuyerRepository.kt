@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface BuyerRepository : JpaRepository<Buyer, Long> {
     fun findByEmail(email: String): Buyer?
-    fun findByProviderNameAndProviderId(providerName: String, providerId: Long): Buyer?
+    fun findByProviderNameAndProviderId(providerName: String, providerId: String): Buyer?
 
     fun existsByEmail(email: String): Boolean
 }

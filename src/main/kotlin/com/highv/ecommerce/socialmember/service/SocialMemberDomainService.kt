@@ -1,6 +1,7 @@
 package com.highv.ecommerce.socialmember.service
 
-import com.highv.ecommerce.Oauth.client.dto.KakaoLoginUserInfoResponse
+import com.highv.ecommerce.Oauth.kakao.dto.KakaoLoginUserInfoResponse
+import com.highv.ecommerce.Oauth.naver.dto.OAuthLoginUserInfo
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import org.springframework.stereotype.Service
@@ -10,8 +11,8 @@ class SocialMemberDomainService(
     private val buyerRepository: BuyerRepository
 ) {
 
-    fun registerIfAbsent(userInfo: KakaoLoginUserInfoResponse): Buyer {
-        return buyerRepository.findByProviderNameAndProviderId("KAKAO", userInfo.id)
+    fun registerIfAbsent(userInfo: OAuthLoginUserInfo): Buyer {
+        return buyerRepository.findByProviderNameAndProviderId(userInfo.provider.toString(), userInfo.id)
             ?: buyerRepository.save(
                 Buyer(
                     // ----------------------
@@ -21,10 +22,10 @@ class SocialMemberDomainService(
                     phoneNumber = "null", // 소셜 로그인 한 사람은 업데이트 하기
                     address = "null", // 소셜 로그인 한 사람은 업데이트 하기
                     // -----------------
-                    providerName = "KAKAO",
+                    providerName = userInfo.provider.toString(),
                     providerId = userInfo.id,
-                    nickname = userInfo.properties.nickname,
-                    profileImage = userInfo.properties.profileImage
+                    nickname = userInfo.nickname,
+                    profileImage = userInfo.profileImage
                 )
             )
     }
