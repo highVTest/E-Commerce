@@ -1,8 +1,8 @@
 package com.highv.ecommerce.domain.buyer.dto.request
 
-import com.highv.ecommerce.domain.products_order.enumClass.OrderStatusType
+import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 
 data class BuyerOrderStatusUpdateRequest(
-    val status: OrderStatusType,
+    val status: OrderStatus,
     val reason: String
 )

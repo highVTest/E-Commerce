@@ -3,9 +3,8 @@ package com.highv.ecommerce.domain.backoffice.service
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.backoffice.dto.saleshistory.SalesHistoryResponse
 import com.highv.ecommerce.domain.backoffice.repository.SalesHistoryRepository
-import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
-import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
-import org.springframework.data.repository.findByIdOrNull
+import com.highv.ecommerce.domain.order_master.dto.OrderStatusRequest
+import com.highv.ecommerce.domain.order_master.repository.ProductsOrderRepository
 import org.springframework.stereotype.Service
 
 @Service

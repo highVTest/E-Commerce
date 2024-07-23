@@ -3,7 +3,7 @@ package com.highv.ecommerce.domain.backoffice.controller
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.backoffice.dto.saleshistory.SalesHistoryResponse
 import com.highv.ecommerce.domain.backoffice.service.SalesHistoryService
-import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
+import com.highv.ecommerce.domain.order_master.dto.OrderStatusRequest
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

@@ -1,11 +1,11 @@
 package com.highv.ecommerce.domain.buyer.dto.response
 
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
-import com.highv.ecommerce.domain.order_status.enumClass.OrderPendingReason
+import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 
 data class BuyerHistoryProductResponse(
     val orderStatusId: Long,
-    val orderPendingReason: OrderPendingReason,
+    val orderPendingReason: ComplainStatus,
     val productName: String,
     val productPrice: Int,
     val productQuantity: Int,
@@ -15,7 +15,7 @@ data class BuyerHistoryProductResponse(
     companion object {
         fun from(
             cart: ItemCart,
-            orderPendingReason: OrderPendingReason,
+            orderPendingReason: ComplainStatus,
             orderStatusId: Long
         ): BuyerHistoryProductResponse =
             BuyerHistoryProductResponse(

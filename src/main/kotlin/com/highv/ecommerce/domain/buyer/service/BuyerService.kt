@@ -11,13 +11,13 @@ import com.highv.ecommerce.domain.buyer.dto.response.BuyerResponse
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.buyer_history.repository.BuyerHistoryRepository
-import com.highv.ecommerce.domain.order_status.entity.OrderStatus
-import com.highv.ecommerce.domain.order_status.enumClass.OrderPendingReason
-import com.highv.ecommerce.domain.order_status.repository.OrderStatusJpaRepository
-import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
-import com.highv.ecommerce.domain.products_order.enumClass.OrderStatusType
-import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
-import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
+import com.highv.ecommerce.domain.order_details.entity.OrderDetails
+import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
+import com.highv.ecommerce.domain.order_details.repository.OrderStatusJpaRepository
+import com.highv.ecommerce.domain.order_master.entity.OrderMaster
+import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
+import com.highv.ecommerce.domain.order_master.enumClass.StatusCode
+import com.highv.ecommerce.domain.order_master.repository.ProductsOrderRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -119,7 +119,7 @@ class BuyerService(
 
         // val buyerHistories: List<BuyerHistory> = buyerHistoryRepository.findAllByBuyerId(buyerId)
 
-        val orderStatuses: List<OrderStatus> = orderStatusJpaRepository.findAllByBuyerId(buyerId)
+        val orderStatuses: List<OrderDetails> = orderStatusJpaRepository.findAllByBuyerId(buyerId)
 
         // val orderGroups: MutableMap<Long, MutableList<OrderStatus>> = mutableMapOf()
         //
@@ -131,7 +131,7 @@ class BuyerService(
         //     orderGroups[it.productsOrder.id]!!.add(it)
         // }
 
-        val orderMap: MutableMap<Long, ProductsOrder> = mutableMapOf()
+        val orderMap: MutableMap<Long, OrderMaster> = mutableMapOf()
         orderStatuses.forEach {
             if (!orderMap.containsKey(it.productsOrder.id!!)) {
                 orderMap[it.productsOrder.id] = it.productsOrder
@@ -174,15 +174,15 @@ class BuyerService(
         * 4. 변경된 내용 반환
         * */
 
-        val productsOrder: ProductsOrder =
+        val productsOrder: OrderMaster =
             productsOrderRepository.findByIdOrNull(orderId) ?: throw RuntimeException("수정할 주문 내역이 없습니다.")
 
-        val orderStatuses: List<OrderStatus> =
+        val orderStatuses: List<OrderDetails> =
             orderStatusJpaRepository.findAllByBuyerIdAndProductsOrderId(buyerId, orderId)
 
-        val orderPendingReason: OrderPendingReason = when (request.status) {
-            OrderStatusType.EXCHANGE -> OrderPendingReason.EXCHANGE_REQUESTED
-            OrderStatusType.REFUND -> OrderPendingReason.REFUND_REQUESTED
+        val orderPendingReason: ComplainStatus = when (request.status) {
+            OrderStatus.EXCHANGE -> ComplainStatus.EXCHANGE_REQUESTED
+            OrderStatus.REFUND -> ComplainStatus.REFUND_REQUESTED
         }
         val now: LocalDateTime = LocalDateTime.now()
 
