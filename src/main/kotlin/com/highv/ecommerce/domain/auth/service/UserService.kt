@@ -58,7 +58,7 @@ class UserService(
         redisUtils.setStringData(
             key = "${AUTH_CODE_PREFIX}${toEmail}",
             value = authCode,
-            expiredTimeMinutes = expirationMillis
+            expiredTimeMillis = expirationMillis
         )
 
         return authCode
