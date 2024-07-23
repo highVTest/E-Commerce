@@ -9,8 +9,8 @@ class RedisUtils(
     private val redisTemplate: RedisTemplate<String, Any>
 ) {
 
-    fun setStringData(key: String, value: String, expiredTimeMinutes: Long) {
-        val duration: Duration = Duration.ofMillis(1000 * 60 * expiredTimeMinutes)
+    fun setStringData(key: String, value: String, expiredTimeMillis: Long) {
+        val duration: Duration = Duration.ofMillis(expiredTimeMillis)
         redisTemplate.opsForValue().set(key, value, duration)
     }
 
