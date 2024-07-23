@@ -25,7 +25,7 @@ class loginUserServiceTest {
     @Test
     fun `구매자 로그인 성공 테스트`() {
         // given
-        val loginRequest = LoginRequest(email = "buyer@example.com", password = "password123", role = "BUYER")
+        val loginRequest = LoginRequest(email = "buyer@example.com", password = "password123")
         val buyer = Buyer(
             id = 1L,
             email = "buyer@example.com",

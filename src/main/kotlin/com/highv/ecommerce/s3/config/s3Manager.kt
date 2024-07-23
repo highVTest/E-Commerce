@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
 
 @Component
-class s3Manager(
+class S3Manager(
     private val amazonS3Client: AmazonS3Client,
     @Value ("\${cloud.aws.s3.bucket}") val bucket: String
 ) {
 
     @PostMapping
-    fun uploadFile(@RequestParam("file") file: MultipartFile): ResponseEntity<String> {
+    fun uploadFile(@RequestParam("file") file: MultipartFile):String {
         val fileName = file.originalFilename
         val fileUrl = "https://$bucket/test/${fileName}"
 
@@ -27,6 +27,6 @@ class s3Manager(
 
             amazonS3Client.putObject(bucket, fileName, file.inputStream, metadata) // Amazon S3 클라이언트를 사용하여 파일을 S3 버킷에 업로드
 
-        return ResponseEntity.ok(fileUrl)
+        return ResponseEntity.ok(fileUrl).toString()
     }
 }

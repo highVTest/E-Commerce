@@ -8,19 +8,22 @@ import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.shop.repository.ShopRepository
+import com.highv.ecommerce.s3.config.S3Manager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
 @Service
 class ProductService(
     private val productRepository: ProductRepository,
     private val shopRepository: ShopRepository,
-    private val productBackOfficeRepository: ProductBackOfficeRepository
+    private val productBackOfficeRepository: ProductBackOfficeRepository,
+    private val s3Manager: S3Manager
 ) {
-    fun createProduct(sellerId: Long, productRequest: CreateProductRequest): ProductResponse {
+    fun createProduct(sellerId: Long, productRequest: CreateProductRequest,multipartFile: MultipartFile?): ProductResponse {
         val shop = shopRepository.findShopBySellerId(sellerId)
         val product = Product(
             name = productRequest.name,
@@ -46,6 +49,14 @@ class ProductService(
         )
         savedProduct.productBackOffice = productBackOffice
         productBackOfficeRepository.save(productBackOffice)
+
+        if (multipartFile != null) {        // 파일 업로드 처리
+            val file = productRequest.productImage
+            val fileUrl = s3Manager.uploadFile(multipartFile) // S3Manager를 통해 파일 업로드
+            savedProduct.productImage = fileUrl // 저장된 상품에 파일 URL 저장
+            productRepository.save(savedProduct)
+        }// 변경 사항 저장
+
         return ProductResponse.from(savedProduct)
     }
 
