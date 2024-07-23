@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/buyer")
 class BuyerController(private val buyerService: BuyerService) {
+
     @PostMapping("/user_signup")
     fun signUp(
         @RequestBody @Valid request: CreateBuyerRequest,
