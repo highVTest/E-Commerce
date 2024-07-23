@@ -12,6 +12,28 @@ class ItemCartEntityTest : AnnotationSpec() {
 
     @Test
     fun `상품 수량을 변경할 때 수량이 1개 보다 적으면 예외가 발생한다`() {
+        val shop = Shop(
+            sellerId = 1L,
+            name = "testName",
+            description = "testDescription",
+            shopImage = "testImage",
+            rate = 0.0f
+        )
+
+        val product = Product(
+            name = "Test Product",
+            description = "Test Description",
+            productImage = "image.jpg",
+            favorite = 0,
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now(),
+            isSoldOut = false,
+            deletedAt = LocalDateTime.now(),
+            isDeleted = false,
+            shop = shop,
+            categoryId = 1L
+        ).apply { id = 1L }
+
         val cart = ItemCart(
             product = product,
             productName = "testName",
@@ -29,6 +51,29 @@ class ItemCartEntityTest : AnnotationSpec() {
 
     @Test
     fun `상품 수량을 변경할 때 1개보다 많으면 변경된다`() {
+
+        val shop = Shop(
+            sellerId = 1L,
+            name = "testName",
+            description = "testDescription",
+            shopImage = "testImage",
+            rate = 0.0f
+        )
+
+        val product = Product(
+            name = "Test Product",
+            description = "Test Description",
+            productImage = "image.jpg",
+            favorite = 0,
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now(),
+            isSoldOut = false,
+            deletedAt = LocalDateTime.now(),
+            isDeleted = false,
+            shop = shop,
+            categoryId = 1L
+        ).apply { id = 1L }
+
         val cart = ItemCart(
             product = product,
             productName = "testName",
