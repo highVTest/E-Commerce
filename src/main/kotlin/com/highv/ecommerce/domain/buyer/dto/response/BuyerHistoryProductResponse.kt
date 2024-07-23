@@ -9,7 +9,8 @@ data class BuyerHistoryProductResponse(
     val productName: String,
     val productPrice: Int,
     val productQuantity: Int,
-    val productImageUrl: String
+    val productImageUrl: String,
+    val productTotalPrice: Int
 ) {
     companion object {
         fun from(
@@ -18,12 +19,13 @@ data class BuyerHistoryProductResponse(
             orderStatusId: Long
         ): BuyerHistoryProductResponse =
             BuyerHistoryProductResponse(
+                orderStatusId = orderStatusId,
                 productName = cart.productName,
                 productPrice = cart.price,
                 productQuantity = cart.quantity,
                 productImageUrl = cart.product.productImage,
                 orderPendingReason = orderPendingReason,
-                orderStatusId = orderStatusId
+                productTotalPrice = cart.quantity * cart.price
             )
     }
 }

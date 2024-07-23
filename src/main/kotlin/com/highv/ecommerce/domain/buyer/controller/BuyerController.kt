@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.buyer.controller
 
 import com.highv.ecommerce.common.exception.LoginException
+import com.highv.ecommerce.domain.buyer.dto.request.BuyerOrderStatusUpdateRequest
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
@@ -17,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -81,4 +83,13 @@ class BuyerController(private val buyerService: BuyerService) {
     @GetMapping("/orders")
     fun getMyOrders(@AuthenticationPrincipal user: UserPrincipal): ResponseEntity<List<BuyerOrderResponse>> =
         ResponseEntity.status(HttpStatus.OK).body(buyerService.getOrders(user.id))
+
+    @PreAuthorize("hasRole('BUYER')")
+    @PutMapping("/orders/{orderId}")
+    fun updateOrder(
+        @AuthenticationPrincipal user: UserPrincipal,
+        @PathVariable(value = "orderId") orderId: Long,
+        @RequestBody request: BuyerOrderStatusUpdateRequest
+    ): ResponseEntity<BuyerOrderResponse> =
+        ResponseEntity.status(HttpStatus.OK).body(buyerService.updateStatus(user.id, orderId, request))
 }

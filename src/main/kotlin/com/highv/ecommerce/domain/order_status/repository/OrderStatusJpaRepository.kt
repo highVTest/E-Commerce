@@ -13,4 +13,5 @@ interface OrderStatusJpaRepository : JpaRepository<OrderStatus, Long> {
 
     fun findAllByProductsOrderId(orderIds: Long): List<OrderStatus>
     fun findAllByBuyerId(buyerId: Long): List<OrderStatus>
+    fun findAllByBuyerIdAndProductsOrderId(buyerId: Long, orderId: Long): List<OrderStatus>
 }
