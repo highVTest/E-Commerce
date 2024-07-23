@@ -30,8 +30,7 @@ class ProductsOrderService(
     private val buyerHistoryRepository: BuyerHistoryRepository,
     private val salesHistoryRepository: SalesHistoryRepository,
     private val buyerRepository: BuyerRepository,
-    private val couponToBuyerRepository: CouponToBuyerRepository
-){
+    ){
 
     @Transactional
     fun requestPayment(buyerId: Long, couponRequest: CouponRequest): DefaultResponse {
@@ -40,20 +39,7 @@ class ProductsOrderService(
 
         val itemCart = itemCartRepository.findAllByBuyerIdAndIsDeletedFalse(buyerId)
 
-        val couponList = couponToBuyerRepository.findAllByCouponIdAndBuyerId(couponRequest.couponId, buyerId)
-
-        var price: Int = 0
-
-        couponList.forEach { i ->
-            itemCart.map {
-                if(it.product.id == i.coupon.product.id){
-                    if(i.coupon.discountPolicy == DiscountPolicy.DISCOUNT_RATE)
-                    price += (it.price * it.quantity) - (it.price * it.quantity) * i.coupon.discount // 실수
-                }else{
-                    price += it.price * it.quantity
-                }
-            }
-        }
+        val totalPrice = productsOrderRepository.discountTotalPriceList(buyerId, couponRequest.couponIdList)
 
 
 
@@ -67,7 +53,7 @@ class ProductsOrderService(
                 buyerId = buyerId,
                 isPaid = false,
                 payDate = LocalDateTime.now(),
-                totalPrice = price,
+                totalPrice = totalPrice,
                 deliveryStartAt = LocalDateTime.now(),
                 deliveryEndAt = LocalDateTime.now(),
                 regDate = LocalDateTime.now(),
@@ -86,7 +72,7 @@ class ProductsOrderService(
         salesHistoryRepository.save(
             SalesHistory(
                 sellerId = itemCart[0].product.shop.sellerId,
-                price = price,
+                price = totalPrice,
                 regDt = LocalDateTime.now(),
                 buyerName = buyer.nickname,
                 orderId = productsOrder.id,

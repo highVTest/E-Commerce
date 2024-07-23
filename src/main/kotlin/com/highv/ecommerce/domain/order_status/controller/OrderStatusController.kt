@@ -38,6 +38,8 @@ class OrderStatusController(
     ): ResponseEntity<OrderStatusResponse>
         = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusReject(orderId, shopId, sellerOrderStatusRequest, userPrincipal.id))
 
+
+
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/buyer/order-status")
     fun requestOrderStatusChangeList(
@@ -53,6 +55,10 @@ class OrderStatusController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse>
         = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusRejectList(sellerOrderStatusRequest, userPrincipal.id))
+
+
+
+
 
     @PreAuthorize("hasRole('BUYER')")
     @GetMapping("/order_details/buyer")

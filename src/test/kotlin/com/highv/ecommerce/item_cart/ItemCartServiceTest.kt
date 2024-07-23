@@ -5,8 +5,6 @@ import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.item_cart.service.ItemCartService
 import com.highv.ecommerce.domain.product.entity.Product
-import com.highv.ecommerce.domain.product.repository.ProductRepository
-import com.highv.ecommerce.domain.shop.entity.QShop.shop
 import com.highv.ecommerce.domain.shop.entity.Shop
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
