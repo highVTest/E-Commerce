@@ -6,10 +6,13 @@ import com.highv.ecommerce.domain.backoffice.repository.SalesHistoryRepository
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.buyer_history.entity.BuyerHistory
 import com.highv.ecommerce.domain.buyer_history.repository.BuyerHistoryRepository
+import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
+import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.order_status.entity.OrderStatus
 import com.highv.ecommerce.domain.order_status.enumClass.OrderPendingReason
 import com.highv.ecommerce.domain.order_status.repository.OrderStatusJpaRepository
+import com.highv.ecommerce.domain.products_order.dto.CouponRequest
 import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
@@ -27,15 +30,19 @@ class ProductsOrderService(
     private val buyerHistoryRepository: BuyerHistoryRepository,
     private val salesHistoryRepository: SalesHistoryRepository,
     private val buyerRepository: BuyerRepository,
-){
+    ){
 
     @Transactional
-    fun requestPayment(buyerId: Long): DefaultResponse {
+    fun requestPayment(buyerId: Long, couponRequest: CouponRequest): DefaultResponse {
 
         //TODO(카트 아이디 를 조회 해서 물건을 가져 온다 -> List<CartItem>)
 
         val itemCart = itemCartRepository.findAllByBuyerIdAndIsDeletedFalse(buyerId)
-        val price = itemCart.sumOf { it.price * it.quantity }
+
+        val totalPrice = productsOrderRepository.discountTotalPriceList(buyerId, couponRequest.couponIdList)
+
+
+
         val buyer = buyerRepository.findByIdOrNull(buyerId)!!
 
         //TODO(만약에 CartItem 에 ProductId 가 Coupon 의 ProductId와 일치할 경우 CartItem 의 가격을 임시로 업데이트)
@@ -46,7 +53,7 @@ class ProductsOrderService(
                 buyerId = buyerId,
                 isPaid = false,
                 payDate = LocalDateTime.now(),
-                totalPrice = price,
+                totalPrice = totalPrice,
                 deliveryStartAt = LocalDateTime.now(),
                 deliveryEndAt = LocalDateTime.now(),
                 regDate = LocalDateTime.now(),
@@ -65,7 +72,7 @@ class ProductsOrderService(
         salesHistoryRepository.save(
             SalesHistory(
                 sellerId = itemCart[0].product.shop.sellerId,
-                price = price,
+                price = totalPrice,
                 regDt = LocalDateTime.now(),
                 buyerName = buyer.nickname,
                 orderId = productsOrder.id,

@@ -2,6 +2,7 @@ package com.highv.ecommerce.domain.products_order.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
+import com.highv.ecommerce.domain.products_order.dto.CouponRequest
 import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.products_order.service.ProductsOrderService
 import com.highv.ecommerce.infra.security.UserPrincipal
@@ -21,8 +22,9 @@ class ProductsOrderController(
     @PostMapping("/payments")
     fun requestPayment(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
+        @RequestBody couponRequest: CouponRequest
     ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal.id))
+        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal.id, couponRequest))
 
 
     @PreAuthorize("hasRole('SELLER')")

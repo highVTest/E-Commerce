@@ -12,7 +12,6 @@ import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.coupon.service.CouponService
 import com.highv.ecommerce.domain.product.entity.Product
-import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.shop.entity.Shop
 import com.highv.ecommerce.infra.security.UserPrincipal
 import io.kotest.assertions.throwables.shouldThrow

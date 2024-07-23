@@ -27,6 +27,9 @@ class ItemCart(
     @Column(name = "buyer_id", nullable = false)
     val buyerId: Long,
 
+    @Column(name = "is_coupon", nullable = false)
+    var isCoupon: Boolean = false,
+
     ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,5 +53,9 @@ class ItemCart(
         this.orderId = productsOrderId
         this.deletedAt = LocalDateTime.now()
         this.isDeleted = true
+    }
+
+    fun useCoupon() {
+        this.isCoupon = !isCoupon
     }
 }
