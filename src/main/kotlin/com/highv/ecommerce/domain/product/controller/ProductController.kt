@@ -27,7 +27,7 @@ class ProductController(
     fun createProduct(
         @AuthenticationPrincipal seller: UserPrincipal,
         @RequestPart productRequest: CreateProductRequest,
-        @RequestPart ("file", required = false) file: MultipartFile
+        @RequestPart (value ="file", required = false) file: MultipartFile
     ): ResponseEntity<ProductResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)

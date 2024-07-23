@@ -51,7 +51,6 @@ class ProductService(
         productBackOfficeRepository.save(productBackOffice)
 
         if (multipartFile != null) {        // 파일 업로드 처리
-            val file = productRequest.productImage
             val fileUrl = s3Manager.uploadFile(multipartFile) // S3Manager를 통해 파일 업로드
             savedProduct.productImage = fileUrl // 저장된 상품에 파일 URL 저장
             productRepository.save(savedProduct)
