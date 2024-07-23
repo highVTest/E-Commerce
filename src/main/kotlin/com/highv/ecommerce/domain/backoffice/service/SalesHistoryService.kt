@@ -3,7 +3,6 @@ package com.highv.ecommerce.domain.backoffice.service
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.backoffice.dto.saleshistory.SalesHistoryResponse
 import com.highv.ecommerce.domain.backoffice.repository.SalesHistoryRepository
-import com.highv.ecommerce.domain.order_status.repository.OrderStatusRepository
 import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -12,8 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 class SalesHistoryService(
     private val salesHistoryRepository: SalesHistoryRepository,
-    private val productsOrderRepository: ProductsOrderRepository,
-    private val orderStatusRepository: OrderStatusRepository
+    private val productsOrderRepository: ProductsOrderRepository
 ) {
     fun getSalesHistory(sellerId: Long, orderId: Long): SalesHistoryResponse {
         val salesHistory = salesHistoryRepository.findByOrderId(orderId)
