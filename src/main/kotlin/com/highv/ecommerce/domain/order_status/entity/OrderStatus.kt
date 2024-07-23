@@ -2,10 +2,9 @@ package com.highv.ecommerce.domain.order_status.entity
 
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.order_status.dto.BuyerOrderStatusRequest
-import com.highv.ecommerce.domain.order_status.enumClass.RejectReason
+import com.highv.ecommerce.domain.order_status.enumClass.OrderPendingReason
 import com.highv.ecommerce.domain.order_status.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
-import com.highv.ecommerce.domain.products_order.enumClass.OrderStatusType
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -18,7 +17,7 @@ class OrderStatus(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "reject_reason", nullable = false)
-    var rejectReason: RejectReason,
+    var orderPendingReason: OrderPendingReason,
 
     @Column(name = "buyer_dt",nullable = true)
     var buyerDateTime : LocalDateTime? = null,
@@ -55,8 +54,8 @@ class OrderStatus(
     fun buyerUpdate(buyerOrderStatusRequest: BuyerOrderStatusRequest) {
 
         when (buyerOrderStatusRequest.orderStatusType.name) {
-            "EXCHANGE" -> this.rejectReason = RejectReason.EXCHANGE_REQUESTED
-            "REFUND" -> this.rejectReason = RejectReason.REFUND_REQUESTED
+            "EXCHANGE" -> this.orderPendingReason = OrderPendingReason.EXCHANGE_REQUESTED
+            "REFUND" -> this.orderPendingReason = OrderPendingReason.REFUND_REQUESTED
         }
 
         this.buyerDateTime = LocalDateTime.now()
@@ -65,8 +64,8 @@ class OrderStatus(
 
     fun sellerUpdate(sellerOrderStatusRequest: SellerOrderStatusRequest) {
         when (sellerOrderStatusRequest.orderStatusType.name) {
-            "EXCHANGE" -> this.rejectReason = RejectReason.EXCHANGE_REJECTED
-            "REFUND" -> this.rejectReason = RejectReason.REFUND_REJECTED
+            "EXCHANGE" -> this.orderPendingReason = OrderPendingReason.EXCHANGE_REJECTED
+            "REFUND" -> this.orderPendingReason = OrderPendingReason.REFUND_REJECTED
         }
         this.sellerDateTime = LocalDateTime.now()
         this.sellerDescription = sellerOrderStatusRequest.description

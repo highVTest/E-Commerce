@@ -8,13 +8,12 @@ import com.highv.ecommerce.domain.buyer_history.entity.BuyerHistory
 import com.highv.ecommerce.domain.buyer_history.repository.BuyerHistoryRepository
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.order_status.entity.OrderStatus
-import com.highv.ecommerce.domain.order_status.enumClass.RejectReason
+import com.highv.ecommerce.domain.order_status.enumClass.OrderPendingReason
 import com.highv.ecommerce.domain.order_status.repository.OrderStatusJpaRepository
 import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
 import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
-import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -32,11 +31,12 @@ class ProductsOrderService(
 
     @Transactional
     fun requestPayment(buyerId: Long): DefaultResponse {
+
         //TODO(카트 아이디 를 조회 해서 물건을 가져 온다 -> List<CartItem>)
+
         val itemCart = itemCartRepository.findAllByBuyerIdAndIsDeletedFalse(buyerId)
         val price = itemCart.sumOf { it.price * it.quantity }
         val buyer = buyerRepository.findByIdOrNull(buyerId)!!
-
 
         //TODO(만약에 CartItem 에 ProductId 가 Coupon 의 ProductId와 일치할 경우 CartItem 의 가격을 임시로 업데이트)
 
@@ -75,7 +75,7 @@ class ProductsOrderService(
         orderStatusRepository.saveAll(
             itemCart.map {
                 OrderStatus(
-                    rejectReason = RejectReason.NONE,
+                    orderPendingReason = OrderPendingReason.NONE,
                     itemCart = it,
                     productsOrder = productsOrder,
                     shopId = it.product.shop.id!!,

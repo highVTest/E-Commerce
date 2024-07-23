@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface OrderStatusJpaRepository: JpaRepository<OrderStatus, Long> {
 
-    fun findAllByShopIdAndBuyerIdAndIsDeletedFalse(shopId: Long, buyerId: Long): List<OrderStatus>
+    fun findAllByShopIdAndProductsOrderIdAndIsDeletedFalse(shopId: Long, productsOrderId: Long): List<OrderStatus>
 
     fun findByIdAndShopIdAndIsDeletedFalse(id: Long, shopId: Long): OrderStatus?
 
