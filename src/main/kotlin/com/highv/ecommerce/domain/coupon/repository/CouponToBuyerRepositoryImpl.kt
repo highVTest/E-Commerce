@@ -49,4 +49,8 @@ class CouponToBuyerRepositoryImpl(
     override fun findByCouponIdAndBuyerIdAndIsUsedFalse(couponId: Long, buyerId: Long): CouponToBuyer? {
         return couponToBuyerJpaRepository.findByCouponIdAndBuyerIdAndIsUsedFalse(couponId, buyerId)
     }
+
+    override fun findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons: List<Long>, buyerId: Long):List<CouponToBuyer> {
+        return couponToBuyerJpaRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons, buyerId)
+    }
 }

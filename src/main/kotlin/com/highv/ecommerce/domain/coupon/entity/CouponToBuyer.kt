@@ -26,4 +26,8 @@ class CouponToBuyer(
     fun useCoupon() {
         isUsed = true
     }
+
+    fun returnCoupon() {
+        isUsed = false
+    }
 }

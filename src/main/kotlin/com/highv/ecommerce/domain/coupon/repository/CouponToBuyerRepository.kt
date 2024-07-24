@@ -1,7 +1,6 @@
 package com.highv.ecommerce.domain.coupon.repository
 
 import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
-import org.springframework.data.jpa.repository.Query
 
 interface CouponToBuyerRepository {
 
@@ -18,4 +17,6 @@ interface CouponToBuyerRepository {
     fun deleteAll(couponToBuyerList: List<CouponToBuyer>)
 
     fun findByCouponIdAndBuyerIdAndIsUsedFalse(couponId: Long, buyerId: Long): CouponToBuyer?
+
+    fun findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons: List<Long>, buyerId: Long):List<CouponToBuyer>
 }

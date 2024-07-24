@@ -1,5 +1,7 @@
 package com.highv.ecommerce.domain.order_details.service
 
+import com.highv.ecommerce.domain.coupon.repository.CouponRepository
+import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
@@ -14,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class OrderDetailsService(
     private val orderDetailsRepository: OrderDetailsRepository,
+    private val couponToBuyerRepository: CouponToBuyerRepository,
+    private val couponRepository: CouponRepository
 ){
 
     @Transactional
@@ -74,6 +78,7 @@ class OrderDetailsService(
     fun requestComplainAccept(shopId: Long, orderId: Long, sellerOrderStatusRequest: SellerOrderStatusRequest): OrderStatusResponse {
 
         val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId, orderId, sellerOrderStatusRequest.buyerId)
+        val coupons = couponRepository.findAllByProductId(orderDetails.map { it.product.id!! })
         val complainType =
             if(orderDetails[0].complainStatus == ComplainStatus.REFUND_REQUESTED) ComplainType.REFUND
             else ComplainType.EXCHANGE
@@ -86,6 +91,9 @@ class OrderDetailsService(
             ComplainStatus.EXCHANGE_REQUESTED -> {
                 orderDetails.map {
                     it.sellerUpdate(OrderStatus.PRODUCT_PREPARING, sellerOrderStatusRequest, ComplainStatus.EXCHANGED)
+                    val couponToBuyer = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons, sellerOrderStatusRequest.buyerId)
+
+                    couponToBuyer.map { it.returnCoupon() }
                 }
             }
             else -> throw RuntimeException("구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")

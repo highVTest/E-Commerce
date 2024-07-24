@@ -16,4 +16,7 @@ interface CouponToBuyerJpaRepository: JpaRepository<CouponToBuyer, Long> {
 
     fun findByCouponIdAndBuyerIdAndIsUsedFalse(couponId: Long, buyerId: Long): CouponToBuyer?
 
+    @Query("SELECT cb FROM CouponToBuyer cb WHERE cb.coupon.id in :couponId AND cb.buyer.id = :buyerId AND cb.isUsed = true")
+    fun findAllByCouponIdAndBuyerIdAndIsUsedTrue(couponId: List<Long>, buyerId: Long): List<CouponToBuyer>
+
 }

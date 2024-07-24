@@ -19,4 +19,7 @@ interface CouponJpaRepository: JpaRepository<Coupon, Long>{
 
     @Query("SELECT RELEASE_LOCK(:name)", nativeQuery = true)
     fun releaseLock(@Param("name") name: String): Int
+
+    @Query("SELECT c.id FROM Coupon c WHERE c.product.id in :productIdList ")
+    fun findAllByProductIdList(productIdList: List<Long>): List<Long>
 }
