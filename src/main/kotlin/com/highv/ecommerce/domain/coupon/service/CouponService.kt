@@ -47,8 +47,6 @@ class CouponService(
                 discount = couponRequest.discount,
                 expiredAt = couponRequest.expiredAt,
                 createdAt = LocalDateTime.now(),
-                isDeleted = false,
-                deletedAt = null,
                 quantity = couponRequest.quantity,
                 sellerId = userPrincipal.id
             )
@@ -129,7 +127,8 @@ class CouponService(
             couponToBuyerRepository.save(
                 CouponToBuyer(
                     buyer = buyer,
-                    coupon = coupon
+                    coupon = coupon,
+                    isUsed = false,
                 )
             )
 
@@ -152,10 +151,8 @@ class CouponService(
 
         log.info(coupon.coupon.product.id!!.toString())
 
-        val itemCart = itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(coupon.coupon.product.id!!, buyerId)
+        val itemCart = itemCartRepository.findByProductIdAndBuyerId(coupon.coupon.product.id!!, buyerId)
             ?: throw RuntimeException("장바구니에 아이템이 존재하지 않습니다")
-
-        itemCart.useCoupon()
 
 
         return DefaultResponse.from("쿠폰 적용이 완료 되었습니다")

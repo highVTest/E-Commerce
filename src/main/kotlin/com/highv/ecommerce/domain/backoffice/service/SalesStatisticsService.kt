@@ -36,14 +36,14 @@ class SalesStatisticsService(
         val product = validateProductWithBackOffice(sellerId, productId)
         val productBackOffice = product.productBackOffice
             ?: throw IllegalArgumentException("ProductBackOffice not found for product with ID $productId")
-        return ProductSalesQuantityResponse(product.name, productBackOffice.soldQuantity)
+        return ProductSalesQuantityResponse(product.name, productBackOffice.soldQuantity.toInt())
     }
 
     fun getProductSales(sellerId: Long, productId: Long): ProductSalesResponse {
         val product = validateProductWithBackOffice(sellerId, productId)
         val productBackOffice = product.productBackOffice
             ?: throw IllegalArgumentException("ProductBackOffice not found for product with ID $productId")
-        return ProductSalesResponse(product.name, productBackOffice.soldQuantity * productBackOffice.price)
+        return ProductSalesResponse(product.name, (productBackOffice.soldQuantity * productBackOffice.price).toInt())
     }
 
     private fun validateProductWithBackOffice(sellerId: Long, productId: Long): Product {

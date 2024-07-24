@@ -26,7 +26,6 @@ class ProductService(
             name = productRequest.name,
             description = productRequest.description,
             productImage = productRequest.productImage,
-            favorite = 0,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
             isSoldOut = false,

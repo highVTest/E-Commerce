@@ -1,6 +1,5 @@
 package com.highv.ecommerce.domain.backoffice.dto.saleshistory
 
-import com.highv.ecommerce.domain.backoffice.entity.SalesHistory
 import java.time.LocalDateTime
 
 data class SalesHistoryResponse(
@@ -11,14 +10,15 @@ data class SalesHistoryResponse(
     val buyerName: String,
     val orderId: Long,
 ) {
-    companion object {
-        fun from(salesHistory: SalesHistory) = SalesHistoryResponse(
-            salesHistory.id!!,
-            salesHistory.sellerId,
-            salesHistory.price,
-            salesHistory.regDt,
-            salesHistory.buyerName,
-            salesHistory.orderId,
-        )
-    }
+    // TODO("수정 및 삭제 필요")
+//    companion object {
+//        fun from(salesHistory: SalesHistory) = SalesHistoryResponse(
+//            salesHistory.id!!,
+//            salesHistory.sellerId,
+//            salesHistory.price,
+//            salesHistory.regDt,
+//            salesHistory.buyerName,
+//            salesHistory.orderId,
+//        )
+//    }
 }

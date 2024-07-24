@@ -9,8 +9,6 @@ import org.hibernate.annotations.SQLRestriction
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
-@SQLDelete(sql = "UPDATE coupon SET deleted_at = CURRENT_TIMESTAMP, is_deleted = true WHERE id = ?")
-@SQLRestriction("is_deleted = false")
 @Entity
 @Table(name = "coupon")
 class Coupon(
@@ -34,18 +32,12 @@ class Coupon(
     @Column(name = "created_at", nullable = false)
     val createdAt: LocalDateTime,
 
-    @Column(name = "deleted_At", nullable = true)
-    val deletedAt: LocalDateTime? = null,
-
-    @Column(name = "is_deleted", nullable = false)
-    val isDeleted: Boolean = false,
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     val product: Product,
 
     @Column(name = "seller_id", nullable = false)
-    val sellerId: Long
+    val sellerId: Long,
 
 ){
 
