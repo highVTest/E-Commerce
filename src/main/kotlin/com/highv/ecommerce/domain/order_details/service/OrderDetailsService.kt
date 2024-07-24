@@ -23,7 +23,7 @@ class OrderDetailsService(
     @Transactional
     fun buyerRequestComplain(buyerOrderStatusRequest: BuyerOrderStatusRequest, buyerId: Long, shopId: Long, orderId: Long): OrderStatusResponse {
 
-        val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(buyerOrderStatusRequest.shopId, buyerId)
+        val orderDetails = orderDetailsRepository.findAllByShopIdAndBuyerId(shopId, buyerId)
 
         orderDetails.map {
             it.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
@@ -86,14 +86,15 @@ class OrderDetailsService(
             ComplainStatus.REFUND_REQUESTED -> {
                 orderDetails.map {
                     it.sellerUpdate(OrderStatus.ORDER_CANCELED, sellerOrderStatusRequest, ComplainStatus.REFUNDED)
+                    val couponToBuyerList = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons, sellerOrderStatusRequest.buyerId)
+
+                    couponToBuyerList.map { couponToBuyer -> couponToBuyer.returnCoupon() }
                 }
             }
             ComplainStatus.EXCHANGE_REQUESTED -> {
                 orderDetails.map {
                     it.sellerUpdate(OrderStatus.PRODUCT_PREPARING, sellerOrderStatusRequest, ComplainStatus.EXCHANGED)
-                    val couponToBuyerList = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons, sellerOrderStatusRequest.buyerId)
 
-                    couponToBuyerList.map { couponToBuyer -> couponToBuyer.returnCoupon() }
                 }
             }
             else -> throw RuntimeException("구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
