@@ -2,7 +2,7 @@ package com.highv.ecommerce.domain.order_master.repository
 
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 
-interface ProductsOrderRepository {
+interface OrderMasterRepository {
 
     fun saveAndFlush(productsOrder: OrderMaster): OrderMaster
 

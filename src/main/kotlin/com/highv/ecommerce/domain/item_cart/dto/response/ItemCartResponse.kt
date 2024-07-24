@@ -8,12 +8,13 @@ data class ItemCartResponse(
     val productQuantity: Int,
     val totalPrice: Int
 ) {
+    // TODO("수정 및 삭제 필요")
     companion object {
         fun from(itemCart: ItemCart): ItemCartResponse = ItemCartResponse(
             cartId = itemCart.id!!,
-            productName = itemCart.productName,
+            productName = "itemCart.productName",
             productQuantity = itemCart.quantity,
-            totalPrice = itemCart.price
+            totalPrice = 1
         )
     }
 }

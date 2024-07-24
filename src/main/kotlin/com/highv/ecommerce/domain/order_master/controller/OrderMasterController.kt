@@ -3,7 +3,7 @@ package com.highv.ecommerce.domain.order_master.controller
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.order_master.dto.CouponRequest
 import com.highv.ecommerce.domain.order_master.dto.OrderStatusRequest
-import com.highv.ecommerce.domain.order_master.service.ProductsOrderService
+import com.highv.ecommerce.domain.order_master.service.OrderMasterService
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/")
-class ProductsOrderController(
-    private val productsOrderService: ProductsOrderService
+class OrderMasterController(
+    private val productsOrderService: OrderMasterService
 ) {
 
     @PreAuthorize("hasRole('BUYER')")

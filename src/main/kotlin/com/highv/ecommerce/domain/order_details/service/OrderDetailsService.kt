@@ -3,7 +3,7 @@ package com.highv.ecommerce.domain.order_details.service
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
-import com.highv.ecommerce.domain.order_details.repository.OrderStatusRepository
+import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
 import com.highv.ecommerce.domain.order_master.dto.ProductsOrderResponse
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import org.springframework.stereotype.Service
@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OrderDetailsService(
-    private val orderStatusRepository: OrderStatusRepository,
+    private val orderStatusRepository: OrderDetailsRepository,
 ){
 
 

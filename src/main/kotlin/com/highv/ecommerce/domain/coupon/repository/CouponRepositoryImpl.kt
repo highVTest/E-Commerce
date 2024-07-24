@@ -6,6 +6,7 @@ import com.highv.ecommerce.domain.product.entity.QProduct
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -24,7 +25,7 @@ class CouponRepositoryImpl(
     }
 
     override fun findByIdOrNull(id: Long): Coupon? {
-        return couponJpaRepository.findByIdAndIsDeletedFalse(id)
+        return couponJpaRepository.findByIdOrNull(id)
     }
 
     override fun delete(coupon: Coupon) {

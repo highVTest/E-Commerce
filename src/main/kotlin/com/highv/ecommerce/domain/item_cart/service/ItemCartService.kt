@@ -24,7 +24,7 @@ class ItemCartService(
         val product: Product =
             productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
 
-        val existsCart: ItemCart? = itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(productId, buyerId)
+        val existsCart: ItemCart? = itemCartRepository.findByProductIdAndBuyerId(productId, buyerId)
 
         if (existsCart != null) {
             val quantity: Int = existsCart.quantity + request.quantity
@@ -34,8 +34,6 @@ class ItemCartService(
         } else {
             val item: ItemCart = ItemCart(
                 product = product,
-                productName = product.name,
-                price = product.productBackOffice!!.price,
                 quantity = request.quantity,
                 buyerId = buyerId
             )
@@ -46,7 +44,7 @@ class ItemCartService(
 
     @Transactional(readOnly = true)
     fun getMyCart(buyerId: Long): List<ItemCartResponse> {
-        val cart: List<ItemCart> = itemCartRepository.findByBuyerIdAndIsDeletedFalse(buyerId)
+        val cart: List<ItemCart> = itemCartRepository.findByBuyerId(buyerId)
 
         return cart.map { ItemCartResponse.from(it) }
     }
@@ -58,7 +56,7 @@ class ItemCartService(
             productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
 
         val item: ItemCart =
-            itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(productId, buyerId)
+            itemCartRepository.findByProductIdAndBuyerId(productId, buyerId)
                 ?: throw RuntimeException("Item not found")
 
         item.updateQuantity(request.quantity) // 추후 프로덕트에서 price 관련된 게 생길 예정
@@ -69,7 +67,7 @@ class ItemCartService(
     @Transactional
     fun deleteItemIntoCart(productId: Long, buyerId: Long) {
 
-        val item: ItemCart = itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(productId, buyerId)
+        val item: ItemCart = itemCartRepository.findByProductIdAndBuyerId(productId, buyerId)
             ?: throw RuntimeException("Item not found")
 
         // 구매자가 장바구니에서 물품을 지우는 경우 하드? 소프트?

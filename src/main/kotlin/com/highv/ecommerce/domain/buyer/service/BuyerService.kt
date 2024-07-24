@@ -12,11 +12,11 @@ import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
-import com.highv.ecommerce.domain.order_details.repository.OrderStatusJpaRepository
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
-import com.highv.ecommerce.domain.order_master.repository.ProductsOrderRepository
+import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
+import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -27,8 +27,8 @@ import java.time.LocalDateTime
 class BuyerService(
     private val buyerRepository: BuyerRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val orderStatusJpaRepository: OrderStatusJpaRepository,
-    private val productsOrderRepository: ProductsOrderRepository
+    private val orderDetailsRepository: OrderDetailsRepository,
+    private val productsOrderRepository: OrderMasterRepository
 ) {
 
     fun signUp(request: CreateBuyerRequest): BuyerResponse {
@@ -117,7 +117,7 @@ class BuyerService(
 
         // val buyerHistories: List<BuyerHistory> = buyerHistoryRepository.findAllByBuyerId(buyerId)
 
-        val orderStatuses: List<OrderDetails> = orderStatusJpaRepository.findAllByBuyerId(buyerId)
+        val orderStatuses: List<OrderDetails> = orderDetailsRepository.findAllByBuyerId(buyerId)
 
         // val orderGroups: MutableMap<Long, MutableList<OrderStatus>> = mutableMapOf()
         //
@@ -176,7 +176,8 @@ class BuyerService(
             productsOrderRepository.findByIdOrNull(orderId) ?: throw RuntimeException("수정할 주문 내역이 없습니다.")
 
         val orderStatuses: List<OrderDetails> =
-            orderStatusJpaRepository.findAllByBuyerIdAndProductsOrderId(buyerId, orderId)
+            //TODO("수정 필요")
+            orderDetailsRepository.findAllByBuyerId(buyerId)
 
         val orderPendingReason: ComplainStatus = when (request.status) {
             ComplainType.EXCHANGE -> ComplainStatus.EXCHANGE_REQUESTED
@@ -192,7 +193,7 @@ class BuyerService(
         }
 
         // 위에랑 어짜피 같은 것임 지워도 되지 않을까?
-        val savedOrderStatuses = orderStatusJpaRepository.saveAll(orderStatuses)
+        val savedOrderStatuses = orderDetailsRepository.saveAll(orderStatuses)
         val savedProductsOrder = productsOrderRepository.save(productsOrder)
 
         // 수정 필요

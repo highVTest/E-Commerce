@@ -21,14 +21,15 @@ class SalesHistoryController(
     private val salesHistoryService: SalesHistoryService
 ) {
     // 주문 상태 확인
-    @PreAuthorize("hasRole('SELLER')")
-    @GetMapping("/{orderId}")
-    fun getOrderStatus(
-        @AuthenticationPrincipal seller: UserPrincipal,
-        @PathVariable orderId: Long
-    ): ResponseEntity<SalesHistoryResponse> = ResponseEntity
-        .status(HttpStatus.OK)
-        .body(salesHistoryService.getSalesHistory(seller.id, orderId))
+    // TODO("수정 필요")
+//    @PreAuthorize("hasRole('SELLER')")
+//    @GetMapping("/{orderId}")
+//    fun getOrderStatus(
+//        @AuthenticationPrincipal seller: UserPrincipal,
+//        @PathVariable orderId: Long
+//    ): ResponseEntity<SalesHistoryResponse> = ResponseEntity
+//        .status(HttpStatus.OK)
+//        .body(salesHistoryService.getSalesHistory(seller.id, orderId))
 
     // 주문 상태 수정
     @PreAuthorize("hasRole('SELLER')")

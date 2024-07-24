@@ -8,22 +8,23 @@ import java.time.LocalDateTime
 data class ProductsOrderResponse(
     val id : Long,
     val statusCode: OrderStatus,
-    val orderPendingReason: ComplainStatus,
+    val complainStatus: ComplainStatus,
     val updatedDate: LocalDateTime,
     val rejectDescription : String? = null,
     val buyerName : String,
     val totalPrice : Int,
 ){
+    // TODO("수정 필요")
     companion object{
-        fun from(orderReject: OrderDetails): ProductsOrderResponse{
+        fun from(orderDetails: OrderDetails): ProductsOrderResponse{
             return ProductsOrderResponse(
-                id = orderReject.productsOrder.id!!,
-                statusCode = orderReject.productsOrder.statusCode,
-                orderPendingReason = orderReject.orderPendingReason,
+                id = orderDetails.orderMaster.id!!,
+                statusCode = orderDetails.orderStatus,
+                complainStatus = orderDetails.complainStatus,
                 updatedDate = LocalDateTime.now(),
-                rejectDescription = orderReject.sellerDescription ?: "",
-                buyerName = orderReject.itemCart.buyerId.toString(),
-                totalPrice = orderReject.productsOrder.totalPrice
+                rejectDescription = orderDetails.sellerDescription ?: "",
+                buyerName = orderDetails.buyer.nickname,
+                totalPrice = 1
             )
         }
     }

@@ -14,11 +14,11 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
 @Repository
-class ProductsOrderRepositoryImpl(
-    private val productsOrderJpaRepository: ProductsOrderJpaRepository,
+class OrderMasterRepositoryImpl(
+    private val productsOrderJpaRepository: OrderMasterJpaRepository,
     @PersistenceContext
     private val em: EntityManager
-): ProductsOrderRepository {
+): OrderMasterRepository {
 
     private val queryFactory = JPAQueryFactory(em)
     private val itemCart = QItemCart.itemCart
@@ -37,10 +37,12 @@ class ProductsOrderRepositoryImpl(
         return productsOrderJpaRepository.save(productsOrder)
     }
 
+    // TODO("수정 필요")
     override fun discountTotalPriceList(buyerId: Long, couponIdList: List<Long>): Int {
 
         val query = queryFactory.select(
-                getTotalPrice().sum()
+            itemCart
+//                getTotalPrice().sum()
         ).from(itemCart)
             .leftJoin(couponToBuyer).fetchJoin()
             .on(couponToBuyer.buyer().id.eq(itemCart.buyerId)
@@ -48,27 +50,26 @@ class ProductsOrderRepositoryImpl(
             .leftJoin(coupon).fetchJoin()
             .on(coupon.id.eq(couponToBuyer.coupon().id)
                 .and(coupon.product().id.eq(itemCart.product().id)))
-            .where(itemCart.buyerId.eq(buyerId)
-                , itemCart.isDeleted.isFalse)
+            .where(itemCart.buyerId.eq(buyerId))
             .fetchOne()
 
 
-        return query ?: 0
+        return 1
     }
 
-    private fun getTotalPrice(): NumberExpression<Int>{
-
-        return CaseBuilder()
-            .`when`(couponToBuyer.coupon().id.isNotNull
-                .and(coupon.discountPolicy.eq(DiscountPolicy.DISCOUNT_RATE)))
-            .then(itemCart.price.multiply(itemCart.quantity)
-                .subtract(itemCart.price.multiply(itemCart.quantity).multiply(coupon.discount.divide(100.0))))
-            .`when`(couponToBuyer.coupon().id.isNotNull
-                .and(coupon.discountPolicy.eq(DiscountPolicy.DISCOUNT_PRICE)))
-            .then(itemCart.price.multiply(itemCart.quantity)
-                .subtract(coupon.discount))
-            .otherwise(itemCart.price.multiply(itemCart.quantity))
-    }
+//    private fun getTotalPrice(): NumberExpression<Int>{
+//
+//        return CaseBuilder()
+//            .`when`(couponToBuyer.coupon().id.isNotNull
+//                .and(coupon.discountPolicy.eq(DiscountPolicy.DISCOUNT_RATE)))
+//            .then(itemCart.price.multiply(itemCart.quantity)
+//                .subtract(itemCart.price.multiply(itemCart.quantity).multiply(coupon.discount.divide(100.0))))
+//            .`when`(couponToBuyer.coupon().id.isNotNull
+//                .and(coupon.discountPolicy.eq(DiscountPolicy.DISCOUNT_PRICE)))
+//            .then(itemCart.price.multiply(itemCart.quantity)
+//                .subtract(coupon.discount))
+//            .otherwise(itemCart.price.multiply(itemCart.quantity))
+//    }
 }
 
 

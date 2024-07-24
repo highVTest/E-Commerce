@@ -2,7 +2,7 @@ package com.highv.ecommerce.domain.order_details.repository
 
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 
-interface OrderStatusRepository {
+interface OrderDetailsRepository {
 
     fun findAllByShopIdAndProductsOrderId(shopId: Long, productsOrderId: Long): List<OrderDetails>
 
