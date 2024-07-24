@@ -8,6 +8,7 @@ import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.shop.repository.ShopRepository
+import com.highv.ecommerce.s3.config.FileUtil
 import com.highv.ecommerce.s3.config.S3Manager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -21,14 +22,17 @@ class ProductService(
     private val productRepository: ProductRepository,
     private val shopRepository: ShopRepository,
     private val productBackOfficeRepository: ProductBackOfficeRepository,
-    private val s3Manager: S3Manager
+    private val s3Manager: S3Manager,
 ) {
-    fun createProduct(sellerId: Long, productRequest: CreateProductRequest,multipartFile: MultipartFile?): ProductResponse {
+    fun createProduct(sellerId: Long, productRequest: CreateProductRequest,multipartFile: MultipartFile): ProductResponse {
+
+        s3Manager.uploadFile(multipartFile) // S3Manager를 통해 파일 업로드
+
         val shop = shopRepository.findShopBySellerId(sellerId)
         val product = Product(
             name = productRequest.name,
             description = productRequest.description,
-            productImage = productRequest.productImage,
+            productImage = s3Manager.getFile(multipartFile.originalFilename), // Buyer 객체에 프로필 이미지 URL 저장
             favorite = 0,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
@@ -50,11 +54,9 @@ class ProductService(
         savedProduct.productBackOffice = productBackOffice
         productBackOfficeRepository.save(productBackOffice)
 
-        if (multipartFile != null) {        // 파일 업로드 처리
-            val fileUrl = s3Manager.uploadFile(multipartFile) // S3Manager를 통해 파일 업로드
-            savedProduct.productImage = fileUrl // 저장된 상품에 파일 URL 저장
+
+
             productRepository.save(savedProduct)
-        }// 변경 사항 저장
 
         return ProductResponse.from(savedProduct)
     }
