@@ -2,7 +2,7 @@ package com.highv.ecommerce.domain.item_cart.dto.response
 
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 
-data class ItemCartResponse(
+data class ItemResponse(
     val cartId: Long,
     val productId: Long,
     val productName: String,
@@ -13,7 +13,7 @@ data class ItemCartResponse(
 ) {
     // TODO("수정 및 삭제 필요")
     companion object {
-        fun from(itemCart: ItemCart): ItemCartResponse = ItemCartResponse(
+        fun from(itemCart: ItemCart): ItemResponse = ItemResponse(
             cartId = itemCart.id!!,
             productId = itemCart.product.id!!,
             productName = itemCart.product.name,

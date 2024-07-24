@@ -2,7 +2,7 @@ package com.highv.ecommerce.domain.item_cart.service
 
 import com.highv.ecommerce.domain.item_cart.dto.request.SelectProductQuantity
 import com.highv.ecommerce.domain.item_cart.dto.response.CartResponse
-import com.highv.ecommerce.domain.item_cart.dto.response.ItemCartResponse
+import com.highv.ecommerce.domain.item_cart.dto.response.ItemResponse
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.product.entity.Product
@@ -16,6 +16,7 @@ class ItemCartService(
     private val itemCartRepository: ItemCartRepository,
     private val productRepository: ProductRepository
 ) {
+    @Transactional
     fun addItemIntoCart(productId: Long, request: SelectProductQuantity, buyerId: Long) {
 
         if (request.quantity < 1) {
@@ -47,13 +48,13 @@ class ItemCartService(
     @Transactional(readOnly = true)
     fun getMyCart(buyerId: Long): List<CartResponse> {
         val cart: List<ItemCart> = itemCartRepository.findByBuyerId(buyerId)
-        val shopGroupItem: MutableMap<Long, MutableList<ItemCartResponse>> = mutableMapOf()
+        val shopGroupItem: MutableMap<Long, MutableList<ItemResponse>> = mutableMapOf()
 
         cart.forEach {
             if (!shopGroupItem.containsKey(it.shopId)) {
                 shopGroupItem[it.shopId] = mutableListOf()
             }
-            shopGroupItem[it.shopId]!!.add(ItemCartResponse.from(it))
+            shopGroupItem[it.shopId]!!.add(ItemResponse.from(it))
         }
 
         return shopGroupItem.map { (key, value) -> CartResponse(key, value) }
