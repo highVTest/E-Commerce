@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.order_master.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.domain.order_master.dto.CouponRequest
 import com.highv.ecommerce.domain.order_master.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.order_master.service.OrderMasterService
 import com.highv.ecommerce.infra.security.UserPrincipal
@@ -21,7 +22,7 @@ class OrderMasterController(
     fun requestPayment(
         @PathVariable("cartId") cartId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        couponIdList: List<Long>
+        @RequestBody couponRequest: CouponRequest
     ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal.id, couponIdList, cartId))
+        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal.id, couponRequest, cartId))
 }

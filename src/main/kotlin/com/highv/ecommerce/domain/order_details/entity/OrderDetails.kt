@@ -25,7 +25,6 @@ class OrderDetails(
     @Column(name = "complain_status", nullable = false)
     var complainStatus: ComplainStatus,
 
-
     @Column(name = "buyer_req_dt",nullable = true)
     var buyerDateTime : LocalDateTime? = null,
 
@@ -55,6 +54,9 @@ class OrderDetails(
 
     @Column(name = "shop_id", nullable = false)
     val shopId: Long,
+
+    @Column(name="total_price", nullable = false)
+    val totalPrice: Int
 ){
     fun buyerUpdate(orderStatus: OrderStatus, buyerOrderStatusRequest: BuyerOrderStatusRequest) {
 

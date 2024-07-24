@@ -25,7 +25,7 @@ class ProductController(private val productService: ProductService) {
     fun createProduct(
         @AuthenticationPrincipal seller: UserPrincipal,
         @RequestPart productRequest: CreateProductRequest,
-        @RequestPart image : MultipartFile
+        @RequestPart image : MultipartFile?
     ): ResponseEntity<ProductResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)

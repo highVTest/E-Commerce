@@ -1,6 +1,5 @@
 package com.highv.ecommerce.domain.coupon.repository
 
-import com.highv.ecommerce.domain.coupon.entity.Coupon
 import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
 import com.highv.ecommerce.domain.coupon.entity.QCouponToBuyer
 import com.querydsl.jpa.impl.JPAQueryFactory
@@ -39,8 +38,8 @@ class CouponToBuyerRepositoryImpl(
         return couponToBuyerJpaRepository.findByCouponIdAndBuyerId(couponId, buyerId)
     }
 
-    override fun findAllByCouponIdAndBuyerId(couponIdList: List<Long>, buyerId: Long): List<CouponToBuyer> {
-        return couponToBuyerJpaRepository.findAllByCouponIdAndBuyerId(couponIdList, buyerId)
+    override fun findAllByCouponIdAndBuyerIdAndIsUsedFalse(couponIdList: List<Long>, buyerId: Long): List<CouponToBuyer> {
+        return couponToBuyerJpaRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(couponIdList, buyerId)
     }
 
     override fun deleteAll(couponToBuyerList: List<CouponToBuyer>) {

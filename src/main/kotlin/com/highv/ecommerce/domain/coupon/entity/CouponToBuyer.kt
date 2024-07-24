@@ -20,6 +20,10 @@ class CouponToBuyer(
     val buyer: Buyer,
 
     @Column(name = "is_used", nullable = false)
-    val isUsed: Boolean,
+    var isUsed: Boolean = false,
 
-)
+) {
+    fun useCoupon() {
+        isUsed = true
+    }
+}

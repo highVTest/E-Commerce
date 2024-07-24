@@ -18,6 +18,9 @@ class ItemCart(
     @Column(name = "buyer_id", nullable = false)
     val buyerId: Long,
 
+    @Column(name = "shop_id", nullable = false)
+    val shopId: Long,
+
     ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
