@@ -1,18 +1,18 @@
 package com.highv.ecommerce.domain.order_details.enumClass
 
 enum class OrderStatus {
-                      
-    PENDING,
 
-    CANCELLED,
+    ORDER_CANCELED,
 
     ORDERED,
 
-    PAYMENTED,
+    PRODUCT_PREPARING,
 
-    DELIVERED_PREPARING,
+    DELIVERY_PREPARING,
 
     SHIPPING,
 
     DELIVERED,
+
+    PENDING,
 }

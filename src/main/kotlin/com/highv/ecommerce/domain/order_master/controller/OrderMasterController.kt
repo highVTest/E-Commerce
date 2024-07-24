@@ -18,25 +18,11 @@ class OrderMasterController(
 ) {
 
     @PreAuthorize("hasRole('BUYER')")
-    @PostMapping("/payments")
+    @PostMapping("/payments/{cartId}")
     fun requestPayment(
+        @PathVariable("cartId") cartId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
         @RequestBody couponRequest: CouponRequest
     ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal.id, couponRequest))
-
-
-    @PreAuthorize("hasRole('SELLER')")
-    @PatchMapping("/order_status/{orderId}")
-    fun updateOrderStatus(
-        @PathVariable("orderId") orderId: Long,
-        @RequestBody orderStatusRequest: OrderStatusRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal,
-    ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.updateOrderStatus(orderId, orderStatusRequest, userPrincipal.id))
-
-
-
-
-
+        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal.id, couponRequest, cartId))
 }
