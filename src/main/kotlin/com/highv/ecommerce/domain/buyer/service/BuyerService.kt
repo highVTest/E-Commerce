@@ -18,10 +18,12 @@ import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
 import com.highv.ecommerce.domain.products_order.enumClass.OrderStatusType
 import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
 import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
+import com.highv.ecommerce.s3.config.S3Manager
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
 @Service
@@ -30,10 +32,11 @@ class BuyerService(
     private val passwordEncoder: PasswordEncoder,
     private val buyerHistoryRepository: BuyerHistoryRepository,
     private val orderStatusJpaRepository: OrderStatusJpaRepository,
-    private val productsOrderRepository: ProductsOrderRepository
+    private val productsOrderRepository: ProductsOrderRepository,
+    private val s3Manager: S3Manager
 ) {
 
-    fun signUp(request: CreateBuyerRequest): BuyerResponse {
+    fun signUp(request: CreateBuyerRequest,multipartFile: MultipartFile): BuyerResponse {
 
         if (buyerRepository.existsByEmail(request.email)) {
             throw RuntimeException("이미 존재하는 이메일입니다. 가입할 수 없습니다.")
@@ -49,6 +52,9 @@ class BuyerService(
             providerName = null,
             providerId = null
         )
+        val fileUrl = s3Manager.uploadFile(multipartFile) // S3Manager를 통해 파일 업로드
+        buyer.profileImage = fileUrl // Buyer 객체에 프로필 이미지 URL 저장
+
 
         val savedBuyer = buyerRepository.save(buyer)
 
@@ -81,10 +87,11 @@ class BuyerService(
     }
 
     @Transactional
-    fun changeProfileImage(request: UpdateBuyerImageRequest, userId: Long) {
+    fun changeProfileImage(request: UpdateBuyerImageRequest, userId: Long,multipartFile: MultipartFile) {
 
         val buyer = buyerRepository.findByIdOrNull(userId) ?: throw RuntimeException("사용자가 존재하지 않습니다.")
 
+        s3Manager.uploadFile(multipartFile)
         buyer.profileImage = request.imageUrl
 
         buyerRepository.save(buyer)

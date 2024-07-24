@@ -24,6 +24,13 @@ class S3Manager(
             contentType = file.contentType
             contentLength = file.size
         }
+        fun getFile(fileName: String): String{
+            return amazonS3Client.getUrl(bucket,fileName).toString()
+        }
+
+        fun deleteFile(fileName: String) {
+            amazonS3Client.deleteObject(bucket,fileName)
+        }
 
             amazonS3Client.putObject(bucket, fileName, file.inputStream, metadata) // Amazon S3 클라이언트를 사용하여 파일을 S3 버킷에 업로드
 
