@@ -26,7 +26,8 @@ class UserController(
     fun loginBuyer(@RequestBody loginRequest: LoginRequest): ResponseEntity<AccessTokenResponse> =
         ResponseEntity.ok().body(userService.loginBuyer(loginRequest))
 
-    @PostMapping("/emails/verification-request")
+    // email 컨트롤러 분리하기? 구매자, 판매자
+    @PostMapping("/email/send")
     fun sendMail(
         @RequestParam(value = "email") email: String,
         @RequestParam(value = "role") role: UserRole
@@ -34,7 +35,7 @@ class UserController(
         .status(HttpStatus.OK)
         .body(userService.sendMail(email, role))
 
-    @GetMapping("/emails/verifications")
+    @GetMapping("/email/confirm")
     fun verifyEmail(
         @RequestParam(value = "email") email: String,
         @RequestParam(value = "code") code: String,
