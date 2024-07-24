@@ -1,7 +1,6 @@
 package com.highv.ecommerce.domain.order_master.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.domain.order_master.dto.CouponRequest
 import com.highv.ecommerce.domain.order_master.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.order_master.service.OrderMasterService
 import com.highv.ecommerce.infra.security.UserPrincipal
@@ -21,9 +20,9 @@ class OrderMasterController(
     @PostMapping("/payments")
     fun requestPayment(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        @RequestBody couponRequest: CouponRequest
+        couponIdList: List<Long>
     ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal.id, couponRequest))
+        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal.id, couponIdList))
 
 
     @PreAuthorize("hasRole('SELLER')")

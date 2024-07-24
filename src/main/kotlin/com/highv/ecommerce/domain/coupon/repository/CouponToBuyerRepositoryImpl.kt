@@ -46,4 +46,8 @@ class CouponToBuyerRepositoryImpl(
     override fun deleteAll(couponToBuyerList: List<CouponToBuyer>) {
         return couponToBuyerJpaRepository.deleteAll(couponToBuyerList)
     }
+
+    override fun findByCouponIdAndBuyerIdAndIsUsedFalse(couponId: Long, buyerId: Long): CouponToBuyer? {
+        return couponToBuyerJpaRepository.findByCouponIdAndBuyerIdAndIsUsedFalse(couponId, buyerId)
+    }
 }

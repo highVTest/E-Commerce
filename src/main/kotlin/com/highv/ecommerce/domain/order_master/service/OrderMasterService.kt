@@ -6,7 +6,6 @@ import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
-import com.highv.ecommerce.domain.order_master.dto.CouponRequest
 import com.highv.ecommerce.domain.order_master.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
@@ -27,13 +26,13 @@ class OrderMasterService(
     ){
 
     @Transactional
-    fun requestPayment(buyerId: Long, couponRequest: CouponRequest): DefaultResponse {
+    fun requestPayment(buyerId: Long, couponIdList: List<Long>): DefaultResponse {
 
         //TODO(카트 아이디 를 조회 해서 물건을 가져 온다 -> List<CartItem>)
 
         val itemCart = itemCartRepository.findAllByBuyerId(buyerId)
 
-        val totalPrice = orderMasterRepository.discountTotalPriceList(buyerId, couponRequest.couponIdList)
+        val totalPrice = orderMasterRepository.discountTotalPriceList(buyerId, couponIdList)
 
         val product = productRepository.findByIdOrNull(1L)
 
