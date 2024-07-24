@@ -2,7 +2,6 @@ package com.highv.ecommerce.domain.backoffice.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.backoffice.dto.saleshistory.SalesHistoryResponse
-import com.highv.ecommerce.domain.backoffice.repository.SalesHistoryRepository
 import com.highv.ecommerce.domain.order_master.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.order_master.repository.ProductsOrderRepository
 import org.springframework.stereotype.Service
@@ -27,7 +26,7 @@ class SalesHistoryService(
         val order = productsOrderRepository.findByIdOrNull(orderId)
             ?: throw RuntimeException("Order not found")
 
-        order.update(orderStatusRequest)
+//        order.update(orderStatusRequest) 수정 예정
         productsOrderRepository.save(order)
 
         return DefaultResponse.from("주문 상태 변경 완료. 변경된 상태 : ${orderStatusRequest.statusCode.name}")

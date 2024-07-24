@@ -5,7 +5,7 @@ import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 
 data class BuyerHistoryProductResponse(
     val orderStatusId: Long,
-    val orderPendingReason: ComplainStatus,
+    val complainStatus: ComplainStatus,
     val productName: String,
     val productPrice: Int,
     val productQuantity: Int,
@@ -13,19 +13,20 @@ data class BuyerHistoryProductResponse(
     val productTotalPrice: Int
 ) {
     companion object {
+        // TODO("수정 필요")
         fun from(
-            cart: ItemCart,
-            orderPendingReason: ComplainStatus,
+//            cart: ItemCart, 수정 필요
+            complainStatus: ComplainStatus,
             orderStatusId: Long
         ): BuyerHistoryProductResponse =
             BuyerHistoryProductResponse(
                 orderStatusId = orderStatusId,
-                productName = cart.productName,
-                productPrice = cart.price,
-                productQuantity = cart.quantity,
-                productImageUrl = cart.product.productImage,
-                orderPendingReason = orderPendingReason,
-                productTotalPrice = cart.quantity * cart.price
+                productName = "productName",
+                productPrice = 1000,
+                productQuantity = 100,
+                productImageUrl = "cart.product.productImage",
+                complainStatus = complainStatus,
+                productTotalPrice = 1
             )
     }
 }

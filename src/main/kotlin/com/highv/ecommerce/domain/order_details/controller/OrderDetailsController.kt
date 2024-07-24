@@ -1,7 +1,7 @@
 package com.highv.ecommerce.domain.order_details.controller
 
 import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
-import com.highv.ecommerce.domain.order_details.service.OrderStatusService
+import com.highv.ecommerce.domain.order_details.service.OrderDetailsService
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.order_master.dto.ProductsOrderResponse
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/")
-class OrderStatusController(
-    private val orderStatusService: OrderStatusService
+class OrderDetailsController(
+    private val orderStatusService: OrderDetailsService
 ){
 
     @PreAuthorize("hasRole('BUYER')")
@@ -37,8 +37,6 @@ class OrderStatusController(
     ): ResponseEntity<OrderStatusResponse>
         = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusReject(orderId, shopId, sellerOrderStatusRequest, userPrincipal.id))
 
-
-
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/buyer/order-status")
     fun requestOrderStatusChangeList(
@@ -54,10 +52,6 @@ class OrderStatusController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse>
         = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusRejectList(sellerOrderStatusRequest, userPrincipal.id))
-
-
-
-
 
     @PreAuthorize("hasRole('BUYER')")
     @GetMapping("/order_details/buyer")

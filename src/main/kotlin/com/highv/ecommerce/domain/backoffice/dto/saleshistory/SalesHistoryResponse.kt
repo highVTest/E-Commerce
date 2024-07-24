@@ -1,6 +1,5 @@
 package com.highv.ecommerce.domain.backoffice.dto.saleshistory
 
-import com.highv.ecommerce.domain.backoffice.entity.SalesHistory
 import java.time.LocalDateTime
 
 data class SalesHistoryResponse(

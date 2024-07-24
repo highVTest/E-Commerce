@@ -1,12 +1,12 @@
 package com.highv.ecommerce.domain.order_details.dto
 
-import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
+import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
 
 data class OrderStatusResponse(
     val msg: String
 ){
     companion object{
-        fun from(orderStatusType: OrderStatus, str: String): OrderStatusResponse{
+        fun from(orderStatusType: ComplainType, str: String): OrderStatusResponse{
             return OrderStatusResponse(
                 msg = when(orderStatusType.name){
                     "CANCEL" -> "주문 취소 $str"

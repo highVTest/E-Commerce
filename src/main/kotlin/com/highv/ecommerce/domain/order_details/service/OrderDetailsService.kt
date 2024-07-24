@@ -5,12 +5,12 @@ import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.repository.OrderStatusRepository
 import com.highv.ecommerce.domain.order_master.dto.ProductsOrderResponse
-import com.highv.ecommerce.domain.order_master.enumClass.StatusCode
+import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class OrderStatusService(
+class OrderDetailsService(
     private val orderStatusRepository: OrderStatusRepository,
 ){
 
@@ -18,15 +18,13 @@ class OrderStatusService(
     @Transactional
     fun requestOrderStatusChange(itemCartId: Long, buyerOrderStatusRequest: BuyerOrderStatusRequest, buyerId: Long): OrderStatusResponse {
 
-        val orderStatus = orderStatusRepository.findByItemCartIdAndBuyerId(itemCartId, buyerId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
+        val orderDetails = orderStatusRepository.findByItemCartIdAndBuyerId(itemCartId, buyerId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
 
-        orderStatus.productsOrder.update(StatusCode.PENDING)
+        orderDetails.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
 
-        orderStatus.buyerUpdate(buyerOrderStatusRequest)
+        orderStatusRepository.save(orderDetails)
 
-        orderStatusRepository.save(orderStatus)
-
-        return OrderStatusResponse.from(buyerOrderStatusRequest.orderStatusType,"요청 완료 되었습니다")
+        return OrderStatusResponse.from(buyerOrderStatusRequest.complainType,"요청 완료 되었습니다")
     }
 
     @Transactional
@@ -34,9 +32,7 @@ class OrderStatusService(
 
         val orderStatus = orderStatusRepository.findByIdAndShopId(orderStatusId, shopId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
 
-        orderStatus.productsOrder.update(StatusCode.ORDERED)
-
-        orderStatus.sellerUpdate(sellerOrderStatusRequest)
+        orderStatus.sellerUpdate(OrderStatus.ORDERED,sellerOrderStatusRequest)
 
         orderStatusRepository.save(orderStatus)
 
@@ -60,16 +56,15 @@ class OrderStatusService(
     @Transactional
     fun requestOrderStatusChangeList(buyerOrderStatusRequest: BuyerOrderStatusRequest, buyerId: Long): OrderStatusResponse {
 
-        val orderStatus = orderStatusRepository.findAllByShopIdAndProductsOrderId(buyerOrderStatusRequest.shopId, buyerId)
+        val orderDetails = orderStatusRepository.findAllByShopIdAndProductsOrderId(buyerOrderStatusRequest.shopId, buyerId)
 
-        orderStatus.map {
-            it.productsOrder.statusCode = StatusCode.PENDING
-            it.buyerUpdate(buyerOrderStatusRequest)
+        orderDetails.map {
+            it.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
         }
 
-        orderStatusRepository.saveAll(orderStatus)
+        orderStatusRepository.saveAll(orderDetails)
 
-        return OrderStatusResponse.from(buyerOrderStatusRequest.orderStatusType,"전체 요청 완료 되었습니다")
+        return OrderStatusResponse.from(buyerOrderStatusRequest.complainType ,"전체 요청 완료 되었습니다")
     }
 
     @Transactional
@@ -78,8 +73,7 @@ class OrderStatusService(
         val orderStatus = orderStatusRepository.findAllByShopIdAndProductsOrderId(sellerOrderStatusRequest.shopId, sellerOrderStatusRequest.buyerId)
 
         orderStatus.map {
-            it.productsOrder.statusCode = StatusCode.ORDERED
-            it.sellerUpdate(sellerOrderStatusRequest)
+            it.sellerUpdate(OrderStatus.ORDERED, sellerOrderStatusRequest)
         }
 
         orderStatusRepository.saveAll(orderStatus)

@@ -4,9 +4,11 @@ import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
-import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
+import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
+import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import com.highv.ecommerce.domain.product.entity.Product
+import com.querydsl.core.types.Order
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -53,9 +55,11 @@ class OrderDetails(
     @Column(name = "product_quantity", nullable = false)
     var productQuantity: Int,
 ){
-    fun buyerUpdate(buyerOrderStatusRequest: BuyerOrderStatusRequest) {
+    fun buyerUpdate(orderStatus: OrderStatus, buyerOrderStatusRequest: BuyerOrderStatusRequest) {
 
-        when (buyerOrderStatusRequest.orderStatusType.name) {
+        this.orderStatus = orderStatus
+
+        when (buyerOrderStatusRequest.complainType.name) {
             "EXCHANGE" -> this.complainStatus = ComplainStatus.EXCHANGE_REQUESTED
             "REFUND" -> this.complainStatus = ComplainStatus.REFUND_REQUESTED
         }
@@ -64,7 +68,10 @@ class OrderDetails(
         this.buyerDescription = buyerOrderStatusRequest.description
     }
 
-    fun sellerUpdate(sellerOrderStatusRequest: SellerOrderStatusRequest) {
+    fun sellerUpdate(orderStatus: OrderStatus, sellerOrderStatusRequest: SellerOrderStatusRequest) {
+
+        this.orderStatus = orderStatus
+
         when (sellerOrderStatusRequest.orderStatusType.name) {
             "EXCHANGE" -> this.complainStatus = ComplainStatus.EXCHANGE_REJECTED
             "REFUND" -> this.complainStatus = ComplainStatus.REFUND_REJECTED

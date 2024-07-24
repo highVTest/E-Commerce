@@ -1,8 +1,6 @@
 package com.highv.ecommerce.domain.order_master.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.domain.backoffice.entity.SalesHistory
-import com.highv.ecommerce.domain.backoffice.repository.SalesHistoryRepository
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.buyer_history.entity.BuyerHistory
 import com.highv.ecommerce.domain.buyer_history.repository.BuyerHistoryRepository
@@ -13,7 +11,7 @@ import com.highv.ecommerce.domain.order_details.repository.OrderStatusJpaReposit
 import com.highv.ecommerce.domain.order_master.dto.CouponRequest
 import com.highv.ecommerce.domain.order_master.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
-import com.highv.ecommerce.domain.order_master.enumClass.StatusCode
+import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import com.highv.ecommerce.domain.order_master.repository.ProductsOrderRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -47,7 +45,7 @@ class ProductsOrderService(
 
         val productsOrder = productsOrderRepository.saveAndFlush(
             OrderMaster(
-                statusCode = StatusCode.ORDERED,
+                statusCode = OrderStatus.ORDERED,
                 buyerId = buyerId,
                 isPaid = false,
                 payDate = LocalDateTime.now(),
