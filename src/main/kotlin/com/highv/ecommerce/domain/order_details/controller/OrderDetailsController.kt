@@ -70,7 +70,7 @@ class OrderDetailsController(
         @PathVariable("orderId") orderId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
         @RequestBody sellerOrderStatusRequest: SellerOrderStatusRequest
-    ): ResponseEntity<List<ProductsOrderResponse>>
+    ): ResponseEntity<OrderStatusResponse>
             = ResponseEntity.status(HttpStatus.OK).body(orderDetailsService.requestComplainAccept(shopId, orderId, sellerOrderStatusRequest))
 
 
