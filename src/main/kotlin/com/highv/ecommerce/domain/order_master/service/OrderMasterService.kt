@@ -2,6 +2,7 @@ package com.highv.ecommerce.domain.order_master.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
+import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
@@ -27,19 +28,13 @@ class OrderMasterService(
     ){
 
     @Transactional
-    fun requestPayment(buyerId: Long, couponRequest: CouponRequest): DefaultResponse {
+    fun requestPayment(buyerId: Long, couponRequest: CouponRequest, cartId: Long): DefaultResponse {
 
-        //TODO(카트 아이디 를 조회 해서 물건을 가져 온다 -> List<CartItem>)
-
-        val itemCart = itemCartRepository.findAllByBuyerId(buyerId)
+        val cart = itemCartRepository.findAllByBuyerId(buyerId)
 
         val totalPrice = orderMasterRepository.discountTotalPriceList(buyerId, couponRequest.couponIdList)
 
-        val product = productRepository.findByIdOrNull(1L)
-
-
-
-        val buyer = buyerRepository.findByIdOrNull(buyerId)!!
+        val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw RuntimeException("구매자 정보가 존재 하지 않습니다")
 
         //TODO(만약에 CartItem 에 ProductId 가 Coupon 의 ProductId와 일치할 경우 CartItem 의 가격을 임시로 업데이트)
 
@@ -49,37 +44,22 @@ class OrderMasterService(
             )
         )
 
-
         orderDetailsRepository.saveAll(
-            itemCart.map {
+            cart.map {
                 OrderDetails(
                     orderStatus = OrderStatus.ORDERED,
                     complainStatus = ComplainStatus.NONE,
                     buyer = buyer,
-                    product = product!!,
+                    product = it.product,
                     orderMaster = orderMaster,
-                    productQuantity = 1
+                    productQuantity = 1,
+                    shopId = it.product.shop.id!!
                 )
             }
 
         )
 
-
         return DefaultResponse.from("주문이 완료 되었습니다, 주문 번호 : ${orderMaster.id}")
     }
-
-    @Transactional
-    fun updateOrderStatus(orderId: Long, orderStatusRequest: OrderStatusRequest, sellerId: Long): DefaultResponse {
-
-//        val order = productsOrderRepository.findByIdOrNull(orderId) ?: throw RuntimeException()
-//
-//        order.update(orderStatusRequest)
-//
-//        productsOrderRepository.save(order)
-
-        return DefaultResponse.from("주문 상태 변경이 완료 되었습니다. 변경된 상태 : ${orderStatusRequest.statusCode.name}")
-    }
-
-
 
 }
