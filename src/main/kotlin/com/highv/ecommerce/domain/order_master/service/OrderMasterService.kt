@@ -35,6 +35,10 @@ class OrderMasterService(
 
         val couponToBuyer = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(couponRequest.couponIdList,buyerId)
 
+        couponToBuyer.forEach {
+            if(it.coupon.expiredAt < LocalDateTime.now()) throw RuntimeException("쿠폰 유효 시간이 만료 되었습니다")
+        }
+
         val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw RuntimeException("구매자 정보가 존재 하지 않습니다")
 
         val productPrice = orderMasterRepository.discountTotalPriceList(buyerId, couponToBuyer)
