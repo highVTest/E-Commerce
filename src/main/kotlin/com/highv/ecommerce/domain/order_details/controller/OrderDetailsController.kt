@@ -15,58 +15,63 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/v1/")
 class OrderDetailsController(
-    private val orderStatusService: OrderDetailsService
+    private val orderDetailsService: OrderDetailsService
 ){
 
     @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/buyer/order-status/{itemCartId}")
-    fun requestOrderStatusChange(
-        @PathVariable("itemCartId") itemCartId: Long,
+    @PatchMapping("/buyer/complain/{shopId}/{orderId}")
+    fun buyerRequestComplain(
+        @PathVariable("shopId") shopId: Long,
+        @PathVariable("orderId") orderId: Long,
         @RequestBody buyerOrderStatusRequest: BuyerOrderStatusRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse>
-         = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChange(itemCartId, buyerOrderStatusRequest, userPrincipal.id))
+            = ResponseEntity.status(HttpStatus.OK).body(orderDetailsService.buyerRequestComplain(buyerOrderStatusRequest, userPrincipal.id, shopId, orderId))
+
+    @PreAuthorize("hasRole('BUYER')")
+    @GetMapping("/buyer/order_details")
+    fun getBuyerOrderDetails(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+    ): ResponseEntity<List<ProductsOrderResponse>>
+            = ResponseEntity.status(HttpStatus.OK).body(orderDetailsService.getBuyerOrderDetails(userPrincipal.id))
 
     @PreAuthorize("hasRole('SELLER')")
-    @PatchMapping("/seller/order-status/{shopId}/{orderId}")
-    fun requestOrderStatusReject(
-        @PathVariable("shopId") shopId: Long, // Shop 추가 시 논의 후에 삭제 예정
+    @PatchMapping("/seller/complain/{shopId}/{orderId}")
+    fun requestComplainReject(
+        @PathVariable("shopId") shopId: Long,
         @PathVariable("orderId") orderId: Long,
         @RequestBody sellerOrderStatusRequest: SellerOrderStatusRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusReject(orderId, shopId, sellerOrderStatusRequest, userPrincipal.id))
-
-    @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/buyer/order-status")
-    fun requestOrderStatusChangeList(
-        @RequestBody buyerOrderStatusRequest: BuyerOrderStatusRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal,
-    ): ResponseEntity<OrderStatusResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusChangeList(buyerOrderStatusRequest, userPrincipal.id))
+            = ResponseEntity.status(HttpStatus.OK).body(orderDetailsService.requestComplainReject(sellerOrderStatusRequest, shopId, orderId))
 
     @PreAuthorize("hasRole('SELLER')")
-    @PatchMapping("/seller/order-status")
-    fun requestOrderStatusRejectList(
-        @RequestBody sellerOrderStatusRequest: SellerOrderStatusRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal,
-    ): ResponseEntity<OrderStatusResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.requestOrderStatusRejectList(sellerOrderStatusRequest, userPrincipal.id))
-
-    @PreAuthorize("hasRole('BUYER')")
-    @GetMapping("/order_details/buyer")
-    fun getBuyerOrderDetails(
-        @AuthenticationPrincipal userPrincipal: UserPrincipal,
-    ): ResponseEntity<List<ProductsOrderResponse>>
-        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.getBuyerOrderDetails(userPrincipal.id))
-
-    @PreAuthorize("hasRole('SELLER')")
-    @GetMapping("/order_details/seller/{shopId}")
-    fun getSellerOrderDetails(
+    @GetMapping("/shop/order_details/{shopId}")
+    fun getSellerOrderDetailsAll(
         @PathVariable("shopId") shopId: Long,  // Shop 추가 시 논의 후에 삭제 예정
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<List<ProductsOrderResponse>>
-        = ResponseEntity.status(HttpStatus.OK).body(orderStatusService.getSellerOrderDetails(shopId, userPrincipal.id))
+            = ResponseEntity.status(HttpStatus.OK).body(orderDetailsService.getSellerOrderDetailsAll(shopId, userPrincipal.id))
+
+    @PreAuthorize("hasRole('SELLER')")
+    @GetMapping("/shop/order_details/{shopId}/{orderID}")
+    fun getSellerOrderDetailsBuyer(
+        @PathVariable("shopId") shopId: Long,  // Shop 추가 시 논의 후에 삭제 예정
+        @PathVariable("orderID") orderId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+        buyerId: Long
+    ): ResponseEntity<List<ProductsOrderResponse>>
+            = ResponseEntity.status(HttpStatus.OK).body(orderDetailsService.getSellerOrderDetailsBuyer(shopId, orderId, buyerId))
+
+    @PreAuthorize("hasRole('SELLER')")
+    @GetMapping("/shop/complain/{shopId}/{orderId}/accept")
+    fun requestComplainAccept(
+        @PathVariable("shopId") shopId: Long,  // Shop 추가 시 논의 후에 삭제 예정
+        @PathVariable("orderId") orderId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+        @RequestBody sellerOrderStatusRequest: SellerOrderStatusRequest
+    ): ResponseEntity<List<ProductsOrderResponse>>
+            = ResponseEntity.status(HttpStatus.OK).body(orderDetailsService.requestComplainAccept(shopId, orderId, sellerOrderStatusRequest))
 
 
 
