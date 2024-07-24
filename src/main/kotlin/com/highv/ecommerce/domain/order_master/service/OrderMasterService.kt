@@ -24,7 +24,6 @@ class OrderMasterService(
     private val orderDetailsRepository: OrderDetailsRepository,
     private val itemCartRepository: ItemCartRepository,
     private val buyerRepository: BuyerRepository,
-    private val productRepository: ProductRepository
     ){
 
     @Transactional
