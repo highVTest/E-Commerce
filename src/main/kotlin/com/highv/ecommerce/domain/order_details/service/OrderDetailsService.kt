@@ -3,6 +3,8 @@ package com.highv.ecommerce.domain.order_details.service
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
+import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
+import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
 import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
 import com.highv.ecommerce.domain.order_master.dto.ProductsOrderResponse
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
@@ -11,74 +13,88 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OrderDetailsService(
-    private val orderStatusRepository: OrderDetailsRepository,
+    private val orderDetailsRepository: OrderDetailsRepository,
 ){
 
-
     @Transactional
-    fun requestOrderStatusChange(itemCartId: Long, buyerOrderStatusRequest: BuyerOrderStatusRequest, buyerId: Long): OrderStatusResponse {
+    fun buyerRequestComplain(buyerOrderStatusRequest: BuyerOrderStatusRequest, buyerId: Long, shopId: Long, orderId: Long): OrderStatusResponse {
 
-        val orderDetails = orderStatusRepository.findByItemCartIdAndBuyerId(itemCartId, buyerId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
-
-        orderDetails.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
-
-        orderStatusRepository.save(orderDetails)
-
-        return OrderStatusResponse.from(buyerOrderStatusRequest.complainType,"요청 완료 되었습니다")
-    }
-
-    @Transactional
-    fun requestOrderStatusReject(orderStatusId: Long, shopId: Long, sellerOrderStatusRequest: SellerOrderStatusRequest, sellerId: Long): OrderStatusResponse {
-
-        val orderStatus = orderStatusRepository.findByIdAndShopId(orderStatusId, shopId) ?: throw RuntimeException("주문 정보가 존재 하지 않습니다")
-
-        orderStatus.sellerUpdate(OrderStatus.ORDERED,sellerOrderStatusRequest)
-
-        orderStatusRepository.save(orderStatus)
-
-        return OrderStatusResponse.from(sellerOrderStatusRequest.orderStatusType ,"요청 거절 완료 되었습니다")
-    }
-
-    fun getBuyerOrderDetails(buyerId: Long): List<ProductsOrderResponse> {
-
-        val orderStatus = orderStatusRepository.findAllByBuyerId(buyerId)
-
-        return orderStatus.map { ProductsOrderResponse.from(it) }
-    }
-
-    fun getSellerOrderDetails(shopId: Long , sellerId: Long): List<ProductsOrderResponse> {
-
-        val orderStatus = orderStatusRepository.findAllByShopId(shopId)
-
-        return orderStatus.map { ProductsOrderResponse.from(it) }
-    }
-
-    @Transactional
-    fun requestOrderStatusChangeList(buyerOrderStatusRequest: BuyerOrderStatusRequest, buyerId: Long): OrderStatusResponse {
-
-        val orderDetails = orderStatusRepository.findAllByShopIdAndProductsOrderId(buyerOrderStatusRequest.shopId, buyerId)
+        val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(buyerOrderStatusRequest.shopId, buyerId)
 
         orderDetails.map {
             it.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
         }
 
-        orderStatusRepository.saveAll(orderDetails)
+        orderDetailsRepository.saveAll(orderDetails)
 
-        return OrderStatusResponse.from(buyerOrderStatusRequest.complainType ,"전체 요청 완료 되었습니다")
+        return OrderStatusResponse.from(buyerOrderStatusRequest.complainType ,"요청 완료 되었습니다")
+    }
+
+    fun getBuyerOrderDetails(buyerId: Long): List<ProductsOrderResponse> {
+
+        val orderDetails = orderDetailsRepository.findAllByBuyerId(buyerId)
+
+        return orderDetails.map { ProductsOrderResponse.from(it) }
     }
 
     @Transactional
-    fun requestOrderStatusRejectList(sellerOrderStatusRequest: SellerOrderStatusRequest, sellerId: Long): OrderStatusResponse {
+    fun requestComplainReject(sellerOrderStatusRequest: SellerOrderStatusRequest, shopId: Long, orderId: Long): OrderStatusResponse {
 
-        val orderStatus = orderStatusRepository.findAllByShopIdAndProductsOrderId(sellerOrderStatusRequest.shopId, sellerOrderStatusRequest.buyerId)
+        val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId, orderId, sellerOrderStatusRequest.buyerId)
+        val complainType =
+            if(orderDetails[0].complainStatus == ComplainStatus.REFUND_REQUESTED) ComplainType.REFUND
+            else ComplainType.EXCHANGE
 
-        orderStatus.map {
-            it.sellerUpdate(OrderStatus.ORDERED, sellerOrderStatusRequest)
+        orderDetails.map {
+            it.sellerUpdate(OrderStatus.ORDERED, sellerOrderStatusRequest, orderDetails[0].complainStatus)
         }
 
-        orderStatusRepository.saveAll(orderStatus)
+        orderDetailsRepository.saveAll(orderDetails)
 
-        return OrderStatusResponse.from(sellerOrderStatusRequest.orderStatusType,"전체 요청 거절 완료 되었습니다")
+        return OrderStatusResponse.from(complainType,"전체 요청 거절 완료 되었습니다")
+
+
+    }
+
+    fun getSellerOrderDetailsAll(shopId: Long, sellerId: Long): List<ProductsOrderResponse> {
+
+        val orderDetails = orderDetailsRepository.findAllByShopId(shopId)
+
+        return orderDetails.map { ProductsOrderResponse.from(it) }
+    }
+
+    fun getSellerOrderDetailsBuyer(shopId: Long,orderId: Long, buyerId: Long): List<ProductsOrderResponse> {
+
+        val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId, orderId, buyerId)
+
+        return orderDetails.map { ProductsOrderResponse.from(it) }
+    }
+
+    @Transactional
+    fun requestComplainAccept(shopId: Long, orderId: Long, sellerOrderStatusRequest: SellerOrderStatusRequest): OrderStatusResponse {
+
+        val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId, orderId, sellerOrderStatusRequest.buyerId)
+        val complainType =
+            if(orderDetails[0].complainStatus == ComplainStatus.REFUND_REQUESTED) ComplainType.REFUND
+            else ComplainType.EXCHANGE
+        when (orderDetails[0].complainStatus) {
+            ComplainStatus.REFUND_REQUESTED -> {
+                orderDetails.map {
+                    it.sellerUpdate(OrderStatus.ORDER_CANCELED, sellerOrderStatusRequest, ComplainStatus.REFUNDED)
+                }
+            }
+            ComplainStatus.EXCHANGE_REQUESTED -> {
+                orderDetails.map {
+                    it.sellerUpdate(OrderStatus.PRODUCT_PREPARING, sellerOrderStatusRequest, ComplainStatus.EXCHANGED)
+                }
+            }
+            else -> throw RuntimeException("구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
+        }
+
+
+        orderDetailsRepository.saveAll(orderDetails)
+
+        return OrderStatusResponse.from(complainType,"전체 요청 승인 완료 되었습니다")
 
 
     }
