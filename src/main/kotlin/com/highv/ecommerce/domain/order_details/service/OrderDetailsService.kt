@@ -91,9 +91,9 @@ class OrderDetailsService(
             ComplainStatus.EXCHANGE_REQUESTED -> {
                 orderDetails.map {
                     it.sellerUpdate(OrderStatus.PRODUCT_PREPARING, sellerOrderStatusRequest, ComplainStatus.EXCHANGED)
-                    val couponToBuyer = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons, sellerOrderStatusRequest.buyerId)
+                    val couponToBuyerList = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons, sellerOrderStatusRequest.buyerId)
 
-                    couponToBuyer.map { it.returnCoupon() }
+                    couponToBuyerList.map { couponToBuyer -> couponToBuyer.returnCoupon() }
                 }
             }
             else -> throw RuntimeException("구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
