@@ -39,7 +39,7 @@ class AdminService(
     //블랙리스트 단건 조회 로직 구현
     fun getBlackList(blackListId: Long): BlackListResponse {
         val blackList = blackListRepository.findByIdOrNull(blackListId)
-            ?: throw IllegalArgumentException("BlackList not found")
+            ?: throw RuntimeException("BlackList not found")
         return BlackListResponse(blackList.nickname, blackList.email)
     }
 
