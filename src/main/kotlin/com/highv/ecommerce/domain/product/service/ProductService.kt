@@ -33,7 +33,6 @@ class ProductService(
             name = productRequest.name,
             description = productRequest.description,
             productImage = s3Manager.getFile(multipartFile.originalFilename), // Buyer 객체에 프로필 이미지 URL 저장
-            favorite = 0,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
             isSoldOut = false,
