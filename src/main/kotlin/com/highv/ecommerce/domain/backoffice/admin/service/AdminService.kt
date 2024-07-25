@@ -44,7 +44,7 @@ class AdminService(
     fun createBlackList(request: CreateBlackListRequest) {
         val existingBlackList = blackListRepository.findByEmail(request.email)
         if (existingBlackList != null) {
-            throw IllegalArgumentException("Email already exists in black list")
+            throw RuntimeException("Email already exists in black list")
         }
         val blackList = BlackList(
             nickname = "N/A",
