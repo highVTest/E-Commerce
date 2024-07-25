@@ -23,7 +23,7 @@ class OrderDetailsService(
     @Transactional
     fun buyerRequestComplain(buyerOrderStatusRequest: BuyerOrderStatusRequest, buyerId: Long, shopId: Long, orderId: Long): OrderStatusResponse {
 
-        val orderDetails = orderDetailsRepository.findAllByShopIdAndBuyerId(shopId, buyerId)
+        val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId,orderId, buyerId)
 
         orderDetails.map {
             it.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
@@ -86,6 +86,7 @@ class OrderDetailsService(
             ComplainStatus.REFUND_REQUESTED -> {
                 orderDetails.map {
                     it.sellerUpdate(OrderStatus.ORDER_CANCELED, sellerOrderStatusRequest, ComplainStatus.REFUNDED)
+                    it.product.productBackOffice!!.quantity += it.productQuantity
                     val couponToBuyerList = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons, sellerOrderStatusRequest.buyerId)
 
                     couponToBuyerList.map { couponToBuyer -> couponToBuyer.returnCoupon() }

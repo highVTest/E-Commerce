@@ -12,5 +12,5 @@ interface ItemCartRepository : JpaRepository<ItemCart, Long> {
     fun findAllByBuyerId(buyerId: Long): List<ItemCart>
 
     @Query("SELECT ic FROM ItemCart ic WHERE ic.id IN :id AND ic.buyerId = :buyerId")
-    fun findAllByIdAndBuyerId(id: ArrayList<Long>, buyerId: Long): List<ItemCart>
+    fun findAllByIdAndBuyerId(id: List<Long>, buyerId: Long): List<ItemCart>
 }
