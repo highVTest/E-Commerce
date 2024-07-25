@@ -2,7 +2,6 @@ package com.highv.ecommerce.domain.buyer.service
 
 import com.highv.ecommerce.domain.buyer.dto.request.BuyerOrderStatusUpdateRequest
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
-import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerHistoryProductResponse
@@ -89,12 +88,16 @@ class BuyerService(
     }
 
     @Transactional
-    fun changeProfileImage(request: UpdateBuyerImageRequest, userId: Long, multipartFile: MultipartFile) {
+    fun changeProfileImage(userId: Long, file: MultipartFile?) {
 
         val buyer = buyerRepository.findByIdOrNull(userId) ?: throw RuntimeException("사용자가 존재하지 않습니다.")
 
-        s3Manager.uploadFile(multipartFile)
-        buyer.profileImage = request.imageUrl
+        if (file != null) {
+            s3Manager.uploadFile(file)
+            buyer.profileImage = s3Manager.getFile(file.originalFilename)
+        } else {
+            buyer.profileImage = ""
+        }
 
         buyerRepository.save(buyer)
     }

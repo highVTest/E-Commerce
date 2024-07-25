@@ -64,7 +64,7 @@ class UserService(
             expiredTimeMillis = expirationMillis
         )
 
-        return authCode
+        return authCode // TODO: 배포때는 인증번호 반환 X
     }
 
     fun verifyCode(email: String, role: UserRole, code: String): EmailAuthResponse {
@@ -95,23 +95,23 @@ class UserService(
         val userId: Long
         if (role == UserRole.BUYER) {
             val buyer = Buyer(
-                nickname = "null",
-                password = "null",
+                nickname = "",
+                password = "",
                 email = email,
-                profileImage = "null",
-                phoneNumber = "null",
-                address = "null"
+                profileImage = "",
+                phoneNumber = "",
+                address = ""
             )
 
             userId = buyerRepository.saveAndFlush(buyer).id!!
         } else {
             val seller = Seller(
-                nickname = "null",
-                password = "null",
+                nickname = "",
+                password = "",
                 email = email,
-                profileImage = "null",
-                phoneNumber = "null",
-                address = "null"
+                profileImage = "",
+                phoneNumber = "",
+                address = ""
             )
 
             userId = sellerRepository.saveAndFlush(seller).id!!

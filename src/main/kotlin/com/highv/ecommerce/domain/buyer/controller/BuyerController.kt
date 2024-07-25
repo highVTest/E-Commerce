@@ -3,7 +3,6 @@ package com.highv.ecommerce.domain.buyer.controller
 import com.highv.ecommerce.common.exception.LoginException
 import com.highv.ecommerce.domain.buyer.dto.request.BuyerOrderStatusUpdateRequest
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
-import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerOrderResponse
@@ -48,7 +47,7 @@ class BuyerController(private val buyerService: BuyerService) {
     }
 
     @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/profile/password")
+    @PatchMapping("/profile/pw")
     fun changePassword(
         @Valid @RequestBody request: UpdateBuyerPasswordRequest,
         bindingResult: BindingResult,
@@ -65,18 +64,16 @@ class BuyerController(private val buyerService: BuyerService) {
     }
 
     @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/profile/profile-image")
+    @PatchMapping("/profile/image")
     fun changeImage(
-        @RequestBody request: UpdateBuyerImageRequest,  // TODO: 삭제
         @AuthenticationPrincipal user: UserPrincipal,
-        @RequestPart(value = "file", required = false) file: MultipartFile
-
+        @RequestPart(value = "file", required = false) file: MultipartFile?
     ): ResponseEntity<Unit> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(buyerService.changeProfileImage(request, user.id, file))
+        .body(buyerService.changeProfileImage(user.id, file))
 
     @PreAuthorize("hasRole('BUYER')")
-    @PutMapping("/profile")
+    @PatchMapping("/profile")
     fun changeProfile(
         @RequestBody request: UpdateBuyerProfileRequest,
         @AuthenticationPrincipal user: UserPrincipal,
