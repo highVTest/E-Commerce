@@ -21,7 +21,7 @@ class AdminController(
     private val adminService: AdminService
 ) {
     // 판매자 제재
-    @PostMapping("/sanctions/seller/{sellerId}")
+    @PostMapping("/sanctions/seller/{seller_id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun sanctionSeller(@PathVariable sellerId: Long): ResponseEntity<DefaultResponse> {
         adminService.sanctionSeller(sellerId)
@@ -31,7 +31,7 @@ class AdminController(
     }
 
     // 상품 제재
-    @PostMapping("/sanctions/product/{productId}")
+    @PostMapping("/sanctions/product/{product_id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun sanctionProduct(@PathVariable productId: Long): ResponseEntity<DefaultResponse> {
         adminService.sanctionProduct(productId)
@@ -41,7 +41,7 @@ class AdminController(
     }
 
     // // 구매자 제재 (미구현)
-    // @PostMapping("/sanctions/buyer/{buyerId}")
+    // @PostMapping("/sanctions/buyer/{buyer_id}")
     // @PreAuthorize("hasRole('ADMIN')")
     // fun sanctionBuyer(@PathVariable buyerId: Long): ResponseEntity<DefaultResponse> {
     //     adminService.sanctionBuyer(buyerId)
@@ -71,7 +71,7 @@ class AdminController(
     }
 
     // 블랙리스트 단건 조회
-    @GetMapping("/black-list/{blackListId}")
+    @GetMapping("/black-list/{black-list_id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun getBlackList(@PathVariable blackListId: Long): ResponseEntity<BlackListResponse> {
         val blackList = adminService.getBlackList(blackListId)
@@ -81,7 +81,7 @@ class AdminController(
     }
 
     // 블랙리스트 삭제
-    @DeleteMapping("/black-list/{blackListId}")
+    @DeleteMapping("/black-list/{black-list_id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun deleteBlackList(@PathVariable blackListId: Long): ResponseEntity<DefaultResponse> {
         adminService.deleteBlackList(blackListId)
