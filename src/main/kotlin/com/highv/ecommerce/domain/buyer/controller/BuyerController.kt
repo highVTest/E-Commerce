@@ -16,14 +16,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/v1/buyer")
@@ -31,8 +25,9 @@ class BuyerController(private val buyerService: BuyerService) {
 
     @PostMapping("/user_signup")
     fun signUp(
-        @RequestBody @Valid request: CreateBuyerRequest,
-        bindingResult: BindingResult
+        @RequestPart @Valid request: CreateBuyerRequest,
+        bindingResult: BindingResult,
+        @RequestPart(value ="file", required = false) file: MultipartFile
     ): ResponseEntity<BuyerResponse> {
 
         if (bindingResult.hasErrors()) {
@@ -41,7 +36,7 @@ class BuyerController(private val buyerService: BuyerService) {
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(buyerService.signUp(request))
+            .body(buyerService.signUp(request,file))
     }
 
     @PreAuthorize("hasRole('BUYER')")
@@ -66,9 +61,11 @@ class BuyerController(private val buyerService: BuyerService) {
     fun changeImage(
         @RequestBody request: UpdateBuyerImageRequest,
         @AuthenticationPrincipal user: UserPrincipal,
+        @RequestPart(value ="file", required = false) file: MultipartFile
+
     ): ResponseEntity<Unit> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(buyerService.changeProfileImage(request, user.id))
+        .body(buyerService.changeProfileImage(request, user.id,file))
 
     @PreAuthorize("hasRole('BUYER')")
     @PutMapping("/profile")

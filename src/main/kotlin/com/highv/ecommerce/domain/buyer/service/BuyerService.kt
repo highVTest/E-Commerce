@@ -21,6 +21,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
 @Service
@@ -31,22 +32,27 @@ class BuyerService(
     private val productsOrderRepository: OrderMasterRepository
 ) {
 
-    fun signUp(request: CreateBuyerRequest): BuyerResponse {
+@Transactional
+    fun signUp(request: CreateBuyerRequest,multipartFile: MultipartFile): BuyerResponse {
 
         if (buyerRepository.existsByEmail(request.email)) {
             throw RuntimeException("이미 존재하는 이메일입니다. 가입할 수 없습니다.")
         }
 
+
+        s3Manager.uploadFile(multipartFile) // S3Manager를 통해 파일 업로드
+
         val buyer = Buyer(
             email = request.email,
             nickname = request.nickname,
             password = passwordEncoder.encode(request.password),
-            profileImage = request.profileImage,
+            profileImage = s3Manager.getFile(multipartFile.originalFilename), // Buyer 객체에 프로필 이미지 URL 저장
             phoneNumber = request.phoneNumber,
             address = request.address,
             providerName = null,
             providerId = null
         )
+
 
         val savedBuyer = buyerRepository.save(buyer)
 
@@ -79,10 +85,12 @@ class BuyerService(
     }
 
     @Transactional
-    fun changeProfileImage(request: UpdateBuyerImageRequest, userId: Long) {
+    fun changeProfileImage(request: UpdateBuyerImageRequest, userId: Long,multipartFile: MultipartFile) {
 
         val buyer = buyerRepository.findByIdOrNull(userId) ?: throw RuntimeException("사용자가 존재하지 않습니다.")
+        val types = fileUtil.validImgFile(multipartFile.inputStream)
 
+        s3Manager.uploadFile(multipartFile)
         buyer.profileImage = request.imageUrl
 
         buyerRepository.save(buyer)
