@@ -47,7 +47,7 @@ class OrderMasterService(
         )
 
         orderDetailsRepository.saveAll(
-            cart.mapIndexed { index, it ->
+            cart.map{
                 OrderDetails(
                     orderStatus = OrderStatus.ORDERED,
                     complainStatus = ComplainStatus.NONE,
@@ -55,7 +55,7 @@ class OrderMasterService(
                     product = it.product,
                     orderMasterId = orderMaster.id!!,
                     productQuantity = it.quantity,
-                    shopId = it.product.shop.id!!,
+                    shopId = it.shopId,
                     totalPrice = productPrice[it.id]!!,
                 )
             }
