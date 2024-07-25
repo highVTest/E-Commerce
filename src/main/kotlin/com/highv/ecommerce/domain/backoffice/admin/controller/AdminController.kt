@@ -21,72 +21,58 @@ class AdminController(
     private val adminService: AdminService
 ) {
     // 판매자 제재
-    @PostMapping("/sanctions/seller/{seller_id}")
+    @PostMapping("/sanctions/seller/{sellerId}")
     @PreAuthorize("hasRole('ADMIN')")
-    fun sanctionSeller(@PathVariable sellerId: Long): ResponseEntity<DefaultResponse> {
-        adminService.sanctionSeller(sellerId)
-        return ResponseEntity
+    fun sanctionSeller(@PathVariable sellerId: Long): ResponseEntity<DefaultResponse> =
+        ResponseEntity
             .status(HttpStatus.OK)
-            .body(DefaultResponse("판매자 제재 완료"))
-    }
+            .body(adminService.sanctionSeller(sellerId))
 
     // 상품 제재
-    @PostMapping("/sanctions/product/{product_id}")
+    @PostMapping("/sanctions/product/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
-    fun sanctionProduct(@PathVariable productId: Long): ResponseEntity<DefaultResponse> {
-        adminService.sanctionProduct(productId)
-        return ResponseEntity
+    fun sanctionProduct(@PathVariable productId: Long): ResponseEntity<DefaultResponse> =
+        ResponseEntity
             .status(HttpStatus.OK)
-            .body(DefaultResponse("상품 제재 완료"))
-    }
+            .body(adminService.sanctionProduct(productId))
 
     // // 구매자 제재 (미구현)
-    // @PostMapping("/sanctions/buyer/{buyer_id}")
+    // @PostMapping("/sanctions/buyer/{buyerId}")
     // @PreAuthorize("hasRole('ADMIN')")
-    // fun sanctionBuyer(@PathVariable buyerId: Long): ResponseEntity<DefaultResponse> {
-    //     adminService.sanctionBuyer(buyerId)
-    //     return ResponseEntity
+    // fun sanctionBuyer(@PathVariable buyerId: Long): ResponseEntity<DefaultResponse> =
+    //     ResponseEntity
     //     .status(HttpStatus.OK)
-    //     .body(DefaultResponse("구매자 제재 완료"))
-    // }
+    //     .body(adminService.sanctionBuyer(buyerId))
 
     // 블랙리스트 생성
     @PostMapping("/black-list")
     @PreAuthorize("hasRole('ADMIN')")
-    fun createBlackList(@RequestBody request: CreateBlackListRequest): ResponseEntity<DefaultResponse> {
-        adminService.createBlackList(request)
-        return ResponseEntity
+    fun createBlackList(@RequestBody request: CreateBlackListRequest): ResponseEntity<DefaultResponse> =
+        ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(DefaultResponse("블랙리스트 생성 완료"))
-    }
+            .body(adminService.createBlackList(request))
 
     // 블랙리스트 조회
     @GetMapping("/black-list")
     @PreAuthorize("hasRole('ADMIN')")
-    fun getBlackLists(): ResponseEntity<List<BlackListResponse>> {
-        val blackLists = adminService.getBlackLists()
-        return ResponseEntity
+    fun getBlackLists(): ResponseEntity<List<BlackListResponse>> =
+        ResponseEntity
             .status(HttpStatus.OK)
-            .body(blackLists)
-    }
+            .body(adminService.getBlackLists())
 
     // 블랙리스트 단건 조회
-    @GetMapping("/black-list/{black-list_id}")
+    @GetMapping("/black-list/{blackListId}")
     @PreAuthorize("hasRole('ADMIN')")
-    fun getBlackList(@PathVariable blackListId: Long): ResponseEntity<BlackListResponse> {
-        val blackList = adminService.getBlackList(blackListId)
-        return ResponseEntity
+    fun getBlackList(@PathVariable blackListId: Long): ResponseEntity<BlackListResponse> =
+        ResponseEntity
             .status(HttpStatus.OK)
-            .body(blackList)
-    }
+            .body(adminService.getBlackList(blackListId))
 
     // 블랙리스트 삭제
-    @DeleteMapping("/black-list/{black-list_id}")
+    @DeleteMapping("/black-list/{blackListId}")
     @PreAuthorize("hasRole('ADMIN')")
-    fun deleteBlackList(@PathVariable blackListId: Long): ResponseEntity<DefaultResponse> {
-        adminService.deleteBlackList(blackListId)
-        return ResponseEntity
+    fun deleteBlackList(@PathVariable blackListId: Long): ResponseEntity<DefaultResponse> =
+        ResponseEntity
             .status(HttpStatus.NO_CONTENT)
-            .body(DefaultResponse("블랙리스트 삭제 완료"))
-    }
+            .body(adminService.deleteBlackList(blackListId))
 }
