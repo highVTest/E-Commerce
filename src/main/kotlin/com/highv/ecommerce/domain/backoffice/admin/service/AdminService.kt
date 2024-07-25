@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 class AdminService(
     private val sellerRepository: SellerRepository,
     private val productRepository: ProductRepository,
-    private val buyerRepository: BuyerRepository,
+    // private val buyerRepository: BuyerRepository,
     private val blackListRepository: BlackListRepository
 ) {
     //판매자 제재 로직 구현
