@@ -64,5 +64,4 @@ class NaverOAuthLoginClient(
         return provider == OAuthProvider.NAVER
     }
 
-
 }
