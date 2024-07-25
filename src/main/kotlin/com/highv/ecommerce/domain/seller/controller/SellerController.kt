@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
@@ -21,7 +20,7 @@ class SellerController(private val sellerService: SellerService) {
     @PostMapping("/user_signup")
     fun signUp(
         @RequestPart @Valid request: CreateSellerRequest,
-        @RequestPart (value ="file", required = false) file: MultipartFile,
+        @RequestPart(value = "file", required = false) file: MultipartFile?,
         bindingResult: BindingResult
     ): ResponseEntity<SellerResponse> {
 
@@ -31,6 +30,6 @@ class SellerController(private val sellerService: SellerService) {
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(sellerService.signUp(request,file))
+            .body(sellerService.signUp(request, file))
     }
 }

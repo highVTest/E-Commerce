@@ -16,7 +16,15 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
 @RestController
@@ -27,7 +35,7 @@ class BuyerController(private val buyerService: BuyerService) {
     fun signUp(
         @RequestPart @Valid request: CreateBuyerRequest,
         bindingResult: BindingResult,
-        @RequestPart(value ="file", required = false) file: MultipartFile
+        @RequestPart(value = "file", required = false) file: MultipartFile?
     ): ResponseEntity<BuyerResponse> {
 
         if (bindingResult.hasErrors()) {
@@ -36,7 +44,7 @@ class BuyerController(private val buyerService: BuyerService) {
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(buyerService.signUp(request,file))
+            .body(buyerService.signUp(request, file))
     }
 
     @PreAuthorize("hasRole('BUYER')")
@@ -59,13 +67,13 @@ class BuyerController(private val buyerService: BuyerService) {
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/profile/profile-image")
     fun changeImage(
-        @RequestBody request: UpdateBuyerImageRequest,
+        @RequestBody request: UpdateBuyerImageRequest,  // TODO: 삭제
         @AuthenticationPrincipal user: UserPrincipal,
-        @RequestPart(value ="file", required = false) file: MultipartFile
+        @RequestPart(value = "file", required = false) file: MultipartFile
 
     ): ResponseEntity<Unit> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(buyerService.changeProfileImage(request, user.id,file))
+        .body(buyerService.changeProfileImage(request, user.id, file))
 
     @PreAuthorize("hasRole('BUYER')")
     @PutMapping("/profile")
