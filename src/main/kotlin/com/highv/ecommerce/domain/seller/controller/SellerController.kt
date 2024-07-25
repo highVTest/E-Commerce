@@ -20,8 +20,8 @@ class SellerController(private val sellerService: SellerService) {
     @PostMapping("/user_signup")
     fun signUp(
         @RequestPart @Valid request: CreateSellerRequest,
+        bindingResult: BindingResult,
         @RequestPart(value = "file", required = false) file: MultipartFile?,
-        bindingResult: BindingResult
     ): ResponseEntity<SellerResponse> {
 
         if (bindingResult.hasErrors()) {

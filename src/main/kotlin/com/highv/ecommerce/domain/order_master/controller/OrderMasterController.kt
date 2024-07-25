@@ -1,8 +1,7 @@
 package com.highv.ecommerce.domain.order_master.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.domain.order_master.dto.CouponRequest
-import com.highv.ecommerce.domain.order_master.dto.OrderStatusRequest
+import com.highv.ecommerce.domain.order_master.dto.PaymentRequest
 import com.highv.ecommerce.domain.order_master.service.OrderMasterService
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
@@ -18,11 +17,10 @@ class OrderMasterController(
 ) {
 
     @PreAuthorize("hasRole('BUYER')")
-    @PostMapping("/payments/{cartId}")
+    @PostMapping("/payments")
     fun requestPayment(
-        @PathVariable("cartId") cartId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        @RequestBody couponRequest: CouponRequest
+        @RequestBody couponRequest: PaymentRequest
     ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal.id, couponRequest, cartId))
+        = ResponseEntity.status(HttpStatus.OK).body(productsOrderService.requestPayment(userPrincipal.id, couponRequest))
 }

@@ -65,4 +65,8 @@ class CouponRepositoryImpl(
     override fun releaseLock(name: String): Int {
         return couponJpaRepository.releaseLock(name)
     }
+
+    override fun findAllByProductId(productIdList: List<Long>): List<Long> {
+        return couponJpaRepository.findAllByProductIdList(productIdList)
+    }
 }

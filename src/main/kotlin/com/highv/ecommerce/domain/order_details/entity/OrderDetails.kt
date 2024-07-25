@@ -54,15 +54,17 @@ class OrderDetails(
     @JoinColumn(name = "product_id")
     val product: Product,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_master_id")
-    val orderMaster: OrderMaster,
+    @Column(name = "order_master_id", nullable = false)
+    val orderMasterId: Long,
 
     @Column(name = "product_quantity", nullable = false)
     var productQuantity: Int,
 
     @Column(name = "shop_id", nullable = false)
     val shopId: Long,
+
+    @Column(name = "total_price", nullable = false)
+    val totalPrice: Int
 ) {
     fun buyerUpdate(orderStatus: OrderStatus, buyerOrderStatusRequest: BuyerOrderStatusRequest) {
 

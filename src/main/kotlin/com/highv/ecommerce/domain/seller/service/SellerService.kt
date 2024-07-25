@@ -4,6 +4,7 @@ import com.highv.ecommerce.domain.seller.dto.CreateSellerRequest
 import com.highv.ecommerce.domain.seller.dto.SellerResponse
 import com.highv.ecommerce.domain.seller.entity.Seller
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
+
 import com.highv.ecommerce.s3.config.S3Manager
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -14,15 +15,10 @@ import org.springframework.web.multipart.MultipartFile
 class SellerService(
     private val sellerRepository: SellerRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val s3Manager: S3Manager,
-
-    ) {
+    private val s3Manager: S3Manager
+) {
 
     fun signUp(request: CreateSellerRequest, file: MultipartFile?): SellerResponse {
-
-        // if (sellerRepository.existsByEmail(request.email)) {
-        //     throw RuntimeException("이미 존재하는 이메일입니다. 가입할 수 없습니다.")
-        // }
 
         val seller: Seller =
             sellerRepository.findByIdOrNull(request.id) ?: throw RuntimeException("이메일 인증된 회원 정보가 없습니다.")

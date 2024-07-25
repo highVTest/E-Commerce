@@ -23,6 +23,7 @@ class ProductService(
     private val productBackOfficeRepository: ProductBackOfficeRepository,
     private val s3Manager: S3Manager,
 ) {
+
     fun createProduct(
         sellerId: Long,
         productRequest: CreateProductRequest,
@@ -53,10 +54,9 @@ class ProductService(
             soldQuantity = 0,
             product = savedProduct
         )
+
         savedProduct.productBackOffice = productBackOffice
         productBackOfficeRepository.save(productBackOffice)
-
-
 
         productRepository.save(savedProduct)
 

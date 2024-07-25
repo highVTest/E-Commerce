@@ -35,7 +35,6 @@ class BuyerService(
 
     @Transactional
     fun signUp(request: CreateBuyerRequest, file: MultipartFile?): BuyerResponse {
-
         val buyer: Buyer = buyerRepository.findByIdOrNull(request.id) ?: throw RuntimeException("이메일 인증된 회원 정보가 없습니다.")
 
         if (request.email != buyer.email) {
@@ -53,7 +52,6 @@ class BuyerService(
             s3Manager.uploadFile(file) // S3Manager를 통해 파일 업로드
             buyer.profileImage = s3Manager.getFile(file.originalFilename) // Buyer 객체에 프로필 이미지 URL 저장
         }
-
         val savedBuyer = buyerRepository.save(buyer)
 
         return BuyerResponse.from(savedBuyer)
