@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.product.service
 
+import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.ProductBackOfficeRequest
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
 import com.highv.ecommerce.domain.product.dto.CreateProductRequest
@@ -20,7 +21,11 @@ class ProductService(
     private val shopRepository: ShopRepository,
     private val productBackOfficeRepository: ProductBackOfficeRepository
 ) {
-    fun createProduct(sellerId: Long, productRequest: CreateProductRequest): ProductResponse {
+    fun createProduct(
+        sellerId: Long,
+        productRequest: CreateProductRequest,
+        productBackOfficeRequest: ProductBackOfficeRequest
+    ): ProductResponse {
         val shop = shopRepository.findShopBySellerId(sellerId)
         val product = Product(
             name = productRequest.name,
@@ -38,14 +43,14 @@ class ProductService(
         val savedProduct = productRepository.save(product)
 
         val productBackOffice = ProductBackOffice(
-            quantity = 0,
-            price = 0,
+            quantity = productBackOfficeRequest.quantity,
+            price = productBackOfficeRequest.price,
             soldQuantity = 0,
             product = savedProduct
         )
         savedProduct.productBackOffice = productBackOffice
         productBackOfficeRepository.save(productBackOffice)
-        return ProductResponse.from(savedProduct)
+        return ProductResponse.from(savedProduct, productBackOffice)
     }
 
     fun updateProduct(sellerId: Long, productId: Long, updateProductRequest: UpdateProductRequest): ProductResponse {
@@ -60,7 +65,7 @@ class ProductService(
             categoryId = updateProductRequest.categoryId
         }
         val updatedProduct = productRepository.save(product)
-        return ProductResponse.from(updatedProduct)
+        return ProductResponse.from(updatedProduct, updatedProduct.productBackOffice!!)
     }
 
     fun deleteProduct(sellerId: Long, productId: Long) {
@@ -75,24 +80,16 @@ class ProductService(
 
     fun getProductById(productId: Long): ProductResponse {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
-        return ProductResponse.from(product)
+        return ProductResponse.from(product, product.productBackOffice!!)
     }
 
     fun getAllProducts(pageable: Pageable): Page<ProductResponse> {
         val products = productRepository.findAllPaginated(pageable)
-        return products.map { ProductResponse.from(it) }
+        return products.map { ProductResponse.from(it, it.productBackOffice!!) }
     }
 
     fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductResponse> {
         val products = productRepository.findByCategoryPaginated(categoryId, pageable)
-        return products.map { ProductResponse.from(it) }
-    }
-
-    fun searchProduct(keyword: String, pageable: Pageable): Page<ProductResponse> {
-        val products = productRepository.searchByKeywordPaginated(keyword, pageable)
-        if (products.hasContent()) {
-            return products.map { ProductResponse.from(it) }
-        }
-        return Page.empty(pageable)
+        return products.map { ProductResponse.from(it, it.productBackOffice!!) }
     }
 }

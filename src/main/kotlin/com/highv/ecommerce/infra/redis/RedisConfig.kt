@@ -1,11 +1,14 @@
 package com.highv.ecommerce.infra.redis
 
+import com.highv.ecommerce.domain.product.dto.ProductResponse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.domain.Page
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
 
 @Configuration
@@ -39,5 +42,14 @@ class RedisConfig(
         // redisTemplate.setDefaultSerializer(StringRedisSerializer())
 
         return redisTemplate
+    }
+
+    @Bean
+    fun productRedisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Page<ProductResponse>> {
+        val template = RedisTemplate<String, Page<ProductResponse>>()
+        template.connectionFactory = redisConnectionFactory
+        template.keySerializer = StringRedisSerializer()
+        template.valueSerializer = GenericJackson2JsonRedisSerializer()
+        return template
     }
 }
