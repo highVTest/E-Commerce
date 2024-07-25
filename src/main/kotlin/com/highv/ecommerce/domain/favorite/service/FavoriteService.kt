@@ -5,6 +5,7 @@ import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.favorite.dto.FavoriteResponse
 import com.highv.ecommerce.domain.favorite.entity.Favorite
 import com.highv.ecommerce.domain.favorite.repository.FavoriteRepository
+import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import org.springframework.stereotype.Service
 
@@ -46,7 +47,9 @@ class FavoriteService(
         // TODO : 상품 정보를 담아서 보낼지? 아니면 상품의 id만 보낼지 추후 결정
 
         val favorites: List<Favorite> = favoriteRepository.findAllByBuyerId(buyerId)
+        val products: List<Product> = productRepository.findAllById(favorites.map { it.productId })
 
-        return favorites.map { FavoriteResponse(it.id!!, it.productId) }
+        // return favorites.map { FavoriteResponse(it.id!!, it.productId) }
+        return products.map { FavoriteResponse(it.id!!, it.name, it.productBackOffice!!.price, it.productImage) }
     }
 }
