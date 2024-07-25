@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.product.service
 
+import com.highv.ecommerce.domain.favorite.service.FavoriteService
 import com.highv.ecommerce.domain.product.dto.ProductResponse
 import com.highv.ecommerce.domain.product.dto.TopSearchKeyword
 import com.highv.ecommerce.domain.product.repository.ProductRepository
@@ -16,7 +17,8 @@ import java.util.concurrent.TimeUnit
 class ProductSearchService(
     private val redisTemplate: RedisTemplate<String, String>,
     private val redisTemplateForProductSearch: RedisTemplate<String, Page<ProductResponse>>,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val favoriteService: FavoriteService
 ) {
     private val topSearchZSet: ZSetOperations<String, String> = redisTemplate.opsForZSet()
     private val searchHash: HashOperations<String, String, Page<ProductResponse>> =
@@ -45,8 +47,10 @@ class ProductSearchService(
             cacheAllFilterCases(keyword, pageRequest)
             val productInfo = productRepository.searchByKeywordPaginated(keyword, pageRequest)
             if (productInfo.hasContent()) {
-                addTermSearch(cacheKey, productInfo.map { ProductResponse.from(it, it.productBackOffice!!) })
-                return productInfo.map { ProductResponse.from(it, it.productBackOffice!!) }
+                addTermSearch(
+                    cacheKey,
+                    productInfo.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) })
+                return productInfo.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
             }
         }
         return Page.empty(pageRequest)
@@ -67,29 +71,18 @@ class ProductSearchService(
     }
 
     private fun cacheAllFilterCases(keyword: String, pageRequest: PageRequest) {
-        val filterCases = listOf("price", "likes", "createdAt")
+        val filterCases = listOf("price", "createdAt")
         val directions = listOf("ASC", "DESC")
         for (filterCase in filterCases) {
             for (direction in directions) {
-                val sort = if (direction == "ASC") Sort.by(filterCase).ascending()
-                else Sort.by(filterCase).descending()
+                val sort = if (direction == "ASC") Sort.by(filterCase).ascending() else Sort.by(filterCase).descending()
                 val pageRequestWithSort = PageRequest.of(0, pageRequest.pageSize, sort)
-                when (filterCase) {
-                    "price" -> {
-                    }
-
-                    "likes" -> {
-                    }
-
-                    "createdAt" -> {
-                        val productInfo = productRepository.searchByKeywordPaginated(keyword, pageRequestWithSort)
-                        if (productInfo.hasContent()) {
-                            val cacheKey = createCacheKey(keyword, filterCase, direction)
-                            addTermSearch(
-                                cacheKey,
-                                productInfo.map { ProductResponse.from(it, it.productBackOffice!!) })
-                        }
-                    }
+                val productInfo = productRepository.searchByKeywordPaginated(keyword, pageRequestWithSort)
+                if (productInfo.hasContent()) {
+                    val cacheKey = createCacheKey(keyword, filterCase, direction)
+                    addTermSearch(
+                        cacheKey,
+                        productInfo.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) })
                 }
             }
         }

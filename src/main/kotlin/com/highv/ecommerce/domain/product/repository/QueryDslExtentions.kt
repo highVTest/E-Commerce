@@ -11,7 +11,6 @@ fun Sort.Order.toOrderSpecifier(): OrderSpecifier<*> {
     val direction = if (isAscending) Order.ASC else Order.DESC
     val path = when (property) {
         "price" -> Expressions.numberPath(Double::class.java, "price")
-        "likes" -> Expressions.numberPath(Int::class.java, "likes")
         "createdAt" -> Expressions.dateTimePath(LocalDateTime::class.java, "createdAt")
         else -> throw IllegalArgumentException("Unknown sort property: $property")
     }

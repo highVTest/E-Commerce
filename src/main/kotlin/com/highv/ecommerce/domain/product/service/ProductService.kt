@@ -3,6 +3,7 @@ package com.highv.ecommerce.domain.product.service
 import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.ProductBackOfficeRequest
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
+import com.highv.ecommerce.domain.favorite.service.FavoriteService
 import com.highv.ecommerce.domain.product.dto.CreateProductRequest
 import com.highv.ecommerce.domain.product.dto.ProductResponse
 import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
@@ -19,7 +20,8 @@ import java.time.LocalDateTime
 class ProductService(
     private val productRepository: ProductRepository,
     private val shopRepository: ShopRepository,
-    private val productBackOfficeRepository: ProductBackOfficeRepository
+    private val productBackOfficeRepository: ProductBackOfficeRepository,
+    private val favoriteService: FavoriteService
 ) {
     fun createProduct(
         sellerId: Long,
@@ -50,7 +52,7 @@ class ProductService(
         )
         savedProduct.productBackOffice = productBackOffice
         productBackOfficeRepository.save(productBackOffice)
-        return ProductResponse.from(savedProduct, productBackOffice)
+        return ProductResponse.from(savedProduct)
     }
 
     fun updateProduct(sellerId: Long, productId: Long, updateProductRequest: UpdateProductRequest): ProductResponse {
@@ -65,7 +67,7 @@ class ProductService(
             categoryId = updateProductRequest.categoryId
         }
         val updatedProduct = productRepository.save(product)
-        return ProductResponse.from(updatedProduct, updatedProduct.productBackOffice!!)
+        return ProductResponse.from(updatedProduct, favoriteService.countFavorite(productId))
     }
 
     fun deleteProduct(sellerId: Long, productId: Long) {
@@ -80,16 +82,16 @@ class ProductService(
 
     fun getProductById(productId: Long): ProductResponse {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
-        return ProductResponse.from(product, product.productBackOffice!!)
+        return ProductResponse.from(product, favoriteService.countFavorite(productId))
     }
 
     fun getAllProducts(pageable: Pageable): Page<ProductResponse> {
         val products = productRepository.findAllPaginated(pageable)
-        return products.map { ProductResponse.from(it, it.productBackOffice!!) }
+        return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
     }
 
     fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductResponse> {
         val products = productRepository.findByCategoryPaginated(categoryId, pageable)
-        return products.map { ProductResponse.from(it, it.productBackOffice!!) }
+        return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
     }
 }
