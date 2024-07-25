@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -67,4 +68,21 @@ class AdminController(
         ResponseEntity
             .status(HttpStatus.NO_CONTENT)
             .body(adminService.deleteBlackList(blackListId))
+
+    // 판매자 탈퇴 대기 회원 승인
+    @DeleteMapping("/seller/resign/{sellerId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    fun approveSellerResignation(@PathVariable sellerId: Long): ResponseEntity<DefaultResponse> =
+        ResponseEntity
+            .status(HttpStatus.OK)
+            .body(adminService.approveSellerResignation(sellerId))
+
+/*    // 판매자 승인 대기 회원 승격
+    //Seller Entity에 status가 없어서 주석처리
+    @PatchMapping("/seller/approval/{sellerId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    fun promotePendingSeller(@PathVariable sellerId: Long): ResponseEntity<DefaultResponse> =
+        ResponseEntity
+            .status(HttpStatus.OK)
+            .body(adminService.promotePendingSeller(sellerId))*/
 }
