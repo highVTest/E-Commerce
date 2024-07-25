@@ -137,37 +137,39 @@ class BuyerService(
         //     orderGroups[it.productsOrder.id]!!.add(it)
         // }
 
-        val orderMap: MutableMap<Long, OrderMaster> = mutableMapOf()
-        orderStatuses.forEach {
-            if (!orderMap.containsKey(it.orderMaster.id!!)) {
-                orderMap[it.orderMaster.id] = it.orderMaster
-            }
-        }
+//        val orderMap: MutableMap<Long, OrderMaster> = mutableMapOf()
+//        orderStatuses.forEach {
+//            if (!orderMap.containsKey(it.orderMasterId)) {
+//                orderMap[it.orderMasterId] = it.orderMasterId
+//            }
+//        }
+//
+//        val orderGroups: MutableMap<Long, MutableList<BuyerHistoryProductResponse>> = mutableMapOf()
+//
+//        orderStatuses.forEach {
+//
+//            if (!orderGroups.containsKey(it.orderMasterId)) {
+//                orderGroups[it.orderMasterId] = mutableListOf<BuyerHistoryProductResponse>()
+//            }
+//            orderGroups[it.orderMasterId]!!.add(
+//                BuyerHistoryProductResponse.from(
+////                    cart = it.itemCart, // 수정 필요
+//                    complainStatus = it.complainStatus,
+//                    orderStatusId = it.id!!
+//                )
+//            )
+//        }
 
-        val orderGroups: MutableMap<Long, MutableList<BuyerHistoryProductResponse>> = mutableMapOf()
+//        val buyerOrderResponse: List<BuyerOrderResponse> = orderMap.map {
+//            BuyerOrderResponse.from(
+//                productsOrder = it.value,
+//                products = orderGroups[it.key]!!,
+//            )
+//        }
+//
+//        return buyerOrderResponse.sortedByDescending { it.orderRegisterDate }
 
-        orderStatuses.forEach {
-
-            if (!orderGroups.containsKey(it.orderMaster.id!!)) {
-                orderGroups[it.orderMaster.id] = mutableListOf<BuyerHistoryProductResponse>()
-            }
-            orderGroups[it.orderMaster.id]!!.add(
-                BuyerHistoryProductResponse.from(
-//                    cart = it.itemCart, // 수정 필요
-                    complainStatus = it.complainStatus,
-                    orderStatusId = it.id!!
-                )
-            )
-        }
-
-        val buyerOrderResponse: List<BuyerOrderResponse> = orderMap.map {
-            BuyerOrderResponse.from(
-                productsOrder = it.value,
-                products = orderGroups[it.key]!!,
-            )
-        }
-
-        return buyerOrderResponse.sortedByDescending { it.orderRegisterDate }
+        TODO()
     }
 
     @Transactional

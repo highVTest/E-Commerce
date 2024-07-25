@@ -18,7 +18,7 @@ data class ProductsOrderResponse(
     companion object{
         fun from(orderDetails: OrderDetails): ProductsOrderResponse{
             return ProductsOrderResponse(
-                id = orderDetails.orderMaster.id!!,
+                id = orderDetails.orderMasterId,
                 statusCode = orderDetails.orderStatus,
                 complainStatus = orderDetails.complainStatus,
                 updatedDate = LocalDateTime.now(),

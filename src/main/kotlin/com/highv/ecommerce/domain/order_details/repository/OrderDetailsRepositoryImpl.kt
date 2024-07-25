@@ -19,9 +19,6 @@ class OrderDetailsRepositoryImpl(
 //    private val productsOrder = QProductsOrder.productsOrder
     private val cartItem = QItemCart.itemCart
 
-    override fun findAllByShopIdAndOrderMasterId(shopId: Long, productsOrderId: Long): List<OrderDetails> {
-        return orderDetailsJpaRepository.findAllByShopIdAndOrderMasterId(shopId, productsOrderId)
-    }
 
     // TODO("수정 필요")
     override fun findAllByBuyerId(id: Long): List<OrderDetails> {
@@ -72,5 +69,9 @@ class OrderDetailsRepositoryImpl(
 
     override fun findAllByShopIdAndOrderMasterIdAndBuyerId(shopId: Long, orderId: Long, buyerId: Long): List<OrderDetails> {
         return orderDetailsJpaRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId, orderId, buyerId)
+    }
+
+    override fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderDetails> {
+        return orderDetailsJpaRepository.findAllByShopIdAndBuyerId(shopId, buyerId)
     }
 }

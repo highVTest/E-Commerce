@@ -33,12 +33,12 @@ class CouponService(
     @Transactional
     fun createCoupon(couponRequest: CreateCouponRequest, userPrincipal: UserPrincipal): DefaultResponse {
 
-        if (couponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && couponRequest.discount > 100)
-            throw RuntimeException("할인율은 100%를 넘길 수 없습 니다")
+        if (couponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && couponRequest.discount > 40)
+            throw RuntimeException("할인율은 40%를 넘길 수 없습 니다")
 
-        val product = productRepository.findByIdOrNull(couponRequest.productId) ?: throw RuntimeException()
+        val product = productRepository.findByIdOrNull(couponRequest.productId) ?: throw RuntimeException("상품이 존재 하지 않습니다")
 
-        if (couponRepository.existsByProductId(couponRequest.productId)) throw RuntimeException()
+        if (couponRepository.existsByProductId(couponRequest.productId)) throw RuntimeException("이미 해당 상품에 쿠폰이 발급 되어 있습니다")
 
         couponRepository.save(
             Coupon(
@@ -147,13 +147,11 @@ class CouponService(
 
     fun applyCoupon(couponId: Long, buyerId: Long): DefaultResponse {
 
-        val coupon = couponToBuyerRepository.findByCouponIdAndBuyerId(couponId, buyerId) ?: throw RuntimeException("쿠폰 정보가 존재 하지 않습니다")
-
-        log.info(coupon.coupon.product.id!!.toString())
+        val coupon = couponToBuyerRepository.findByCouponIdAndBuyerIdAndIsUsedFalse(couponId, buyerId)
+            ?: throw RuntimeException("쿠폰 정보가 존재 하지 않습니다")
 
         val itemCart = itemCartRepository.findByProductIdAndBuyerId(coupon.coupon.product.id!!, buyerId)
             ?: throw RuntimeException("장바구니에 아이템이 존재하지 않습니다")
-
 
         return DefaultResponse.from("쿠폰 적용이 완료 되었습니다")
     }
