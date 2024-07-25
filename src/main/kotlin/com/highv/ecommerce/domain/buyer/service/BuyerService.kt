@@ -1,35 +1,22 @@
 package com.highv.ecommerce.domain.buyer.service
 
-import com.highv.ecommerce.domain.buyer.dto.request.BuyerOrderStatusUpdateRequest
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
-import com.highv.ecommerce.domain.buyer.dto.response.BuyerHistoryProductResponse
-import com.highv.ecommerce.domain.buyer.dto.response.BuyerOrderResponse
-import com.highv.ecommerce.domain.buyer.dto.response.BuyerOrderShopResponse
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerResponse
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
-import com.highv.ecommerce.domain.order_details.entity.OrderDetails
-import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
-import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
-import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
-import com.highv.ecommerce.domain.order_master.entity.OrderMaster
-import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
 import com.highv.ecommerce.s3.config.S3Manager
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDateTime
 
 @Service
 class BuyerService(
     private val buyerRepository: BuyerRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val orderDetailsRepository: OrderDetailsRepository,
-    private val orderMasterRepository: OrderMasterRepository,
     private val s3Manager: S3Manager
 ) {
 
@@ -116,98 +103,54 @@ class BuyerService(
         return BuyerResponse.from(saveBuyer)
     }
 
-    // 추후 리팩토링 때 내부 로직에서 orderService의 로직 이용 가능한 것 있으면 사용
-    fun getOrders(buyerId: Long): List<BuyerOrderResponse> {
-        /*  // 주문 내역 전체 불러오기
-        * 1. oderDetails 에서 buyerId로 목록 전체 가져오기
-        * 2. 가져온 주문 내역에서 주문 별로 나누고 가게별로 분리
-        * 3. 주문 내역 목록 반환하기
-        * */
-        val orderDetails: List<OrderDetails> = orderDetailsRepository.findAllByBuyerId(buyerId)
-        val orderMasters: List<OrderMaster> = orderMasterRepository.findByIdIn(orderDetails.map { it.orderMasterId })
-
-        val orderMasterGroup: MutableMap<Long, MutableMap<Long, BuyerOrderShopResponse>> = mutableMapOf()
-
-        orderDetails.forEach {
-            if (!orderMasterGroup.containsKey(it.orderMasterId)) {
-                orderMasterGroup[it.orderMasterId] = mutableMapOf()
-            }
-            if (!orderMasterGroup[it.orderMasterId]!!.contains(it.shopId)) {
-                orderMasterGroup[it.orderMasterId]!![it.shopId] = BuyerOrderShopResponse(it.shopId, mutableListOf())
-            }
-            orderMasterGroup[it.orderMasterId]!![it.shopId]!!.productsOrders.add(BuyerHistoryProductResponse.from(it))
-        }
-
-        val orderMasterAndShopGroup: MutableMap<Long, MutableList<BuyerOrderShopResponse>> = mutableMapOf()
-
-        orderMasterGroup.forEach {
-            if (!orderMasterAndShopGroup.containsKey(it.key)) {
-                orderMasterAndShopGroup[it.key] = mutableListOf()
-            }
-            it.value.forEach { item ->
-                orderMasterAndShopGroup[it.key]?.add(item.value)
-            }
-
-        }
-
-
-        return orderMasters.map {
-            BuyerOrderResponse(
-                orderMasterId = it.id!!,
-                orderRegisterDate = it.regDateTime,
-                orderMasterAndShopGroup[it.id]!!
-            )
-        }
-    }
-
-    @Transactional
-    // 주문 내역에서 상품(상품이 포함된 주문목록 전체) 교환 및 환불 신청하기
-    fun updateStatus(buyerId: Long, orderId: Long, request: BuyerOrderStatusUpdateRequest): BuyerOrderResponse {
-        /*
-        * 1. orderId와 userId로 주문 정보 목록 불러오기
-        * 2. request의 상태로 상태 변경 후 이유 넣기
-        * 3. productsOrder의 status를 Pending으로 변경하기
-        * 4. 변경된 내용 반환
-        * */
-
-        val productsOrder: OrderMaster =
-            orderMasterRepository.findByIdOrNull(orderId) ?: throw RuntimeException("수정할 주문 내역이 없습니다.")
-
-        val orderStatuses: List<OrderDetails> =
-            //TODO("수정 필요")
-            orderDetailsRepository.findAllByBuyerId(buyerId)
-
-        val orderPendingReason: ComplainStatus = when (request.status) {
-            ComplainType.EXCHANGE -> ComplainStatus.EXCHANGE_REQUESTED
-            ComplainType.REFUND -> ComplainStatus.REFUND_REQUESTED
-        }
-        val now: LocalDateTime = LocalDateTime.now()
-
-        // 이것보단 한방 쿼리가 좋을 거라 생각 됨
-        orderStatuses.forEach {
-            it.complainStatus = orderPendingReason
-            it.buyerDescription = request.reason
-            it.buyerDateTime = now
-        }
-
-        // 위에랑 어짜피 같은 것임 지워도 되지 않을까?
-        val savedOrderStatuses = orderDetailsRepository.saveAll(orderStatuses)
-        val savedProductsOrder = orderMasterRepository.save(productsOrder)
-
-        // 수정 필요
-        // val buyerHistoryProductResponses: List<BuyerHistoryProductResponse> = savedOrderStatuses.map {
-        //     BuyerHistoryProductResponse.from(
-        //         cart = it.orderPendingReason = orderPendingReason,
-        //         it.id!!
-        //     )
-        // }
-        //
-        // return BuyerOrderResponse(
-        //     productsOrderId = savedProductsOrder.id!!,
-        //     orderRegisterDate = savedProductsOrder.regDateTime,
-        //     orderStatus = OrderStatus.PENDING,
-        //     savedOrderStatuses.map { Order }
-        // )
-        TODO()
-    }
+    // @Transactional
+    // // 주문 내역에서 상품(상품이 포함된 주문목록 전체) 교환 및 환불 신청하기
+    // fun updateStatus(buyerId: Long, orderId: Long, request: BuyerOrderStatusUpdateRequest): BuyerOrderResponse {
+    //     /*
+    //     * 1. orderId와 userId로 주문 정보 목록 불러오기
+    //     * 2. request의 상태로 상태 변경 후 이유 넣기
+    //     * 3. productsOrder의 status를 Pending으로 변경하기
+    //     * 4. 변경된 내용 반환
+    //     * */
+    //
+    //     val productsOrder: OrderMaster =
+    //         orderMasterRepository.findByIdOrNull(orderId) ?: throw RuntimeException("수정할 주문 내역이 없습니다.")
+    //
+    //     val orderStatuses: List<OrderDetails> =
+    //         //TODO("수정 필요")
+    //         orderDetailsRepository.findAllByBuyerId(buyerId)
+    //
+    //     val orderPendingReason: ComplainStatus = when (request.status) {
+    //         ComplainType.EXCHANGE -> ComplainStatus.EXCHANGE_REQUESTED
+    //         ComplainType.REFUND -> ComplainStatus.REFUND_REQUESTED
+    //     }
+    //     val now: LocalDateTime = LocalDateTime.now()
+    //
+    //     // 이것보단 한방 쿼리가 좋을 거라 생각 됨
+    //     orderStatuses.forEach {
+    //         it.complainStatus = orderPendingReason
+    //         it.buyerDescription = request.reason
+    //         it.buyerDateTime = now
+    //     }
+    //
+    //     // 위에랑 어짜피 같은 것임 지워도 되지 않을까?
+    //     val savedOrderStatuses = orderDetailsRepository.saveAll(orderStatuses)
+    //     val savedProductsOrder = orderMasterRepository.save(productsOrder)
+    //
+    //     // 수정 필요
+    //     // val buyerHistoryProductResponses: List<BuyerHistoryProductResponse> = savedOrderStatuses.map {
+    //     //     BuyerHistoryProductResponse.from(
+    //     //         cart = it.orderPendingReason = orderPendingReason,
+    //     //         it.id!!
+    //     //     )
+    //     // }
+    //     //
+    //     // return BuyerOrderResponse(
+    //     //     productsOrderId = savedProductsOrder.id!!,
+    //     //     orderRegisterDate = savedProductsOrder.regDateTime,
+    //     //     orderStatus = OrderStatus.PENDING,
+    //     //     savedOrderStatuses.map { Order }
+    //     // )
+    //     TODO()
+    // }
 }
