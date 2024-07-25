@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface OrderMasterJpaRepository : JpaRepository<OrderMaster, Long> {
     fun findByIdIn(ids: List<Long>): List<OrderMaster>
+    fun findByIdInOrderByIdDesc(ids: List<Long>): List<OrderMaster>
 }

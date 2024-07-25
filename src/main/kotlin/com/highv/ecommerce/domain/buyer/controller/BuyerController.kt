@@ -75,13 +75,4 @@ class BuyerController(private val buyerService: BuyerService) {
     ): ResponseEntity<BuyerResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(buyerService.changeProfile(request, user.id))
-
-    // @PreAuthorize("hasRole('BUYER')")
-    // @PutMapping("/orders/{orderId}")
-    // fun updateOrder(
-    //     @AuthenticationPrincipal user: UserPrincipal,
-    //     @PathVariable(value = "orderId") orderId: Long,
-    //     @RequestBody request: BuyerOrderStatusUpdateRequest
-    // ): ResponseEntity<BuyerOrderResponse> =
-    //     ResponseEntity.status(HttpStatus.OK).body(buyerService.updateStatus(user.id, orderId, request))
 }

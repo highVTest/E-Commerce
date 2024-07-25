@@ -19,7 +19,8 @@ import org.springframework.stereotype.Repository
 class OrderMasterRepositoryImpl(
     private val productsOrderJpaRepository: OrderMasterJpaRepository,
     @PersistenceContext
-    private val em: EntityManager
+    private val em: EntityManager,
+    private val orderMasterJpaRepository: OrderMasterJpaRepository
 ) : OrderMasterRepository {
 
     private val queryFactory = JPAQueryFactory(em)
@@ -67,6 +68,10 @@ class OrderMasterRepositoryImpl(
 
     override fun findByIdIn(ids: List<Long>): List<OrderMaster> {
         return productsOrderJpaRepository.findByIdIn(ids)
+    }
+
+    override fun findByIdInOrderByIdDesc(ids: List<Long>): List<OrderMaster> {
+        return orderMasterJpaRepository.findByIdInOrderByIdDesc(ids)
     }
 
     private fun getTotalPrice(): NumberExpression<Int> {

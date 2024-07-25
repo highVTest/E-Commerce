@@ -37,7 +37,7 @@ class OrderDetailsService(
 
         val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId, orderId, buyerId)
 
-        orderDetails.map {
+        orderDetails.forEach {
             it.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
         }
 
@@ -54,7 +54,8 @@ class OrderDetailsService(
         * */
 
         val orderDetails: List<OrderDetails> = orderDetailsRepository.findAllByBuyerId(buyerId)
-        val orderMasters: List<OrderMaster> = orderMasterRepository.findByIdIn(orderDetails.map { it.orderMasterId })
+        val orderMasters: List<OrderMaster> =
+            orderMasterRepository.findByIdInOrderByIdDesc(orderDetails.map { it.orderMasterId })
 
         val orderMasterGroup: MutableMap<Long, MutableMap<Long, BuyerOrderShopResponse>> = mutableMapOf()
 
