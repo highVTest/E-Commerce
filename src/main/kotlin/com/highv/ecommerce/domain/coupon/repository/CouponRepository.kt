@@ -25,4 +25,6 @@ interface CouponRepository {
     fun getLock(name: String, time: Int):Int
 
     fun releaseLock(name: String): Int
+
+    fun findAllByProductId(productIdList : List<Long>): List<Long>
 }

@@ -35,7 +35,8 @@ class ItemCartService(
             val item: ItemCart = ItemCart(
                 product = product,
                 quantity = request.quantity,
-                buyerId = buyerId
+                buyerId = buyerId,
+                shopId = product.shop.id!!
             )
 
             itemCartRepository.save(item)

@@ -42,8 +42,9 @@ class Coupon(
 ){
 
     fun update(updateCouponRequest: UpdateCouponRequest) {
-        if(updateCouponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && updateCouponRequest.discount > 100){
-            throw RuntimeException("할인율은 100%를 넘길 수 없습 니다")
+
+        if(updateCouponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && updateCouponRequest.discount > 40){
+            throw RuntimeException("할인율은 40%를 넘길 수 없습 니다")
         }
 
         discountPolicy = updateCouponRequest.discountPolicy

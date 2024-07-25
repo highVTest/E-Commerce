@@ -17,6 +17,7 @@ import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
 import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
+import com.highv.ecommerce.s3.config.S3Manager
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -29,7 +30,8 @@ class BuyerService(
     private val buyerRepository: BuyerRepository,
     private val passwordEncoder: PasswordEncoder,
     private val orderDetailsRepository: OrderDetailsRepository,
-    private val productsOrderRepository: OrderMasterRepository
+    private val productsOrderRepository: OrderMasterRepository,
+    private val s3Manager: S3Manager,
 ) {
 
 @Transactional
@@ -88,7 +90,6 @@ class BuyerService(
     fun changeProfileImage(request: UpdateBuyerImageRequest, userId: Long,multipartFile: MultipartFile) {
 
         val buyer = buyerRepository.findByIdOrNull(userId) ?: throw RuntimeException("사용자가 존재하지 않습니다.")
-        val types = fileUtil.validImgFile(multipartFile.inputStream)
 
         s3Manager.uploadFile(multipartFile)
         buyer.profileImage = request.imageUrl
@@ -137,37 +138,39 @@ class BuyerService(
         //     orderGroups[it.productsOrder.id]!!.add(it)
         // }
 
-        val orderMap: MutableMap<Long, OrderMaster> = mutableMapOf()
-        orderStatuses.forEach {
-            if (!orderMap.containsKey(it.orderMaster.id!!)) {
-                orderMap[it.orderMaster.id] = it.orderMaster
-            }
-        }
+//        val orderMap: MutableMap<Long, OrderMaster> = mutableMapOf()
+//        orderStatuses.forEach {
+//            if (!orderMap.containsKey(it.orderMasterId)) {
+//                orderMap[it.orderMasterId] = it.orderMasterId
+//            }
+//        }
+//
+//        val orderGroups: MutableMap<Long, MutableList<BuyerHistoryProductResponse>> = mutableMapOf()
+//
+//        orderStatuses.forEach {
+//
+//            if (!orderGroups.containsKey(it.orderMasterId)) {
+//                orderGroups[it.orderMasterId] = mutableListOf<BuyerHistoryProductResponse>()
+//            }
+//            orderGroups[it.orderMasterId]!!.add(
+//                BuyerHistoryProductResponse.from(
+////                    cart = it.itemCart, // 수정 필요
+//                    complainStatus = it.complainStatus,
+//                    orderStatusId = it.id!!
+//                )
+//            )
+//        }
 
-        val orderGroups: MutableMap<Long, MutableList<BuyerHistoryProductResponse>> = mutableMapOf()
+//        val buyerOrderResponse: List<BuyerOrderResponse> = orderMap.map {
+//            BuyerOrderResponse.from(
+//                productsOrder = it.value,
+//                products = orderGroups[it.key]!!,
+//            )
+//        }
+//
+//        return buyerOrderResponse.sortedByDescending { it.orderRegisterDate }
 
-        orderStatuses.forEach {
-
-            if (!orderGroups.containsKey(it.orderMaster.id!!)) {
-                orderGroups[it.orderMaster.id] = mutableListOf<BuyerHistoryProductResponse>()
-            }
-            orderGroups[it.orderMaster.id]!!.add(
-                BuyerHistoryProductResponse.from(
-//                    cart = it.itemCart, // 수정 필요
-                    complainStatus = it.complainStatus,
-                    orderStatusId = it.id!!
-                )
-            )
-        }
-
-        val buyerOrderResponse: List<BuyerOrderResponse> = orderMap.map {
-            BuyerOrderResponse.from(
-                productsOrder = it.value,
-                products = orderGroups[it.key]!!,
-            )
-        }
-
-        return buyerOrderResponse.sortedByDescending { it.orderRegisterDate }
+        TODO()
     }
 
     @Transactional

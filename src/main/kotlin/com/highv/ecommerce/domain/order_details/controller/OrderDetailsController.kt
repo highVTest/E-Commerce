@@ -54,17 +54,17 @@ class OrderDetailsController(
             = ResponseEntity.status(HttpStatus.OK).body(orderDetailsService.getSellerOrderDetailsAll(shopId, userPrincipal.id))
 
     @PreAuthorize("hasRole('SELLER')")
-    @GetMapping("/shop/order_details/{shopId}/{orderID}")
+    @GetMapping("/shop/order_details/{shopId}/{orderId}")
     fun getSellerOrderDetailsBuyer(
         @PathVariable("shopId") shopId: Long,  // Shop 추가 시 논의 후에 삭제 예정
-        @PathVariable("orderID") orderId: Long,
+        @PathVariable("orderId") orderId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
         buyerId: Long
     ): ResponseEntity<List<ProductsOrderResponse>>
             = ResponseEntity.status(HttpStatus.OK).body(orderDetailsService.getSellerOrderDetailsBuyer(shopId, orderId, buyerId))
 
     @PreAuthorize("hasRole('SELLER')")
-    @GetMapping("/shop/complain/{shopId}/{orderId}/accept")
+    @PatchMapping("/shop/complain/{shopId}/{orderId}/accept")
     fun requestComplainAccept(
         @PathVariable("shopId") shopId: Long,  // Shop 추가 시 논의 후에 삭제 예정
         @PathVariable("orderId") orderId: Long,
