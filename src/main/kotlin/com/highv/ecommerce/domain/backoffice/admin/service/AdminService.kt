@@ -5,7 +5,6 @@ import com.highv.ecommerce.domain.backoffice.admin.dto.BlackListResponse
 import com.highv.ecommerce.domain.backoffice.admin.dto.CreateBlackListRequest
 import com.highv.ecommerce.domain.backoffice.admin.entity.BlackList
 import com.highv.ecommerce.domain.backoffice.admin.repository.BlackListRepository
-import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import org.springframework.data.repository.findByIdOrNull
