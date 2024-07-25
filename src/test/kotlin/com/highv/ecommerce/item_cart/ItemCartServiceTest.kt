@@ -68,7 +68,7 @@ class ItemCartServiceTest : BehaviorSpec() {
 
                 every { productRepository.findByIdOrNull(any()) } returns product
 
-                every { itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(any(), any()) } returns null
+                every { itemCartRepository.findByProductIdAndBuyerId(any(), any()) } returns null
 
                 every { itemCartRepository.save(any()) } returns itemCart
 
@@ -148,7 +148,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                 val request: SelectProductQuantity = SelectProductQuantity(quantity = 5)
 
                 every { productRepository.findByIdOrNull(any()) } returns product
-                every { itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(any(), any()) } returns itemCart
+                every { itemCartRepository.findByProductIdAndBuyerId(any(), any()) } returns itemCart
 
                 Then("수량과 총액이 변경된다.") {
                     every { itemCartRepository.save(any()) } returns itemCart.apply { 3000 * request.quantity }
@@ -162,7 +162,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                 val request: SelectProductQuantity = SelectProductQuantity(quantity = 5)
 
                 every { productRepository.findByIdOrNull(any()) } returns product
-                every { itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(any(), any()) } returns null
+                every { itemCartRepository.findByProductIdAndBuyerId(any(), any()) } returns null
 
                 Then("상품이 없다는 예외가 발생한다.") {
                     shouldThrow<RuntimeException> {

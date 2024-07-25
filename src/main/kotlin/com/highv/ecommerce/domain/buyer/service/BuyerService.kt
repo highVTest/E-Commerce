@@ -10,16 +10,13 @@ import com.highv.ecommerce.domain.buyer.dto.response.BuyerOrderResponse
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerResponse
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
-import com.highv.ecommerce.domain.buyer_history.repository.BuyerHistoryRepository
-import com.highv.ecommerce.domain.order_status.entity.OrderStatus
-import com.highv.ecommerce.domain.order_status.enumClass.OrderPendingReason
-import com.highv.ecommerce.domain.order_status.repository.OrderStatusJpaRepository
-import com.highv.ecommerce.domain.products_order.entity.ProductsOrder
-import com.highv.ecommerce.domain.products_order.enumClass.OrderStatusType
-import com.highv.ecommerce.domain.products_order.enumClass.StatusCode
-import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
-import com.highv.ecommerce.s3.config.S3Manager
-import jodd.io.FileUtil
+import com.highv.ecommerce.domain.order_details.entity.OrderDetails
+import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
+import com.highv.ecommerce.domain.order_master.entity.OrderMaster
+import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
+import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
+import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
+import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -31,11 +28,8 @@ import java.time.LocalDateTime
 class BuyerService(
     private val buyerRepository: BuyerRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val buyerHistoryRepository: BuyerHistoryRepository,
-    private val orderStatusJpaRepository: OrderStatusJpaRepository,
-    private val productsOrderRepository: ProductsOrderRepository,
-    private val s3Manager: S3Manager,
-    private val fileUtil: com.highv.ecommerce.s3.config.FileUtil
+    private val orderDetailsRepository: OrderDetailsRepository,
+    private val productsOrderRepository: OrderMasterRepository
 ) {
 
 @Transactional
@@ -131,7 +125,7 @@ class BuyerService(
 
         // val buyerHistories: List<BuyerHistory> = buyerHistoryRepository.findAllByBuyerId(buyerId)
 
-        val orderStatuses: List<OrderStatus> = orderStatusJpaRepository.findAllByBuyerId(buyerId)
+        val orderStatuses: List<OrderDetails> = orderDetailsRepository.findAllByBuyerId(buyerId)
 
         // val orderGroups: MutableMap<Long, MutableList<OrderStatus>> = mutableMapOf()
         //
@@ -143,10 +137,10 @@ class BuyerService(
         //     orderGroups[it.productsOrder.id]!!.add(it)
         // }
 
-        val orderMap: MutableMap<Long, ProductsOrder> = mutableMapOf()
+        val orderMap: MutableMap<Long, OrderMaster> = mutableMapOf()
         orderStatuses.forEach {
-            if (!orderMap.containsKey(it.productsOrder.id!!)) {
-                orderMap[it.productsOrder.id] = it.productsOrder
+            if (!orderMap.containsKey(it.orderMaster.id!!)) {
+                orderMap[it.orderMaster.id] = it.orderMaster
             }
         }
 
@@ -154,13 +148,13 @@ class BuyerService(
 
         orderStatuses.forEach {
 
-            if (!orderGroups.containsKey(it.productsOrder.id!!)) {
-                orderGroups[it.productsOrder.id] = mutableListOf<BuyerHistoryProductResponse>()
+            if (!orderGroups.containsKey(it.orderMaster.id!!)) {
+                orderGroups[it.orderMaster.id] = mutableListOf<BuyerHistoryProductResponse>()
             }
-            orderGroups[it.productsOrder.id]!!.add(
+            orderGroups[it.orderMaster.id]!!.add(
                 BuyerHistoryProductResponse.from(
-                    cart = it.itemCart,
-                    orderPendingReason = it.orderPendingReason,
+//                    cart = it.itemCart, // 수정 필요
+                    complainStatus = it.complainStatus,
                     orderStatusId = it.id!!
                 )
             )
@@ -186,46 +180,44 @@ class BuyerService(
         * 4. 변경된 내용 반환
         * */
 
-        val productsOrder: ProductsOrder =
+        val productsOrder: OrderMaster =
             productsOrderRepository.findByIdOrNull(orderId) ?: throw RuntimeException("수정할 주문 내역이 없습니다.")
 
-        val orderStatuses: List<OrderStatus> =
-            orderStatusJpaRepository.findAllByBuyerIdAndProductsOrderId(buyerId, orderId)
+        val orderStatuses: List<OrderDetails> =
+            //TODO("수정 필요")
+            orderDetailsRepository.findAllByBuyerId(buyerId)
 
-        val orderPendingReason: OrderPendingReason = when (request.status) {
-            OrderStatusType.EXCHANGE -> OrderPendingReason.EXCHANGE_REQUESTED
-            OrderStatusType.REFUND -> OrderPendingReason.REFUND_REQUESTED
+        val orderPendingReason: ComplainStatus = when (request.status) {
+            ComplainType.EXCHANGE -> ComplainStatus.EXCHANGE_REQUESTED
+            ComplainType.REFUND -> ComplainStatus.REFUND_REQUESTED
         }
         val now: LocalDateTime = LocalDateTime.now()
 
         // 이것보단 한방 쿼리가 좋을 거라 생각 됨
         orderStatuses.forEach {
-            it.orderPendingReason = orderPendingReason
+            it.complainStatus = orderPendingReason
             it.buyerDescription = request.reason
             it.buyerDateTime = now
         }
 
-        productsOrder.apply {
-            statusCode = StatusCode.PENDING
-        }
-
         // 위에랑 어짜피 같은 것임 지워도 되지 않을까?
-        val savedOrderStatuses = orderStatusJpaRepository.saveAll(orderStatuses)
+        val savedOrderStatuses = orderDetailsRepository.saveAll(orderStatuses)
         val savedProductsOrder = productsOrderRepository.save(productsOrder)
 
-        val buyerHistoryProductResponses: List<BuyerHistoryProductResponse> = savedOrderStatuses.map {
-            BuyerHistoryProductResponse.from(
-                cart = it.itemCart,
-                orderPendingReason = orderPendingReason,
-                it.id!!
-            )
-        }
+        // 수정 필요
+//        val buyerHistoryProductResponses: List<BuyerHistoryProductResponse> = savedOrderStatuses.map {
+//            BuyerHistoryProductResponse.from(
+//                cart = it.itemCart,
+//                orderPendingReason = orderPendingReason,
+//                it.id!!
+//            )
+//        }
 
         return BuyerOrderResponse(
             productsOrderId = savedProductsOrder.id!!,
-            orderRegisterDate = savedProductsOrder.regDate,
-            orderStatus = savedProductsOrder.statusCode,
-            productsOrders = buyerHistoryProductResponses
+            orderRegisterDate = savedProductsOrder.regDateTime,
+            orderStatus = OrderStatus.PENDING,
+//            orderStatus = savedProductsOrder.statusCode,
         )
     }
 }

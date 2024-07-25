@@ -1,22 +1,19 @@
 package com.highv.ecommerce.domain.backoffice.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.domain.backoffice.dto.saleshistory.SalesHistoryResponse
-import com.highv.ecommerce.domain.backoffice.repository.SalesHistoryRepository
-import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
-import com.highv.ecommerce.domain.products_order.repository.ProductsOrderRepository
-import org.springframework.data.repository.findByIdOrNull
+import com.highv.ecommerce.domain.order_master.dto.OrderStatusRequest
+import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
 import org.springframework.stereotype.Service
 
 @Service
 class SalesHistoryService(
-    private val salesHistoryRepository: SalesHistoryRepository,
-    private val productsOrderRepository: ProductsOrderRepository
+    private val productsOrderRepository: OrderMasterRepository
 ) {
-    fun getSalesHistory(sellerId: Long, orderId: Long): SalesHistoryResponse {
-        val salesHistory = salesHistoryRepository.findByOrderId(orderId)
-        return SalesHistoryResponse.from(salesHistory)
-    }
+    //TODO("SalesHistory 삭제")
+//    fun getSalesHistory(sellerId: Long, orderId: Long): SalesHistoryResponse {
+//        val salesHistory = salesHistoryRepository.findByOrderId(orderId)
+//        return SalesHistoryResponse.from(salesHistory)
+//    }
 
     fun salesStatusChange(
         sellerId: Long,
@@ -28,7 +25,7 @@ class SalesHistoryService(
         val order = productsOrderRepository.findByIdOrNull(orderId)
             ?: throw RuntimeException("Order not found")
 
-        order.update(orderStatusRequest)
+//        order.update(orderStatusRequest) 수정 예정
         productsOrderRepository.save(order)
 
         return DefaultResponse.from("주문 상태 변경 완료. 변경된 상태 : ${orderStatusRequest.statusCode.name}")

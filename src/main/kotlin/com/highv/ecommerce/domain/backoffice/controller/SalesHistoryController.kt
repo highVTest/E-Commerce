@@ -3,7 +3,7 @@ package com.highv.ecommerce.domain.backoffice.controller
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.backoffice.dto.saleshistory.SalesHistoryResponse
 import com.highv.ecommerce.domain.backoffice.service.SalesHistoryService
-import com.highv.ecommerce.domain.products_order.dto.OrderStatusRequest
+import com.highv.ecommerce.domain.order_master.dto.OrderStatusRequest
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -21,14 +21,15 @@ class SalesHistoryController(
     private val salesHistoryService: SalesHistoryService
 ) {
     // 주문 상태 확인
-    @PreAuthorize("hasRole('SELLER')")
-    @GetMapping("/{orderId}")
-    fun getOrderStatus(
-        @AuthenticationPrincipal seller: UserPrincipal,
-        @PathVariable orderId: Long
-    ): ResponseEntity<SalesHistoryResponse> = ResponseEntity
-        .status(HttpStatus.OK)
-        .body(salesHistoryService.getSalesHistory(seller.id, orderId))
+    // TODO("수정 필요")
+//    @PreAuthorize("hasRole('SELLER')")
+//    @GetMapping("/{orderId}")
+//    fun getOrderStatus(
+//        @AuthenticationPrincipal seller: UserPrincipal,
+//        @PathVariable orderId: Long
+//    ): ResponseEntity<SalesHistoryResponse> = ResponseEntity
+//        .status(HttpStatus.OK)
+//        .body(salesHistoryService.getSalesHistory(seller.id, orderId))
 
     // 주문 상태 수정
     @PreAuthorize("hasRole('SELLER')")

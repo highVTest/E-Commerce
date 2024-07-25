@@ -16,9 +16,6 @@ class Product(
     @Column(name = "product_image")
     var productImage: String,
 
-    @Column(name = "favorite")
-    val favorite: Int,
-
     @Column(name = "created_at")
     val createdAt: LocalDateTime,
 
