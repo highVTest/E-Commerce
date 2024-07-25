@@ -24,7 +24,11 @@ class ProductService(
     private val productBackOfficeRepository: ProductBackOfficeRepository,
     private val s3Manager: S3Manager,
 ) {
-    fun createProduct(sellerId: Long, productRequest: CreateProductRequest,multipartFile: MultipartFile): ProductResponse {
+    fun createProduct(
+        sellerId: Long,
+        productRequest: CreateProductRequest,
+        multipartFile: MultipartFile
+    ): ProductResponse {
 
         s3Manager.uploadFile(multipartFile) // S3Manager를 통해 파일 업로드
 
@@ -33,7 +37,6 @@ class ProductService(
             name = productRequest.name,
             description = productRequest.description,
             productImage = s3Manager.getFile(multipartFile.originalFilename), // Buyer 객체에 프로필 이미지 URL 저장
-            favorite = 0,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
             isSoldOut = false,
@@ -56,7 +59,7 @@ class ProductService(
 
 
 
-            productRepository.save(savedProduct)
+        productRepository.save(savedProduct)
 
         return ProductResponse.from(savedProduct)
     }
