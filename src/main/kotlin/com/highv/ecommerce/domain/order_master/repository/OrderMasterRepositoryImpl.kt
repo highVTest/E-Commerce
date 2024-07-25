@@ -2,11 +2,8 @@ package com.highv.ecommerce.domain.order_master.repository
 
 import com.highv.ecommerce.domain.coupon.entity.QCoupon
 import com.highv.ecommerce.domain.coupon.entity.QCouponToBuyer
-import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import com.highv.ecommerce.domain.item_cart.entity.QItemCart
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
-import com.querydsl.core.types.dsl.CaseBuilder
-import com.querydsl.core.types.dsl.NumberExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
@@ -18,7 +15,7 @@ class OrderMasterRepositoryImpl(
     private val productsOrderJpaRepository: OrderMasterJpaRepository,
     @PersistenceContext
     private val em: EntityManager
-): OrderMasterRepository {
+) : OrderMasterRepository {
 
     private val queryFactory = JPAQueryFactory(em)
     private val itemCart = QItemCart.itemCart
@@ -45,16 +42,24 @@ class OrderMasterRepositoryImpl(
 //                getTotalPrice().sum()
         ).from(itemCart)
             .leftJoin(couponToBuyer).fetchJoin()
-            .on(couponToBuyer.buyer().id.eq(itemCart.buyerId)
-                .and(couponToBuyer.coupon().id.`in`(couponIdList)))
+            .on(
+                couponToBuyer.buyer().id.eq(itemCart.buyerId)
+                    .and(couponToBuyer.coupon().id.`in`(couponIdList))
+            )
             .leftJoin(coupon).fetchJoin()
-            .on(coupon.id.eq(couponToBuyer.coupon().id)
-                .and(coupon.product().id.eq(itemCart.product().id)))
+            .on(
+                coupon.id.eq(couponToBuyer.coupon().id)
+                    .and(coupon.product().id.eq(itemCart.product().id))
+            )
             .where(itemCart.buyerId.eq(buyerId))
             .fetchOne()
 
 
         return 1
+    }
+
+    override fun findByIdIn(ids: List<Long>): List<OrderMaster> {
+        return productsOrderJpaRepository.findByIdIn(ids)
     }
 
 //    private fun getTotalPrice(): NumberExpression<Int>{

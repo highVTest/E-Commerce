@@ -10,5 +10,7 @@ interface OrderMasterRepository {
 
     fun save(productsOrder: OrderMaster): OrderMaster
 
-    fun discountTotalPriceList(buyerId: Long, couponIdList: List<Long>, ): Int
+    fun discountTotalPriceList(buyerId: Long, couponIdList: List<Long>): Int
+
+    fun findByIdIn(ids: List<Long>): List<OrderMaster>
 }

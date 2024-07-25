@@ -6,13 +6,13 @@ import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerHistoryProductResponse
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerOrderResponse
+import com.highv.ecommerce.domain.buyer.dto.response.BuyerOrderShopResponse
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerResponse
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
-import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
@@ -29,16 +29,13 @@ class BuyerService(
     private val buyerRepository: BuyerRepository,
     private val passwordEncoder: PasswordEncoder,
     private val orderDetailsRepository: OrderDetailsRepository,
-    private val productsOrderRepository: OrderMasterRepository,
+    private val orderMasterRepository: OrderMasterRepository,
     private val s3Manager: S3Manager
 ) {
 
     @Transactional
     fun signUp(request: CreateBuyerRequest, file: MultipartFile?): BuyerResponse {
 
-        // if (buyerRepository.existsByEmail(request.email)) {
-        //     throw RuntimeException("이미 존재하는 이메일입니다. 가입할 수 없습니다.")
-        // }
         val buyer: Buyer = buyerRepository.findByIdOrNull(request.id) ?: throw RuntimeException("이메일 인증된 회원 정보가 없습니다.")
 
         if (request.email != buyer.email) {
@@ -123,57 +120,46 @@ class BuyerService(
 
     // 추후 리팩토링 때 내부 로직에서 orderService의 로직 이용 가능한 것 있으면 사용
     fun getOrders(buyerId: Long): List<BuyerOrderResponse> {
-        /* // 주문 내역 전체 불러오기
-        * 1. buyerId를 이용해서 주문 내역 전부 가져오기
-        * 2. 주문 내역에 있는 order_id를 이용해서 status와 장바구니 내역 가져오기
-        * 3. 장바구니 내역과 잘 조합해서 반환하기
+        /*  // 주문 내역 전체 불러오기
+        * 1. oderDetails 에서 buyerId로 목록 전체 가져오기
+        * 2. 가져온 주문 내역에서 주문 별로 나누고 가게별로 분리
+        * 3. 주문 내역 목록 반환하기
         * */
+        val orderDetails: List<OrderDetails> = orderDetailsRepository.findAllByBuyerId(buyerId)
+        val orderMasters: List<OrderMaster> = orderMasterRepository.findByIdIn(orderDetails.map { it.orderMasterId })
 
-        // val buyerHistories: List<BuyerHistory> = buyerHistoryRepository.findAllByBuyerId(buyerId)
+        val orderMasterGroup: MutableMap<Long, MutableMap<Long, BuyerOrderShopResponse>> = mutableMapOf()
 
-        val orderStatuses: List<OrderDetails> = orderDetailsRepository.findAllByBuyerId(buyerId)
-
-        // val orderGroups: MutableMap<Long, MutableList<OrderStatus>> = mutableMapOf()
-        //
-        // orderStatuses.forEach {
-        //
-        //     if (!orderGroups.containsKey(it.productsOrder.id!!)) {
-        //         orderGroups[it.productsOrder.id] = mutableListOf<OrderStatus>()
-        //     }
-        //     orderGroups[it.productsOrder.id]!!.add(it)
-        // }
-
-        val orderMap: MutableMap<Long, OrderMaster> = mutableMapOf()
-        orderStatuses.forEach {
-            if (!orderMap.containsKey(it.orderMaster.id!!)) {
-                orderMap[it.orderMaster.id] = it.orderMaster
+        orderDetails.forEach {
+            if (!orderMasterGroup.containsKey(it.orderMasterId)) {
+                orderMasterGroup[it.orderMasterId] = mutableMapOf()
             }
+            if (!orderMasterGroup[it.orderMasterId]!!.contains(it.shopId)) {
+                orderMasterGroup[it.orderMasterId]!![it.shopId] = BuyerOrderShopResponse(it.shopId, mutableListOf())
+            }
+            orderMasterGroup[it.orderMasterId]!![it.shopId]!!.productsOrders.add(BuyerHistoryProductResponse.from(it))
         }
 
-        val orderGroups: MutableMap<Long, MutableList<BuyerHistoryProductResponse>> = mutableMapOf()
+        val orderMasterAndShopGroup: MutableMap<Long, MutableList<BuyerOrderShopResponse>> = mutableMapOf()
 
-        orderStatuses.forEach {
-
-            if (!orderGroups.containsKey(it.orderMaster.id!!)) {
-                orderGroups[it.orderMaster.id] = mutableListOf<BuyerHistoryProductResponse>()
+        orderMasterGroup.forEach {
+            if (!orderMasterAndShopGroup.containsKey(it.key)) {
+                orderMasterAndShopGroup[it.key] = mutableListOf()
             }
-            orderGroups[it.orderMaster.id]!!.add(
-                BuyerHistoryProductResponse.from(
-//                    cart = it.itemCart, // 수정 필요
-                    complainStatus = it.complainStatus,
-                    orderStatusId = it.id!!
-                )
+            it.value.forEach { item ->
+                orderMasterAndShopGroup[it.key]?.add(item.value)
+            }
+
+        }
+
+
+        return orderMasters.map {
+            BuyerOrderResponse(
+                orderMasterId = it.id!!,
+                orderRegisterDate = it.regDateTime,
+                orderMasterAndShopGroup[it.id]!!
             )
         }
-
-        val buyerOrderResponse: List<BuyerOrderResponse> = orderMap.map {
-            BuyerOrderResponse.from(
-                productsOrder = it.value,
-                products = orderGroups[it.key]!!,
-            )
-        }
-
-        return buyerOrderResponse.sortedByDescending { it.orderRegisterDate }
     }
 
     @Transactional
@@ -187,7 +173,7 @@ class BuyerService(
         * */
 
         val productsOrder: OrderMaster =
-            productsOrderRepository.findByIdOrNull(orderId) ?: throw RuntimeException("수정할 주문 내역이 없습니다.")
+            orderMasterRepository.findByIdOrNull(orderId) ?: throw RuntimeException("수정할 주문 내역이 없습니다.")
 
         val orderStatuses: List<OrderDetails> =
             //TODO("수정 필요")
@@ -208,22 +194,22 @@ class BuyerService(
 
         // 위에랑 어짜피 같은 것임 지워도 되지 않을까?
         val savedOrderStatuses = orderDetailsRepository.saveAll(orderStatuses)
-        val savedProductsOrder = productsOrderRepository.save(productsOrder)
+        val savedProductsOrder = orderMasterRepository.save(productsOrder)
 
         // 수정 필요
-//        val buyerHistoryProductResponses: List<BuyerHistoryProductResponse> = savedOrderStatuses.map {
-//            BuyerHistoryProductResponse.from(
-//                cart = it.itemCart,
-//                orderPendingReason = orderPendingReason,
-//                it.id!!
-//            )
-//        }
-
-        return BuyerOrderResponse(
-            productsOrderId = savedProductsOrder.id!!,
-            orderRegisterDate = savedProductsOrder.regDateTime,
-            orderStatus = OrderStatus.PENDING,
-//            orderStatus = savedProductsOrder.statusCode,
-        )
+        // val buyerHistoryProductResponses: List<BuyerHistoryProductResponse> = savedOrderStatuses.map {
+        //     BuyerHistoryProductResponse.from(
+        //         cart = it.orderPendingReason = orderPendingReason,
+        //         it.id!!
+        //     )
+        // }
+        //
+        // return BuyerOrderResponse(
+        //     productsOrderId = savedProductsOrder.id!!,
+        //     orderRegisterDate = savedProductsOrder.regDateTime,
+        //     orderStatus = OrderStatus.PENDING,
+        //     savedOrderStatuses.map { Order }
+        // )
+        TODO()
     }
 }

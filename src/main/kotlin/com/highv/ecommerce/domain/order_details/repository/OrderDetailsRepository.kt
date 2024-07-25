@@ -6,7 +6,7 @@ interface OrderDetailsRepository {
 
     fun findAllByShopIdAndOrderMasterId(shopId: Long, productsOrderId: Long): List<OrderDetails>
 
-    fun findAllByBuyerId(id: Long): List<OrderDetails>
+    fun findAllByBuyerId(buyerId: Long): List<OrderDetails>
 
     fun save(orderStatus: OrderDetails): OrderDetails
 

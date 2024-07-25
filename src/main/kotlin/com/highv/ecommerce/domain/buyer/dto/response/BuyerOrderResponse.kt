@@ -2,23 +2,20 @@ package com.highv.ecommerce.domain.buyer.dto.response
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
-import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import java.time.LocalDateTime
 
 data class BuyerOrderResponse(
-    val productsOrderId: Long,
+    val orderMasterId: Long,
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     val orderRegisterDate: LocalDateTime,
-    val orderStatus: OrderStatus,
-//    val productsOrders: List<BuyerHistoryProductResponse> // 수정 필요
+    val orderShopDetails: List<BuyerOrderShopResponse>
 ) {
     companion object {
-        fun from(productsOrder: OrderMaster, products: List<BuyerHistoryProductResponse>): BuyerOrderResponse =
+        fun from(productsOrder: OrderMaster, orderShopDetails: List<BuyerOrderShopResponse>): BuyerOrderResponse =
             BuyerOrderResponse(
-                productsOrderId = productsOrder.id!!,
+                orderMasterId = productsOrder.id!!,
                 orderRegisterDate = productsOrder.regDateTime,
-                orderStatus = OrderStatus.ORDERED, // 수정 필요
-//                productsOrders = products // 수정 필요
+                orderShopDetails = orderShopDetails // 수정 필요
             )
     }
 }

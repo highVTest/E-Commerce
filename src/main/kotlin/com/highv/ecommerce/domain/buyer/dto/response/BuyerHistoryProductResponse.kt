@@ -1,32 +1,30 @@
 package com.highv.ecommerce.domain.buyer.dto.response
 
-import com.highv.ecommerce.domain.item_cart.entity.ItemCart
+import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 
 data class BuyerHistoryProductResponse(
-    val orderStatusId: Long,
+    val orderDetailId: Long,
     val complainStatus: ComplainStatus,
     val productName: String,
     val productPrice: Int,
     val productQuantity: Int,
     val productImageUrl: String,
-    val productTotalPrice: Int
+    // val productTotalPrice: Int
 ) {
     companion object {
         // TODO("수정 필요")
         fun from(
-//            cart: ItemCart, 수정 필요
-            complainStatus: ComplainStatus,
-            orderStatusId: Long
+            orderDetails: OrderDetails,
         ): BuyerHistoryProductResponse =
             BuyerHistoryProductResponse(
-                orderStatusId = orderStatusId,
-                productName = "productName",
-                productPrice = 1000,
-                productQuantity = 100,
-                productImageUrl = "cart.product.productImage",
-                complainStatus = complainStatus,
-                productTotalPrice = 1
+                orderDetailId = orderDetails.id!!,
+                complainStatus = orderDetails.complainStatus,
+                productName = orderDetails.product.name,
+                productPrice = orderDetails.product.productBackOffice!!.price,
+                productQuantity = orderDetails.productQuantity,
+                productImageUrl = orderDetails.product.productImage
+                // productTotalPrice = cart.product.p
             )
     }
 }
