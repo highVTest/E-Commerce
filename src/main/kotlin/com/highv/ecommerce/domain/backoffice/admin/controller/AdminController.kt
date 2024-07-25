@@ -2,6 +2,7 @@ package com.highv.ecommerce.domain.backoffice.admin.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.backoffice.admin.dto.BlackListResponse
+import com.highv.ecommerce.domain.backoffice.admin.dto.CreateBlackListRequest
 import com.highv.ecommerce.domain.backoffice.admin.service.AdminService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -41,6 +43,22 @@ class AdminController(
     //     adminService.sanctionBuyer(buyerId)
     //     return ResponseEntity.status(HttpStatus.OK).body(DefaultResponse("구매자 제재 완료"))
     // }
+
+    // 블랙리스트 생성
+    @PostMapping("/black-list")
+    @PreAuthorize("hasRole('ADMIN')")
+    fun createBlackList(@RequestBody request: CreateBlackListRequest): ResponseEntity<DefaultResponse> {
+        adminService.createBlackList(request)
+        return ResponseEntity.status(HttpStatus.CREATED).body(DefaultResponse("블랙리스트 생성 완료"))
+    }
+
+    // 블랙리스트 조회
+    @GetMapping("/black-list")
+    @PreAuthorize("hasRole('ADMIN')")
+    fun getBlackLists(): ResponseEntity<List<BlackListResponse>> {
+        val blackLists = adminService.getBlackLists()
+        return ResponseEntity.status(HttpStatus.OK).body(blackLists)
+    }
 
     // 블랙리스트 단건 조회
     @GetMapping("/black-list/{blackListId}")
