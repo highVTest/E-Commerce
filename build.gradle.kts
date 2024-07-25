@@ -39,9 +39,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security") //security 사용 가능
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+    //s3
+    implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-mail:3.3.0")
     implementation("org.redisson:redisson-spring-boot-starter:3.33.0")
+
+    implementation("org.apache.tika:tika-core:1.24")
 
 
     // 추가된 부분: JSON 웹 토큰(JWT) 관련 의존성

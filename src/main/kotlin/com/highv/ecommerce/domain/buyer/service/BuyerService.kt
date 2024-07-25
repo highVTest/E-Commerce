@@ -12,15 +12,17 @@ import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
-import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
+import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
+import com.highv.ecommerce.s3.config.S3Manager
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
 @Service
@@ -28,20 +30,25 @@ class BuyerService(
     private val buyerRepository: BuyerRepository,
     private val passwordEncoder: PasswordEncoder,
     private val orderDetailsRepository: OrderDetailsRepository,
-    private val productsOrderRepository: OrderMasterRepository
+    private val productsOrderRepository: OrderMasterRepository,
+    private val s3Manager: S3Manager
 ) {
 
-    fun signUp(request: CreateBuyerRequest): BuyerResponse {
+    @Transactional
+    fun signUp(request: CreateBuyerRequest, multipartFile: MultipartFile): BuyerResponse {
 
         if (buyerRepository.existsByEmail(request.email)) {
             throw RuntimeException("이미 존재하는 이메일입니다. 가입할 수 없습니다.")
         }
 
+
+        s3Manager.uploadFile(multipartFile) // S3Manager를 통해 파일 업로드
+
         val buyer = Buyer(
             email = request.email,
             nickname = request.nickname,
             password = passwordEncoder.encode(request.password),
-            profileImage = request.profileImage,
+            profileImage = s3Manager.getFile(multipartFile.originalFilename), // Buyer 객체에 프로필 이미지 URL 저장
             phoneNumber = request.phoneNumber,
             address = request.address,
             providerName = null,
@@ -79,10 +86,11 @@ class BuyerService(
     }
 
     @Transactional
-    fun changeProfileImage(request: UpdateBuyerImageRequest, userId: Long) {
+    fun changeProfileImage(request: UpdateBuyerImageRequest, userId: Long, multipartFile: MultipartFile) {
 
         val buyer = buyerRepository.findByIdOrNull(userId) ?: throw RuntimeException("사용자가 존재하지 않습니다.")
 
+        s3Manager.uploadFile(multipartFile)
         buyer.profileImage = request.imageUrl
 
         buyerRepository.save(buyer)

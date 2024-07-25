@@ -17,7 +17,9 @@ import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/v1/products")
-class ProductController(private val productService: ProductService) {
+class ProductController(
+    private val productService: ProductService
+) {
 
     //상품 등록
     @PostMapping
@@ -25,11 +27,11 @@ class ProductController(private val productService: ProductService) {
     fun createProduct(
         @AuthenticationPrincipal seller: UserPrincipal,
         @RequestPart productRequest: CreateProductRequest,
-        @RequestPart image : MultipartFile
+        @RequestPart (value ="file", required = false) file: MultipartFile
     ): ResponseEntity<ProductResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(productService.createProduct(seller.id, productRequest))
+            .body(productService.createProduct(seller.id, productRequest,file))
     }
 
     //상품 수정
@@ -53,7 +55,7 @@ class ProductController(private val productService: ProductService) {
         .status(HttpStatus.NO_CONTENT)
         .body(productService.deleteProduct(seller.id, productId))
 
-    //상품 상세 보기
+    //상품 상세보기
     @GetMapping("/{productId}")
     fun getProductById(
         @PathVariable("productId") productId: Long
