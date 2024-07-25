@@ -9,7 +9,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "black_list")
-class BlackList (
+class BlackList(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -18,5 +18,12 @@ class BlackList (
     val nickname: String,
 
     @Column(name = "email")
-    val email: String
+    val email: String,
+
+    @Column(name = "sanctions_count")
+    var sanctionsCount: Int = 1,
+
+    @Column(name = "is_sanctioned")
+    var isSanctioned: Boolean = false
+
 )

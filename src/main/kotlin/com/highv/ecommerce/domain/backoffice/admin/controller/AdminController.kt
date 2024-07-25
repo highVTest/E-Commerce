@@ -44,14 +44,6 @@ class AdminController(
     //     .status(HttpStatus.OK)
     //     .body(adminService.sanctionBuyer(buyerId))
 
-    // 블랙리스트 생성
-    @PostMapping("/black-list")
-    @PreAuthorize("hasRole('ADMIN')")
-    fun createBlackList(@RequestBody request: CreateBlackListRequest): ResponseEntity<DefaultResponse> =
-        ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(adminService.createBlackList(request))
-
     // 블랙리스트 조회
     @GetMapping("/black-list")
     @PreAuthorize("hasRole('ADMIN')")
