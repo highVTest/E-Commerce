@@ -2,7 +2,6 @@ package com.highv.ecommerce.domain.order_master.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
-import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
@@ -10,10 +9,8 @@ import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
-import com.highv.ecommerce.domain.order_master.dto.CouponRequest
+import com.highv.ecommerce.domain.order_master.dto.PaymentRequest
 import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
-import com.highv.ecommerce.domain.product.repository.ProductRepository
-import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,11 +26,11 @@ class OrderMasterService(
     ){
 
     @Transactional
-    fun requestPayment(buyerId: Long, couponRequest: CouponRequest, cartId: Long): DefaultResponse {
+    fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
 
-        val cart = itemCartRepository.findAllByBuyerId(buyerId)
+        val cart = itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
 
-        val couponToBuyer = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(couponRequest.couponIdList,buyerId)
+        val couponToBuyer = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(paymentRequest.couponIdList,buyerId)
 
         couponToBuyer.forEach {
             if(it.coupon.expiredAt < LocalDateTime.now()) throw RuntimeException("쿠폰 유효 시간이 만료 되었습니다")
@@ -56,7 +53,7 @@ class OrderMasterService(
                     complainStatus = ComplainStatus.NONE,
                     buyer = buyer,
                     product = it.product,
-                    orderMaster = orderMaster,
+                    orderMasterId = orderMaster.id!!,
                     productQuantity = it.quantity,
                     shopId = it.product.shop.id!!,
                     totalPrice = productPrice[it.id]!!,
@@ -66,6 +63,8 @@ class OrderMasterService(
         )
 
         couponToBuyer.map { it.useCoupon() }
+
+        itemCartRepository.deleteAll(cart)
 
         return DefaultResponse.from("주문이 완료 되었습니다, 주문 번호 : ${orderMaster.id}")
     }
