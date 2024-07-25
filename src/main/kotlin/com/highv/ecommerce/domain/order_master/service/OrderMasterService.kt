@@ -22,11 +22,13 @@ class OrderMasterService(
     private val orderDetailsRepository: OrderDetailsRepository,
     private val itemCartRepository: ItemCartRepository,
     private val buyerRepository: BuyerRepository,
-    private val couponToBuyerRepository: CouponToBuyerRepository
+    private val couponToBuyerRepository: CouponToBuyerRepository,
     ){
 
     @Transactional
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
+
+        val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw RuntimeException("구매자 정보가 존재 하지 않습니다")
 
         val cart = itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
 
@@ -36,7 +38,7 @@ class OrderMasterService(
             if(it.coupon.expiredAt < LocalDateTime.now()) throw RuntimeException("쿠폰 유효 시간이 만료 되었습니다")
         }
 
-        val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw RuntimeException("구매자 정보가 존재 하지 않습니다")
+
 
         val productPrice = orderMasterRepository.discountTotalPriceList(buyerId, couponToBuyer)
 
@@ -59,10 +61,14 @@ class OrderMasterService(
                     totalPrice = productPrice[it.id]!!,
                 )
             }
-
         )
 
         couponToBuyer.map { it.useCoupon() }
+
+        cart.forEach {
+            if(it.product.productBackOffice!!.quantity < it.quantity) throw RuntimeException("재고가 부족 합니다")
+            it.product.productBackOffice!!.quantity -= it.quantity
+        }
 
         itemCartRepository.deleteAll(cart)
 
