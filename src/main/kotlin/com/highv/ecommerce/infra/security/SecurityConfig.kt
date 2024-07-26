@@ -38,7 +38,6 @@ class SecurityConfig(
                     "/api/v1/**", // 구현 완료 후 삭제
                     "/oauth/login/**",
                     "/api/v1/emails/**",
-                    "/api/v1/admin/**"
                 ).permitAll()
                     .anyRequest().authenticated()
             }
