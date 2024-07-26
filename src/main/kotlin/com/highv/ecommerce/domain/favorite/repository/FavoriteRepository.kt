@@ -7,4 +7,6 @@ interface FavoriteRepository : JpaRepository<Favorite, Long> {
     fun findByProductIdAndBuyerId(productId: Long, id: Long): Favorite?
 
     fun findAllByBuyerId(buyerId: Long): List<Favorite>
+
+    fun countFavoriteByProductId(productId: Long): Int
 }

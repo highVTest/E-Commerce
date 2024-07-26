@@ -19,11 +19,11 @@ class FavoriteService(
     fun management(productId: Long, buyerId: Long): DefaultResponse {
 
         if (!productRepository.existsById(productId)) {
-            throw RuntimeException("Product with ID ${productId} not found")
+            throw RuntimeException("Product with ID $productId not found")
         }
 
         if (!buyerRepository.existsById(buyerId)) {
-            throw RuntimeException("Buyer with ID ${buyerId} not found")
+            throw RuntimeException("Buyer with ID $buyerId not found")
         }
 
         val existsFavorite: Favorite? = favoriteRepository.findByProductIdAndBuyerId(productId, buyerId)
@@ -33,7 +33,7 @@ class FavoriteService(
             return DefaultResponse("찜 목록에서 삭제했습니다.")
         }
 
-        val favorite: Favorite = Favorite(
+        val favorite = Favorite(
             productId = productId,
             buyerId = buyerId
         )
@@ -51,5 +51,9 @@ class FavoriteService(
 
         // return favorites.map { FavoriteResponse(it.id!!, it.productId) }
         return products.map { FavoriteResponse(it.id!!, it.name, it.productBackOffice!!.price, it.productImage) }
+    }
+
+    fun countFavorite(productId: Long): Int {
+        return favoriteRepository.countFavoriteByProductId(productId)
     }
 }
