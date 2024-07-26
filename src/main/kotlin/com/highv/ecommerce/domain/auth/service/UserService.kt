@@ -28,7 +28,7 @@ class UserService(
 
         val seller = sellerRepository.findByEmail(loginRequest.email)
         if (seller != null && passwordEncoder.matches(loginRequest.password, seller.password)) {
-            val token = jwtPlugin.generateAccessToken(seller.id.toString(), seller.email, "SELLER")
+            val token = jwtPlugin.generateAccessToken(seller.id.toString(), seller.email, "ADMIN")
             return AccessTokenResponse(token)
         }
         throw RuntimeException("판매자 로그인 실패")

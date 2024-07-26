@@ -21,7 +21,27 @@ class AdminService(
     fun sanctionSeller(sellerId: Long): DefaultResponse {
         val seller = sellerRepository.findByIdOrNull(sellerId)
             ?: throw RuntimeException("Seller id $sellerId not found")
-        blackListRepository.save(BlackList(nickname = seller.nickname, email = seller.email))
+
+        val existingBlackList = blackListRepository.findByEmail(seller.email)
+
+        if (existingBlackList != null) {
+            // 제재 횟수를 증가시킵니다.
+            existingBlackList.sanctionsCount += 1
+            // 제재 횟수가 5 이상이면 제재 상태로 설정합니다.
+            if (existingBlackList.sanctionsCount >= 5) {
+                existingBlackList.isSanctioned = true
+            }
+            blackListRepository.save(existingBlackList)
+        } else {
+            // 블랙리스트에 판매자가 없을 경우 새로운 블랙리스트 항목을 생성합니다.
+            val blackList = BlackList(
+                nickname = seller.nickname,
+                email = seller.email,
+                sanctionsCount = 1
+            )
+            blackListRepository.save(blackList)
+        }
+
         return DefaultResponse("판매자 제재 완료")
     }
 
