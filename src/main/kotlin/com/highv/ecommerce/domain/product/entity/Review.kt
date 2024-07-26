@@ -1,23 +1,32 @@
 package com.highv.ecommerce.domain.product.entity
 
+import com.highv.ecommerce.domain.buyer.entity.Buyer
 import jakarta.persistence.*
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "review")
 class Review(
-    @Column(name = "product_id")
-    val productId: Long,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    val product: Product,
 
-    @Column(name = "reviewer_name")
-    val reviewerName: String, //이메일? , 닉네임?
+    @Column(name = "buyer_id")
+    val buyerId: Long,
 
-    @Column(name = "rating")
-    val rating: Int,
+    @Column(name = "deleted_at")
+    val deletedAt: LocalDateTime? = null,
 
-    @Column(name = "comment")
-    val comment: String,
+    @Column(name = "is_deleted")
+    val isDeleted: Boolean = false,
 
-) {
+    @Column(name = "rate")
+    val rate: Float,
+
+    @Column(name = "content")
+    val content: String,
+
+    ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null

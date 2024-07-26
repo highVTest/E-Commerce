@@ -3,6 +3,7 @@ package com.highv.ecommerce.domain.product.service
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.product.dto.CreateReviewRequest
 import com.highv.ecommerce.domain.product.dto.ReviewResponse
+import com.highv.ecommerce.domain.product.entity.QReview.review
 import com.highv.ecommerce.domain.product.entity.Review
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.product.repository.ReviewRepository
@@ -18,15 +19,15 @@ class ReviewService(
     private val reviews = mutableListOf<Review>()
 
 
-    fun addReview(productId: Long, reviewRequest: CreateReviewRequest): DefaultResponse {
+    fun addReview(productId: Long, reviewRequest: CreateReviewRequest,buyerId:Long): DefaultResponse {
         val product = productRepository.findByIdOrNull(productId)
             ?: throw RuntimeException("Product id $productId not found")
 
         val review = Review(
-            productId = product.id!! ,
-            reviewerName = reviewRequest.reviewerName,
-            rating = reviewRequest.rating,
-            comment = reviewRequest.comment
+            buyerId = buyerId,
+            product = product,
+            rate = reviewRequest.rate,
+            content = reviewRequest.content
         )
 
         reviewRepository.save(review)
@@ -34,13 +35,11 @@ class ReviewService(
     }
 
     fun getReviews(productId: Long): List<ReviewResponse> {
-        return reviews.map {review ->
+        return  reviewRepository.findAllByProductId(productId).map { review ->
             ReviewResponse(
                 id = review.id!!,
-                productId = productId,
-                reviewerName = review.reviewerName,
-                rating = review.rating,
-                comment = review.comment
+                rate = review.rate,
+                content = review.content
             )
         }
     }
