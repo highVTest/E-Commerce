@@ -1,7 +1,8 @@
-package com.highv.ecommerce.domain.order_master.entity
+package com.highv.ecommerce.domain.order_master.dto
 
 import com.querydsl.core.annotations.QueryProjection
 
 data class TotalPriceDto @QueryProjection constructor(
-    var totalPrice: Int
+    val itemCartId : Long,
+    val price : Int
 )

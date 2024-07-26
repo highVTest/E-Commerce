@@ -1,5 +1,7 @@
 package com.highv.ecommerce.domain.order_details.service
 
+import com.highv.ecommerce.domain.coupon.repository.CouponRepository
+import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
@@ -14,12 +16,14 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class OrderDetailsService(
     private val orderDetailsRepository: OrderDetailsRepository,
+    private val couponToBuyerRepository: CouponToBuyerRepository,
+    private val couponRepository: CouponRepository
 ){
 
     @Transactional
     fun buyerRequestComplain(buyerOrderStatusRequest: BuyerOrderStatusRequest, buyerId: Long, shopId: Long, orderId: Long): OrderStatusResponse {
 
-        val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(buyerOrderStatusRequest.shopId, buyerId)
+        val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId,orderId, buyerId)
 
         orderDetails.map {
             it.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
@@ -74,6 +78,7 @@ class OrderDetailsService(
     fun requestComplainAccept(shopId: Long, orderId: Long, sellerOrderStatusRequest: SellerOrderStatusRequest): OrderStatusResponse {
 
         val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId, orderId, sellerOrderStatusRequest.buyerId)
+        val coupons = couponRepository.findAllByProductId(orderDetails.map { it.product.id!! })
         val complainType =
             if(orderDetails[0].complainStatus == ComplainStatus.REFUND_REQUESTED) ComplainType.REFUND
             else ComplainType.EXCHANGE
@@ -81,11 +86,16 @@ class OrderDetailsService(
             ComplainStatus.REFUND_REQUESTED -> {
                 orderDetails.map {
                     it.sellerUpdate(OrderStatus.ORDER_CANCELED, sellerOrderStatusRequest, ComplainStatus.REFUNDED)
+                    it.product.productBackOffice!!.quantity += it.productQuantity
+                    val couponToBuyerList = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons, sellerOrderStatusRequest.buyerId)
+
+                    couponToBuyerList.map { couponToBuyer -> couponToBuyer.returnCoupon() }
                 }
             }
             ComplainStatus.EXCHANGE_REQUESTED -> {
                 orderDetails.map {
                     it.sellerUpdate(OrderStatus.PRODUCT_PREPARING, sellerOrderStatusRequest, ComplainStatus.EXCHANGED)
+
                 }
             }
             else -> throw RuntimeException("구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")

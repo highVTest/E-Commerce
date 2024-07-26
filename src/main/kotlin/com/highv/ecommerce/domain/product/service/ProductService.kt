@@ -10,10 +10,13 @@ import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.shop.repository.ShopRepository
+import com.highv.ecommerce.s3.config.FileUtil
+import com.highv.ecommerce.s3.config.S3Manager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
 @Service
@@ -21,18 +24,24 @@ class ProductService(
     private val productRepository: ProductRepository,
     private val shopRepository: ShopRepository,
     private val productBackOfficeRepository: ProductBackOfficeRepository,
-    private val favoriteService: FavoriteService
+    private val favoriteService: FavoriteService,
+    private val s3Manager: S3Manager,
 ) {
     fun createProduct(
         sellerId: Long,
         productRequest: CreateProductRequest,
-        productBackOfficeRequest: ProductBackOfficeRequest
+        productBackOfficeRequest: ProductBackOfficeRequest,
+        multipartFile: MultipartFile
     ): ProductResponse {
+
+
+        s3Manager.uploadFile(multipartFile) // S3Manager를 통해 파일 업로드
+
         val shop = shopRepository.findShopBySellerId(sellerId)
         val product = Product(
             name = productRequest.name,
             description = productRequest.description,
-            productImage = productRequest.productImage,
+            productImage = s3Manager.getFile(multipartFile.originalFilename), // Buyer 객체에 프로필 이미지 URL 저장
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
             isSoldOut = false,
@@ -52,6 +61,11 @@ class ProductService(
         )
         savedProduct.productBackOffice = productBackOffice
         productBackOfficeRepository.save(productBackOffice)
+
+
+
+            productRepository.save(savedProduct)
+
         return ProductResponse.from(savedProduct)
     }
 

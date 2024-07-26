@@ -4,8 +4,6 @@ import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 
 interface OrderDetailsRepository {
 
-    fun findAllByShopIdAndOrderMasterId(shopId: Long, productsOrderId: Long): List<OrderDetails>
-
     fun findAllByBuyerId(id: Long): List<OrderDetails>
 
     fun save(orderStatus: OrderDetails): OrderDetails
@@ -19,4 +17,7 @@ interface OrderDetailsRepository {
     fun findByIdAndShopId(orderStatusId: Long, shopId: Long): OrderDetails?
 
     fun findAllByShopIdAndOrderMasterIdAndBuyerId(shopId: Long, orderId: Long, buyerId: Long): List<OrderDetails>
+
+    fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderDetails>
+
 }

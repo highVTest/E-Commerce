@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.order_master.repository
 
+import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 
 interface OrderMasterRepository {
@@ -10,5 +11,5 @@ interface OrderMasterRepository {
 
     fun save(productsOrder: OrderMaster): OrderMaster
 
-    fun discountTotalPriceList(buyerId: Long, couponIdList: List<Long>, ): Int
+    fun discountTotalPriceList(buyerId: Long, couponIdList: List<CouponToBuyer>): Map<Long, Int>
 }
