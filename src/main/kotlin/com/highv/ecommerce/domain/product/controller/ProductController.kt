@@ -40,7 +40,7 @@ class ProductController(
     ): ResponseEntity<ProductResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(productService.createProduct(seller.id, productRequest,productBackOfficeRequest, file))
+            .body(productService.createProduct(seller.id, productRequest, productBackOfficeRequest, file))
     }
 
     //상품 수정

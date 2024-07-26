@@ -1,7 +1,7 @@
 package com.highv.ecommerce.domain.item_cart.controller
 
 import com.highv.ecommerce.domain.item_cart.dto.request.SelectProductQuantity
-import com.highv.ecommerce.domain.item_cart.dto.response.ItemCartResponse
+import com.highv.ecommerce.domain.item_cart.dto.response.CartResponse
 import com.highv.ecommerce.domain.item_cart.service.ItemCartService
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
@@ -39,7 +39,7 @@ class ItemCartController(
     @GetMapping()
     fun getMyCart(
         @AuthenticationPrincipal user: UserPrincipal,
-    ): ResponseEntity<List<ItemCartResponse>> = ResponseEntity
+    ): ResponseEntity<List<CartResponse>> = ResponseEntity
         .status(HttpStatus.OK)
         .body(itemCartService.getMyCart(user.id))
 

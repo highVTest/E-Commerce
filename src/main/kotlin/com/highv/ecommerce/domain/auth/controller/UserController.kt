@@ -1,12 +1,13 @@
 package com.highv.ecommerce.domain.auth.controller
 
 import com.highv.ecommerce.common.dto.AccessTokenResponse
+import com.highv.ecommerce.domain.auth.dto.EmailAuthRequest
+import com.highv.ecommerce.domain.auth.dto.EmailAuthResponse
 import com.highv.ecommerce.domain.auth.dto.LoginRequest
-import com.highv.ecommerce.domain.auth.dto.UserRole
 import com.highv.ecommerce.domain.auth.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -26,20 +27,35 @@ class UserController(
     fun loginBuyer(@RequestBody loginRequest: LoginRequest): ResponseEntity<AccessTokenResponse> =
         ResponseEntity.ok().body(userService.loginBuyer(loginRequest))
 
-    @PostMapping("/emails/verification-request")
+    // email 컨트롤러 분리하기? 구매자, 판매자
+    @PostMapping("/email/send")
     fun sendMail(
-        @RequestParam(value = "email") email: String,
-        @RequestParam(value = "role") role: UserRole
-    ): ResponseEntity<String> = ResponseEntity
-        .status(HttpStatus.OK)
-        .body(userService.sendMail(email, role))
+        @RequestBody request: EmailAuthRequest,
+        bindingResult: BindingResult
+    ): ResponseEntity<String> {
 
-    @GetMapping("/emails/verifications")
+        if (bindingResult.hasErrors()) {
+            throw RuntimeException(bindingResult.fieldError?.defaultMessage.toString())
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(userService.sendMail(request.email, request.role))
+    }
+
+    @PostMapping("/email/confirm")
     fun verifyEmail(
-        @RequestParam(value = "email") email: String,
-        @RequestParam(value = "code") code: String,
-        @RequestParam(value = "role") role: UserRole
-    ): ResponseEntity<Boolean> = ResponseEntity
-        .status(HttpStatus.OK)
-        .body(userService.verifyCode(email, code, role))
+        @RequestBody request: EmailAuthRequest,
+        bindingResult: BindingResult,
+        @RequestParam(value = "code") code: String
+    ): ResponseEntity<EmailAuthResponse> {
+
+        if (bindingResult.hasErrors()) {
+            throw RuntimeException(bindingResult.fieldError?.defaultMessage.toString())
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(userService.verifyCode(request.email, request.role, code))
+    }
 }
