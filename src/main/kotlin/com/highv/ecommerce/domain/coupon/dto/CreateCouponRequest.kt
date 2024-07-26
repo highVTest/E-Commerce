@@ -19,10 +19,4 @@ data class CreateCouponRequest (
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     val expiredAt: LocalDateTime,
     val quantity : Int
-){
-//    fun toLocalDateTime(): LocalDateTime {
-//        val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
-//        val localDate = LocalDateTime.parse(expiredAt, formatter)
-//        return localDate.atZone(ZoneId.of("UTC")).toLocalDateTime()
-//    }
-}
+)

@@ -70,6 +70,7 @@ class BuyerService(
     }
 
     @Transactional
+
     fun changeProfileImage(userId: Long, file: MultipartFile?) {
 
         val buyer = buyerRepository.findByIdOrNull(userId) ?: throw RuntimeException("사용자가 존재하지 않습니다.")

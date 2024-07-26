@@ -7,9 +7,9 @@ import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
-import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
 import com.highv.ecommerce.domain.order_master.dto.PaymentRequest
+import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -23,33 +23,34 @@ class OrderMasterService(
     private val itemCartRepository: ItemCartRepository,
     private val buyerRepository: BuyerRepository,
     private val couponToBuyerRepository: CouponToBuyerRepository,
-    ){
+) {
 
     @Transactional
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
 
         val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw RuntimeException("구매자 정보가 존재 하지 않습니다")
 
-        val cart = itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
+        val cart = if (paymentRequest.cartIdList.isNotEmpty()) itemCartRepository.findAllByBuyerId(buyerId)
+        else
+            itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
 
-        val couponToBuyer = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(paymentRequest.couponIdList,buyerId)
+        val couponToBuyer =
+            couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(paymentRequest.couponIdList, buyerId)
 
         couponToBuyer.forEach {
-            if(it.coupon.expiredAt < LocalDateTime.now()) throw RuntimeException("쿠폰 유효 시간이 만료 되었습니다")
+            if (it.coupon.expiredAt < LocalDateTime.now()) throw RuntimeException("쿠폰 유효 시간이 만료 되었습니다")
         }
-
-
 
         val productPrice = orderMasterRepository.discountTotalPriceList(buyerId, couponToBuyer)
 
-        val orderMaster = orderMasterRepository.saveAndFlush(
+        val orderMaster = orderMasterRepository.save(
             OrderMaster(
                 regDateTime = LocalDateTime.now(),
             )
         )
 
         orderDetailsRepository.saveAll(
-            cart.map{
+            cart.map {
                 OrderDetails(
                     orderStatus = OrderStatus.ORDERED,
                     complainStatus = ComplainStatus.NONE,
@@ -66,7 +67,7 @@ class OrderMasterService(
         couponToBuyer.map { it.useCoupon() }
 
         cart.forEach {
-            if(it.product.productBackOffice!!.quantity < it.quantity) throw RuntimeException("재고가 부족 합니다")
+            if (it.product.productBackOffice!!.quantity < it.quantity) throw RuntimeException("재고가 부족 합니다")
             it.product.productBackOffice!!.quantity -= it.quantity
         }
 
@@ -74,5 +75,4 @@ class OrderMasterService(
 
         return DefaultResponse.from("주문이 완료 되었습니다, 주문 번호 : ${orderMaster.id}")
     }
-
 }
