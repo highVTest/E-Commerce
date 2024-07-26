@@ -1,7 +1,9 @@
 package com.highv.ecommerce.domain.product.service
 
+import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.ProductBackOfficeRequest
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
+import com.highv.ecommerce.domain.favorite.service.FavoriteService
 import com.highv.ecommerce.domain.product.dto.CreateProductRequest
 import com.highv.ecommerce.domain.product.dto.ProductResponse
 import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
@@ -22,13 +24,16 @@ class ProductService(
     private val productRepository: ProductRepository,
     private val shopRepository: ShopRepository,
     private val productBackOfficeRepository: ProductBackOfficeRepository,
+    private val favoriteService: FavoriteService,
     private val s3Manager: S3Manager,
 ) {
     fun createProduct(
         sellerId: Long,
         productRequest: CreateProductRequest,
+        productBackOfficeRequest: ProductBackOfficeRequest,
         multipartFile: MultipartFile
     ): ProductResponse {
+
 
         s3Manager.uploadFile(multipartFile) // S3Manager를 통해 파일 업로드
 
@@ -49,8 +54,8 @@ class ProductService(
         val savedProduct = productRepository.save(product)
 
         val productBackOffice = ProductBackOffice(
-            quantity = 0,
-            price = 0,
+            quantity = productBackOfficeRequest.quantity,
+            price = productBackOfficeRequest.price,
             soldQuantity = 0,
             product = savedProduct
         )
@@ -76,7 +81,7 @@ class ProductService(
             categoryId = updateProductRequest.categoryId
         }
         val updatedProduct = productRepository.save(product)
-        return ProductResponse.from(updatedProduct)
+        return ProductResponse.from(updatedProduct, favoriteService.countFavorite(productId))
     }
 
     fun deleteProduct(sellerId: Long, productId: Long) {
@@ -91,24 +96,16 @@ class ProductService(
 
     fun getProductById(productId: Long): ProductResponse {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
-        return ProductResponse.from(product)
+        return ProductResponse.from(product, favoriteService.countFavorite(productId))
     }
 
     fun getAllProducts(pageable: Pageable): Page<ProductResponse> {
         val products = productRepository.findAllPaginated(pageable)
-        return products.map { ProductResponse.from(it) }
+        return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
     }
 
     fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductResponse> {
         val products = productRepository.findByCategoryPaginated(categoryId, pageable)
-        return products.map { ProductResponse.from(it) }
-    }
-
-    fun searchProduct(keyword: String, pageable: Pageable): Page<ProductResponse> {
-        val products = productRepository.searchByKeywordPaginated(keyword, pageable)
-        if (products.hasContent()) {
-            return products.map { ProductResponse.from(it) }
-        }
-        return Page.empty(pageable)
+        return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
     }
 }

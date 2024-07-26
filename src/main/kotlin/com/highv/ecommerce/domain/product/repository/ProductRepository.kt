@@ -1,7 +1,8 @@
 package com.highv.ecommerce.domain.product.repository
 
+import com.highv.ecommerce.domain.backoffice.entity.QProductBackOffice.productBackOffice
 import com.highv.ecommerce.domain.product.entity.Product
-import com.highv.ecommerce.domain.product.entity.QProduct
+import com.highv.ecommerce.domain.product.entity.QProduct.product
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.data.domain.Page
@@ -14,11 +15,12 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ProductRepository : JpaRepository<Product, Long>, ProductQueryDslRepository {
     fun findAllByShopId(shopId: Long): List<Product>
-    
+
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productBackOffice WHERE p.id = :productId")
     fun findProductWithBackOfficeById(productId: Long): Product?
 }
 
+@Repository
 interface ProductQueryDslRepository {
     fun findAllPaginated(pageable: Pageable): Page<Product>
     fun findByCategoryPaginated(categoryId: Long, pageable: Pageable): Page<Product>
@@ -28,17 +30,20 @@ interface ProductQueryDslRepository {
 class ProductQueryDslRepositoryImpl(
     private val jpaQueryFactory: JPAQueryFactory
 ) : ProductQueryDslRepository {
-    private val product = QProduct.product
+
     override fun findAllPaginated(pageable: Pageable): Page<Product> {
         val totalCount = jpaQueryFactory
             .select(product.count())
             .from(product)
+            .leftJoin(product.productBackOffice(), productBackOffice)
             .fetchOne() ?: 0L
 
         val query = jpaQueryFactory
             .selectFrom(product)
+            .leftJoin(product.productBackOffice(), productBackOffice)
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
+            .orderBy(*pageable.sort.map { it.toOrderSpecifier() }.toList().toTypedArray())
 
         val results = query.fetch()
         return PageImpl(results, pageable, totalCount)
@@ -48,14 +53,17 @@ class ProductQueryDslRepositoryImpl(
         val totalCount = jpaQueryFactory
             .select(product.count())
             .from(product)
+            .leftJoin(product.productBackOffice(), productBackOffice)
             .where(product.categoryId.eq(categoryId))
             .fetchOne() ?: 0L
 
         val query = jpaQueryFactory
             .selectFrom(product)
+            .leftJoin(product.productBackOffice(), productBackOffice)
             .where(product.categoryId.eq(categoryId))
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
+            .orderBy(*pageable.sort.map { it.toOrderSpecifier() }.toList().toTypedArray())
 
         val results = query.fetch()
         return PageImpl(results, pageable, totalCount)
@@ -65,19 +73,28 @@ class ProductQueryDslRepositoryImpl(
         val totalCount = jpaQueryFactory
             .select(product.count())
             .from(product)
+            .leftJoin(product.productBackOffice(), productBackOffice)
+            .where(keywordLike(keyword))
             .fetchOne() ?: 0L
 
         val query = jpaQueryFactory
             .selectFrom(product)
+            .leftJoin(product.productBackOffice(), productBackOffice)
             .where(keywordLike(keyword))
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
+            .orderBy(*pageable.sort.map { it.toOrderSpecifier() }.toList().toTypedArray())
 
         val results = query.fetch()
         return PageImpl(results, pageable, totalCount)
     }
 
-    private fun keywordLike(keyword: String?): BooleanExpression? {
-        return if (keyword.isNullOrEmpty()) null else product.name.contains(keyword)
+    private fun keywordLike(keyword: String): BooleanExpression? {
+        return if (keyword.isNotBlank()) {
+            product.name.containsIgnoreCase(keyword)
+                .or(product.description.containsIgnoreCase(keyword))
+        } else {
+            null
+        }
     }
 }
