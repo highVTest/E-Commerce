@@ -70,7 +70,7 @@ class OrderMasterRepositoryImpl(
         return productsOrderJpaRepository.findByIdIn(ids)
     }
 
-    override fun findByIdInOrderByIdDesc(ids: List<Long>): List<OrderMaster> {
+    override fun findByIdInOrderByIdDesc(ids: Set<Long>): List<OrderMaster> {
         return orderMasterJpaRepository.findByIdInOrderByIdDesc(ids)
     }
 

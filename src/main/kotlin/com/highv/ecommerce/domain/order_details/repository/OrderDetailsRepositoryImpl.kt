@@ -17,25 +17,29 @@ class OrderDetailsRepositoryImpl(
 
     private val queryFactory = JPAQueryFactory(em)
 
-    //    private val orderStatus = QOrderStatus.orderStatus
-//    private val productsOrder = QProductsOrder.productsOrder
+    // private val orderStatus = QOrderStatus.orderStatus
+    // private val productsOrder = QProductsOrder.productsOrder
     private val cartItem = QItemCart.itemCart
     private val orderDetails = QOrderDetails.orderDetails
+
     override fun findAllByShopIdAndOrderMasterId(shopId: Long, productsOrderId: Long): List<OrderDetails> {
         TODO("Not yet implemented")
     }
 
-    // TODO("수정 필요")
     override fun findAllByBuyerId(buyerId: Long): List<OrderDetails> {
+        // 연관관계 N+1 문제 때문에 아래와 같이 fetchJoin 사용
+        val query = queryFactory
+            .select(orderDetails)
+            .from(orderDetails)
+            .innerJoin(orderDetails.product()).fetchJoin()
+            .innerJoin(orderDetails.product().productBackOffice()).fetchJoin()
+            .innerJoin(orderDetails.product().shop()).fetchJoin()
+            .innerJoin(orderDetails.buyer()).fetchJoin()
+            .where(orderDetails.buyer().id.eq(buyerId))
+            .fetch()
 
-        // val query = queryFactory
-        //     .select(orderDetails)
-        //     .from(orderDetails)
-        //     .where(orderDetails.buyer().id.eq(buyerId))
-        //     .fetch()
-        //
-        // return query
-        return orderDetailsJpaRepository.findAllByBuyerId(buyerId)
+        return query
+        // return orderDetailsJpaRepository.findAllByBuyerId(buyerId)
     }
 
     override fun save(orderStatus: OrderDetails): OrderDetails {

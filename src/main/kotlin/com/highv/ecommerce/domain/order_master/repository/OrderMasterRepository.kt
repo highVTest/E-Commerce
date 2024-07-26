@@ -13,7 +13,7 @@ interface OrderMasterRepository {
 
     fun findByIdIn(ids: List<Long>): List<OrderMaster>
 
-    fun findByIdInOrderByIdDesc(ids: List<Long>): List<OrderMaster>
+    fun findByIdInOrderByIdDesc(ids: Set<Long>): List<OrderMaster>
 
     fun discountTotalPriceList(buyerId: Long, couponIdList: List<CouponToBuyer>): Map<Long, Int>
 }

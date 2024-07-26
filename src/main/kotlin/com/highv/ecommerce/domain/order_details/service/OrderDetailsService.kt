@@ -55,7 +55,7 @@ class OrderDetailsService(
 
         val orderDetails: List<OrderDetails> = orderDetailsRepository.findAllByBuyerId(buyerId)
         val orderMasters: List<OrderMaster> =
-            orderMasterRepository.findByIdInOrderByIdDesc(orderDetails.map { it.orderMasterId })
+            orderMasterRepository.findByIdInOrderByIdDesc(orderDetails.map { it.orderMasterId }.toSet<Long>())
 
         val orderMasterGroup: MutableMap<Long, MutableMap<Long, BuyerOrderShopResponse>> = mutableMapOf()
 
