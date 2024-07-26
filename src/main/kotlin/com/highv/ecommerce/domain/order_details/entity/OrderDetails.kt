@@ -72,12 +72,13 @@ class OrderDetails(
             "EXCHANGE" -> {
                 if (this.orderStatus != OrderStatus.DELIVERED) throw RuntimeException("물건 수령 전에는 교환 요청이 어렵습니다")
                 this.complainStatus = ComplainStatus.EXCHANGE_REQUESTED
+                this.orderStatus = OrderStatus.PENDING
             }
 
             "REFUND" -> {
                 when (this.orderStatus) {
                     OrderStatus.DELIVERY_PREPARING -> throw RuntimeException("배송 준비 중에는 환불 요청이 어렵습니다")
-                    OrderStatus.SHIPPING -> throw RuntimeException("배송 중에는 환불 요청이 어렵 습니다")
+                    OrderStatus.SHIPPING -> throw RuntimeException("배송 중에는 환불 요청이 어렵습니다")
                     OrderStatus.PENDING -> throw RuntimeException("이미 환불 및 교환 요청이 접수 되었습니다")
                     else -> this.orderStatus = orderStatus
                 }
