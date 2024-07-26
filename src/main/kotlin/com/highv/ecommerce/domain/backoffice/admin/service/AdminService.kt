@@ -21,7 +21,6 @@ class AdminService(
     fun sanctionSeller(sellerId: Long): DefaultResponse {
         val seller = sellerRepository.findByIdOrNull(sellerId)
             ?: throw RuntimeException("Seller id $sellerId not found")
-        blackListRepository.save(BlackList(nickname = seller.nickname, email = seller.email))
         return DefaultResponse("판매자 제재 완료")
     }
 
