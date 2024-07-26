@@ -1,6 +1,6 @@
 package com.highv.ecommerce.domain.order_details.controller
 
-import com.highv.ecommerce.domain.buyer.dto.response.BuyerOrderResponse
+import com.highv.ecommerce.domain.order_details.dto.BuyerOrderResponse
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
@@ -37,10 +37,18 @@ class OrderDetailsController(
 
     @PreAuthorize("hasRole('BUYER')")
     @GetMapping("/buyer/order-details")
-    fun getBuyerOrderDetails(
+    fun getBuyerOrders(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<List<BuyerOrderResponse>> =
-        ResponseEntity.status(HttpStatus.OK).body(orderDetailsService.getBuyerOrderDetails(userPrincipal.id))
+        ResponseEntity.status(HttpStatus.OK).body(orderDetailsService.getBuyerOrders(userPrincipal.id))
+
+    @PreAuthorize("hasRole('BUYER')")
+    @GetMapping("/buyer/order-details/{orderId}")
+    fun getBuyerOrderDetails(
+        @PathVariable("orderId") orderId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<BuyerOrderResponse> =
+        ResponseEntity.status(HttpStatus.OK).body(orderDetailsService.getBuyerOrderDetails(userPrincipal.id, orderId))
 
     @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/seller/complain/{shopId}/{orderId}")

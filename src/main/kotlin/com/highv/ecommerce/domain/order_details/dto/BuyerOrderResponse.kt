@@ -1,4 +1,4 @@
-package com.highv.ecommerce.domain.buyer.dto.response
+package com.highv.ecommerce.domain.order_details.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster

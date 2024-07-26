@@ -1,10 +1,10 @@
-package com.highv.ecommerce.domain.buyer.dto.response
+package com.highv.ecommerce.domain.order_details.dto
 
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 
-data class BuyerHistoryProductResponse(
+data class BuyerOrderDetailProductResponse(
     val orderDetailId: Long,
     val orderStatus: OrderStatus,
     val complainStatus: ComplainStatus,
@@ -18,8 +18,8 @@ data class BuyerHistoryProductResponse(
         // TODO("수정 필요")
         fun from(
             orderDetails: OrderDetails,
-        ): BuyerHistoryProductResponse =
-            BuyerHistoryProductResponse(
+        ): BuyerOrderDetailProductResponse =
+            BuyerOrderDetailProductResponse(
                 orderDetailId = orderDetails.id!!,
                 orderStatus = orderDetails.orderStatus,
                 complainStatus = orderDetails.complainStatus,

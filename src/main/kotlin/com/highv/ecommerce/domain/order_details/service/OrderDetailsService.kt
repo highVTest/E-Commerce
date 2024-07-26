@@ -1,10 +1,10 @@
 package com.highv.ecommerce.domain.order_details.service
 
-import com.highv.ecommerce.domain.buyer.dto.response.BuyerHistoryProductResponse
-import com.highv.ecommerce.domain.buyer.dto.response.BuyerOrderResponse
-import com.highv.ecommerce.domain.buyer.dto.response.BuyerOrderShopResponse
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
+import com.highv.ecommerce.domain.order_details.dto.BuyerOrderDetailProductResponse
+import com.highv.ecommerce.domain.order_details.dto.BuyerOrderResponse
+import com.highv.ecommerce.domain.order_details.dto.BuyerOrderShopResponse
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
@@ -46,7 +46,7 @@ class OrderDetailsService(
         return OrderStatusResponse.from(buyerOrderStatusRequest.complainType, "요청 완료 되었습니다")
     }
 
-    fun getBuyerOrderDetails(buyerId: Long): List<BuyerOrderResponse> {
+    fun getBuyerOrders(buyerId: Long): List<BuyerOrderResponse> {
         /*  // 주문 내역 전체 불러오기
         * 1. oderDetails 에서 buyerId로 목록 전체 가져오기
         * 2. 가져온 주문 내역에서 주문 별로 나누고 가게별로 분리
@@ -66,7 +66,7 @@ class OrderDetailsService(
             if (!orderMasterGroup[it.orderMasterId]!!.contains(it.shopId)) {
                 orderMasterGroup[it.orderMasterId]!![it.shopId] = BuyerOrderShopResponse(it.shopId, mutableListOf())
             }
-            orderMasterGroup[it.orderMasterId]!![it.shopId]!!.productsOrders.add(BuyerHistoryProductResponse.from(it))
+            orderMasterGroup[it.orderMasterId]!![it.shopId]!!.productsOrders.add(BuyerOrderDetailProductResponse.from(it))
         }
 
         val orderMasterAndShopGroup: MutableMap<Long, MutableList<BuyerOrderShopResponse>> = mutableMapOf()
@@ -89,6 +89,39 @@ class OrderDetailsService(
                 orderMasterAndShopGroup[it.id]!!
             )
         }
+    }
+
+    fun getBuyerOrderDetails(buyerId: Long, orderId: Long): BuyerOrderResponse {
+
+        val orderMaster: OrderMaster =
+            orderMasterRepository.findByIdOrNull(orderId) ?: throw RuntimeException("주문 내역이 없습니다.")
+
+        val orderDetails: List<OrderDetails> = orderDetailsRepository.findAllByBuyerIdAndOrderMasterId(buyerId, orderId)
+
+        if (orderDetails.isEmpty()) {
+            throw RuntimeException("주문 내역이 없습니다.")
+        }
+
+        val shopGroup: MutableMap<Long, MutableList<BuyerOrderDetailProductResponse>> = mutableMapOf()
+
+        orderDetails.forEach {
+            if (!shopGroup.containsKey(it.shopId)) {
+                shopGroup[it.shopId] = mutableListOf()
+            }
+            shopGroup[it.shopId]?.add(BuyerOrderDetailProductResponse.from(it))
+        }
+
+        val orderShopDetails: MutableList<BuyerOrderShopResponse> = mutableListOf()
+
+        shopGroup.forEach {
+            orderShopDetails.add(BuyerOrderShopResponse.from(it.key, it.value))
+        }
+
+        return BuyerOrderResponse(
+            orderMasterId = orderMaster.id!!,
+            orderRegisterDate = orderMaster.regDateTime,
+            orderShopDetails = orderShopDetails
+        )
     }
 
     @Transactional

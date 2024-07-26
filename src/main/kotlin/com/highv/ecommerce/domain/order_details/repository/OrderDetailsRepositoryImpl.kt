@@ -26,6 +26,21 @@ class OrderDetailsRepositoryImpl(
         TODO("Not yet implemented")
     }
 
+    override fun findAllByBuyerIdAndOrderMasterId(buyerId: Long, orderId: Long): List<OrderDetails> {
+        val query = queryFactory
+            .select(orderDetails)
+            .from(orderDetails)
+            .innerJoin(orderDetails.product()).fetchJoin()
+            .innerJoin(orderDetails.product().productBackOffice()).fetchJoin()
+            .innerJoin(orderDetails.product().shop()).fetchJoin()
+            .innerJoin(orderDetails.buyer()).fetchJoin()
+            .where(orderDetails.buyer().id.eq(buyerId))
+            .where(orderDetails.orderMasterId.eq(orderId))
+            .fetch()
+
+        return query
+    }
+
     override fun findAllByBuyerId(buyerId: Long): List<OrderDetails> {
         // 연관관계 N+1 문제 때문에 아래와 같이 fetchJoin 사용
         val query = queryFactory
