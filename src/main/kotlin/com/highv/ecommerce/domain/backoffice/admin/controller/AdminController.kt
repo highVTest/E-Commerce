@@ -69,20 +69,22 @@ class AdminController(
             .status(HttpStatus.NO_CONTENT)
             .body(adminService.deleteBlackList(blackListId))
 
-    // 판매자 탈퇴 대기 회원 승인
-    @DeleteMapping("/seller/resign/{sellerId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    fun approveSellerResignation(@PathVariable sellerId: Long): ResponseEntity<DefaultResponse> =
-        ResponseEntity
-            .status(HttpStatus.OK)
-            .body(adminService.approveSellerResignation(sellerId))
+    /* 기능 추가할 부분이 많아서 V2에서 추가할 예정
+        // 판매자 탈퇴 대기 회원 승인
+        @DeleteMapping("/seller/resign/{sellerId}")
+        @PreAuthorize("hasRole('ADMIN')")
+        fun approveSellerResignation(@PathVariable sellerId: Long): ResponseEntity<DefaultResponse> =
+            ResponseEntity
+                .status(HttpStatus.OK)
+                .body(adminService.approveSellerResignation(sellerId))
 
-/*    // 판매자 승인 대기 회원 승격
-    //Seller Entity에 status가 없어서 주석처리
-    @PatchMapping("/seller/approval/{sellerId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    fun promotePendingSeller(@PathVariable sellerId: Long): ResponseEntity<DefaultResponse> =
-        ResponseEntity
-            .status(HttpStatus.OK)
-            .body(adminService.promotePendingSeller(sellerId))*/
+        // 판매자 승인 대기 회원 승격
+        //Seller Entity에 status가 없어서 주석처리
+        @PatchMapping("/seller/approval/{sellerId}")
+        @PreAuthorize("hasRole('ADMIN')")
+        fun promotePendingSeller(@PathVariable sellerId: Long): ResponseEntity<DefaultResponse> =
+            ResponseEntity
+                .status(HttpStatus.OK)
+                .body(adminService.promotePendingSeller(sellerId))
+        */
 }
