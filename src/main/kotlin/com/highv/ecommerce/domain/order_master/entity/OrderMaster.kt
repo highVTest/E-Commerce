@@ -11,5 +11,5 @@ class OrderMaster(
     val id : Long? = null,
 
     @Column(name = "reg_dt", nullable = false)
-    val regDateTime: LocalDateTime,
+    val regDateTime: LocalDateTime = LocalDateTime.now(),
 )

@@ -28,6 +28,8 @@ class OrderMasterService(
     @Transactional
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
 
+        if(paymentRequest.cartIdList.isEmpty()) throw RuntimeException("장바구니 에서 아이템 목록을 선택해 주세요")
+
         val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw RuntimeException("구매자 정보가 존재 하지 않습니다")
 
         val cart = itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
@@ -38,15 +40,9 @@ class OrderMasterService(
             if(it.coupon.expiredAt < LocalDateTime.now()) throw RuntimeException("쿠폰 유효 시간이 만료 되었습니다")
         }
 
-
-
         val productPrice = orderMasterRepository.discountTotalPriceList(buyerId, couponToBuyer)
 
-        val orderMaster = orderMasterRepository.saveAndFlush(
-            OrderMaster(
-                regDateTime = LocalDateTime.now(),
-            )
-        )
+        val orderMaster = orderMasterRepository.saveAndFlush(OrderMaster())
 
         orderDetailsRepository.saveAll(
             cart.map{
