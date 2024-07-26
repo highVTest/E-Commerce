@@ -26,4 +26,6 @@ class Seller(
     var phoneNumber: String,
     @Column(name = "address")
     var address: String,
+/*    @Column(name = "status")
+    var status: String,*/
 )

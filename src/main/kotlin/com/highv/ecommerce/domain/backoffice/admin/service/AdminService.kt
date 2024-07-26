@@ -109,24 +109,25 @@ class AdminService(
         blackListRepository.delete(blackList)
         return DefaultResponse("블랙리스트 삭제 완료")
     }
+    /* 기능 추가할 부분이 많아서 V2에서 추가할 예정
+        // 판매자 탈퇴 대기 회원 승인
+        @Transactional
+        fun approveSellerResignation(sellerId: Long): DefaultResponse {
+            val seller = sellerRepository.findByIdOrNull(sellerId)
+                ?: throw RuntimeException("Seller id $sellerId not found")
+            sellerRepository.delete(seller)
+            return DefaultResponse("판매자 탈퇴 승인 완료")
+        }
 
-    // 판매자 탈퇴 대기 회원 승인
-    @Transactional
-    fun approveSellerResignation(sellerId: Long): DefaultResponse {
-        val seller = sellerRepository.findByIdOrNull(sellerId)
-            ?: throw RuntimeException("Seller id $sellerId not found")
-        sellerRepository.delete(seller)
-        return DefaultResponse("판매자 탈퇴 승인 완료")
-    }
-
-    // // 판매자 승인 대기 회원 승격
-    // Seller Entity에 status가 없어서 주석처리
-    // @Transactional
-    // fun promotePendingSeller(sellerId: Long): DefaultResponse {
-    //     val seller = sellerRepository.findByIdOrNull(sellerId)
-    //         ?: throw RuntimeException("Seller id $sellerId not found")
-    //     seller.status = "APPROVED" //판매자의 상태 APPROVED로 변경한다고 가정
-    //     sellerRepository.save(seller)
-    //     return DefaultResponse("판매자 승격 완료")
-    // }
+        // 판매자 승인 대기 회원 승격
+        Seller Entity에 status가 없어서 주석처리
+        @Transactional
+        fun promotePendingSeller(sellerId: Long): DefaultResponse {
+            val seller = sellerRepository.findByIdOrNull(sellerId)
+                ?: throw RuntimeException("Seller id $sellerId not found")
+            seller.status = "APPROVED" //판매자의 상태 APPROVED로 변경한다고 가정
+            sellerRepository.save(seller)
+            return DefaultResponse("판매자 승격 완료")
+        }
+        */
 }
