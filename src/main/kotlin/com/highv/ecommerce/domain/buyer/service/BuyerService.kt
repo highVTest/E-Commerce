@@ -34,8 +34,8 @@ class BuyerService(
     private val s3Manager: S3Manager,
 ) {
 
-@Transactional
-    fun signUp(request: CreateBuyerRequest,multipartFile: MultipartFile): BuyerResponse {
+    @Transactional
+    fun signUp(request: CreateBuyerRequest, multipartFile: MultipartFile): BuyerResponse {
 
         if (buyerRepository.existsByEmail(request.email)) {
             throw RuntimeException("이미 존재하는 이메일입니다. 가입할 수 없습니다.")
@@ -54,7 +54,6 @@ class BuyerService(
             providerName = null,
             providerId = null
         )
-
 
         val savedBuyer = buyerRepository.save(buyer)
 
@@ -87,7 +86,7 @@ class BuyerService(
     }
 
     @Transactional
-    fun changeProfileImage(request: UpdateBuyerImageRequest, userId: Long,multipartFile: MultipartFile) {
+    fun changeProfileImage(request: UpdateBuyerImageRequest, userId: Long, multipartFile: MultipartFile) {
 
         val buyer = buyerRepository.findByIdOrNull(userId) ?: throw RuntimeException("사용자가 존재하지 않습니다.")
 

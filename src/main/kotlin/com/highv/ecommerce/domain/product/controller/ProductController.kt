@@ -36,7 +36,7 @@ class ProductController(
         @AuthenticationPrincipal seller: UserPrincipal,
         @RequestPart productRequest: CreateProductRequest,
         @RequestPart productBackOfficeRequest: ProductBackOfficeRequest,
-        @RequestPart (value ="file", required = false) file: MultipartFile
+        @RequestPart(value = "file", required = false) file: MultipartFile
     ): ResponseEntity<ProductResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
