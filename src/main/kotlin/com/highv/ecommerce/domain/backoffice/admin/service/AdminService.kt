@@ -91,7 +91,7 @@ class AdminService(
     // 블랙리스트 조회 로직 구현
     fun getBlackLists(): List<BlackListResponse> {
         return blackListRepository.findAll().map {
-            BlackListResponse(it.nickname, it.email)
+            BlackListResponse(it.nickname, it.email,it.sanctionsCount,it.isSanctioned)
         }
     }
 
@@ -99,7 +99,7 @@ class AdminService(
     fun getBlackList(blackListId: Long): BlackListResponse {
         val blackList = blackListRepository.findByIdOrNull(blackListId)
             ?: throw RuntimeException("BlackList not found")
-        return BlackListResponse(blackList.nickname, blackList.email)
+        return BlackListResponse(blackList.nickname, blackList.email,blackList.sanctionsCount,blackList.isSanctioned)
     }
 
     // 블랙리스트 삭제 로직 구현
