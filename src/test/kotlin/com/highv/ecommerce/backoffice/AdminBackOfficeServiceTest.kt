@@ -21,17 +21,23 @@ import org.springframework.data.repository.findByIdOrNull
 
 class AdminBackOfficeServiceTest : BehaviorSpec({
 
+    // 필요한 리포지토리들을 Mock 객체로 생성합니다.
     val sellerRepository: SellerRepository = mockk()
     val productRepository: ProductRepository = mockk()
     val blackListRepository: BlackListRepository = mockk()
+
+    // AdminService 객체를 생성합니다.
     val adminService = AdminService(sellerRepository, productRepository, blackListRepository)
 
+    // 각 테스트 후 모든 Mock 객체들을 초기화합니다.
     afterEach {
         clearAllMocks()
     }
 
+    // 판매자 제재 관련 테스트
     Given("관리자가 판매자를 제재할 때") {
         val sellerId = 1L
+        // 판매자 객체를 생성합니다.
         val seller = Seller(
             id = sellerId,
             email = "seller@test.com",
@@ -41,18 +47,22 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             phoneNumber = "010-1234-5678",
             address = "서울시 용산구"
         )
+        // BlackList 객체를 캡처하기 위해 슬롯을 사용합니다.
         val blackListSlot = slot<BlackList>()
+        // 블랙리스트 객체를 생성합니다.
         val blackList = BlackList(
             nickname = seller.nickname,
             email = seller.email,
             sanctionsCount = 1
         )
 
+        // 판매자가 존재하고 블랙리스트에 없을 때
         When("판매자가 존재하고 블랙리스트에 없으면") {
             every { sellerRepository.findByIdOrNull(sellerId) } returns seller
             every { blackListRepository.findByEmail(seller.email) } returns null
             every { blackListRepository.save(capture(blackListSlot)) } returns blackList
 
+            // 블랙리스트에 추가하는 테스트
             Then("블랙리스트에 추가된다") {
                 val response = adminService.sanctionSeller(sellerId)
                 response.msg shouldBe "판매자 제재 완료"
@@ -63,6 +73,7 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             }
         }
 
+        // 판매자가 존재하고 블랙리스트에 이미 있을 때
         When("판매자가 존재하고 블랙리스트에 이미 있으면") {
             val existingBlackList = BlackList(
                 nickname = seller.nickname,
@@ -74,6 +85,7 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             every { blackListRepository.findByEmail(seller.email) } returns existingBlackList
             every { blackListRepository.save(existingBlackList) } returns existingBlackList
 
+            // 블랙리스트의 제재 횟수를 증가시키는 테스트
             Then("블랙리스트의 제재 횟수가 증가한다") {
                 val response = adminService.sanctionSeller(sellerId)
                 response.msg shouldBe "판매자 제재 완료"
@@ -83,9 +95,11 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
         }
     }
 
+    // 상품 제재 관련 테스트
     Given("관리자가 상품을 제재할 때") {
         val productId = 1L
         val sellerId = 2L
+        // 판매자 객체를 생성합니다.
         val seller = Seller(
             email = "seller@test.com",
             nickname = "TestSeller",
@@ -94,6 +108,7 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             phoneNumber = "010-1234-5678",
             address = "서울시 용산구"
         )
+        // 상품 객체를 생성합니다.
         val product = Product(
             name = "TestProduct",
             description = "Description",
@@ -118,12 +133,14 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             sanctionsCount = 1
         )
 
+        // 상품과 판매자가 존재하고 블랙리스트에 없을 때
         When("상품과 판매자가 존재하고 블랙리스트에 없으면") {
             every { productRepository.findByIdOrNull(productId) } returns product
             every { sellerRepository.findByIdOrNull(sellerId) } returns seller
             every { blackListRepository.findByEmail(seller.email) } returns null
             every { blackListRepository.save(capture(blackListSlot)) } returns blackList
 
+            // 블랙리스트에 추가하는 테스트
             Then("블랙리스트에 추가된다") {
                 val response = adminService.sanctionProduct(productId)
                 response.msg shouldBe "상품 제재 완료"
@@ -134,6 +151,7 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             }
         }
 
+        // 상품과 판매자가 존재하고 블랙리스트에 이미 있을 때
         When("상품과 판매자가 존재하고 블랙리스트에 이미 있으면") {
             val existingBlackList = BlackList(
                 nickname = seller.nickname,
@@ -146,6 +164,7 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             every { blackListRepository.findByEmail(seller.email) } returns existingBlackList
             every { blackListRepository.save(existingBlackList) } returns existingBlackList
 
+            // 블랙리스트의 제재 횟수를 증가시키는 테스트
             Then("블랙리스트의 제재 횟수가 증가한다") {
                 val response = adminService.sanctionProduct(productId)
                 response.msg shouldBe "상품 제재 완료"
@@ -156,7 +175,9 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
         }
     }
 
+    // 블랙리스트 조회 관련 테스트
     Given("관리자가 블랙리스트를 조회할 때") {
+        // 블랙리스트가 존재할 때
         When("블랙리스트가 존재하면") {
             val blackLists = listOf(
                 BlackList(nickname = "nickname1", email = "email1", sanctionsCount = 1, isSanctioned = true),
@@ -164,6 +185,7 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             )
             every { blackListRepository.findAll() } returns blackLists
 
+            // 블랙리스트 목록을 반환하는 테스트
             Then("블랙리스트 목록을 반환한다") {
                 val response = adminService.getBlackLists()
                 response.size shouldBe 2
@@ -173,13 +195,16 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
         }
     }
 
+    // 특정 블랙리스트 항목 조회 관련 테스트
     Given("관리자가 특정 블랙리스트를 조회할 때") {
         val blackListId = 1L
 
+        // 블랙리스트 항목이 존재할 때
         When("블랙리스트 항목이 존재하면") {
             val blackList = BlackList(nickname = "nickname", email = "email", sanctionsCount = 3, isSanctioned = true)
             every { blackListRepository.findByIdOrNull(blackListId) } returns blackList
 
+            // 블랙리스트 항목을 반환하는 테스트
             Then("블랙리스트 항목을 반환한다") {
                 val response = adminService.getBlackList(blackListId)
                 response.email shouldBe "email"
@@ -188,9 +213,11 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
         }
     }
 
+    // 블랙리스트 항목 삭제 관련 테스트
     Given("관리자가 블랙리스트 항목을 삭제할 때") {
         val blackListId = 1L
 
+        // 블랙리스트 항목이 존재할 때
         When("블랙리스트 항목이 존재하면") {
             val blackList = BlackList(
                 id = blackListId,
@@ -202,6 +229,7 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             every { blackListRepository.findByIdOrNull(blackListId) } returns blackList
             every { blackListRepository.delete(blackList) } returns Unit
 
+            // 블랙리스트 항목을 삭제하는 테스트
             Then("블랙리스트 항목을 삭제하고 응답을 반환한다") {
                 val response = adminService.deleteBlackList(blackListId)
                 response.msg shouldBe "블랙리스트 삭제 완료"
