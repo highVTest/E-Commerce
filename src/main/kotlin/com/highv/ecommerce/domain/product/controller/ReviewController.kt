@@ -3,6 +3,7 @@ package com.highv.ecommerce.domain.product.controller
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.product.dto.CreateReviewRequest
 import com.highv.ecommerce.domain.product.dto.ReviewResponse
+import com.highv.ecommerce.domain.product.dto.UpdateReviewRequest
 import com.highv.ecommerce.domain.product.service.ReviewService
 import com.highv.ecommerce.infra.security.UserPrincipal
 import jakarta.persistence.Id
@@ -37,6 +38,29 @@ class ReviewController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(reviewService.getReviews(productId))
+    }
+
+    @PatchMapping("/{productId}")
+    @PreAuthorize("hasRole('BUYER')")
+    fun updateReview(
+        @PathVariable productId: Long,
+        @RequestBody reviewRequest: UpdateReviewRequest,
+        @AuthenticationPrincipal buyerId: UserPrincipal
+    ): ResponseEntity<DefaultResponse> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(reviewService.updateReview(productId, reviewRequest, buyerId.id))
+    }
+
+    @DeleteMapping("/{productId}")
+    @PreAuthorize("hasRole('BUYER')")
+    fun deleteReview(
+        @PathVariable productId: Long,
+        @AuthenticationPrincipal buyerId: UserPrincipal
+    ): ResponseEntity<Unit> {
+        return ResponseEntity
+            .status(HttpStatus.NO_CONTENT)
+            .body(reviewService.deleteReview(productId, buyerId.id))
     }
 }
 

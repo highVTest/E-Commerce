@@ -3,6 +3,7 @@ package com.highv.ecommerce.domain.product.service
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.product.dto.CreateReviewRequest
 import com.highv.ecommerce.domain.product.dto.ReviewResponse
+import com.highv.ecommerce.domain.product.dto.UpdateReviewRequest
 import com.highv.ecommerce.domain.product.entity.QReview.review
 import com.highv.ecommerce.domain.product.entity.Review
 import com.highv.ecommerce.domain.product.repository.ProductRepository
@@ -43,4 +44,27 @@ class ReviewService(
             )
         }
     }
+
+    fun updateReview(productId: Long, reviewRequest: UpdateReviewRequest,buyerId: Long): DefaultResponse {
+        val product = productRepository.findByIdOrNull(productId)
+        ?: throw RuntimeException("Product id $productId not found")
+
+        val review = Review(
+            buyerId = buyerId,
+            product = product,
+            rate = reviewRequest.rate,
+            content = reviewRequest.content
+        )
+
+        reviewRepository.save(review)
+        return DefaultResponse("Review updated successfully")
+    }
+
+    fun deleteReview(productId: Long, reviewId: Long) {
+        productRepository.findByIdOrNull(productId)
+            ?: throw RuntimeException("Product id $productId not found")
+
+        reviews.removeIf { it.id == reviewId }
+    }
+
 }
