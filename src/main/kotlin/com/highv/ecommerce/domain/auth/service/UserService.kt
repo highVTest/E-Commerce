@@ -1,9 +1,12 @@
 package com.highv.ecommerce.domain.auth.service
 
 import com.highv.ecommerce.common.dto.AccessTokenResponse
+import com.highv.ecommerce.domain.auth.dto.EmailAuthResponse
 import com.highv.ecommerce.domain.auth.dto.LoginRequest
 import com.highv.ecommerce.domain.auth.dto.UserRole
+import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
+import com.highv.ecommerce.domain.seller.entity.Seller
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.infra.email.EmailUtils
 import com.highv.ecommerce.infra.redis.RedisUtils
@@ -28,7 +31,7 @@ class UserService(
 
         val seller = sellerRepository.findByEmail(loginRequest.email)
         if (seller != null && passwordEncoder.matches(loginRequest.password, seller.password)) {
-            val token = jwtPlugin.generateAccessToken(seller.id.toString(), seller.email, "ADMIN")
+            val token = jwtPlugin.generateAccessToken(seller.id.toString(), seller.email, "SELLER")
             return AccessTokenResponse(token)
         }
         throw RuntimeException("판매자 로그인 실패")
@@ -61,12 +64,10 @@ class UserService(
             expiredTimeMillis = expirationMillis
         )
 
-        return authCode
+        return authCode // TODO: 배포때는 인증번호 반환 X
     }
 
-    fun verifyCode(email: String, code: String, role: UserRole): Boolean {
-
-        // email이랑 code가 공백인 경우 추후 예외처리
+    fun verifyCode(email: String, role: UserRole, code: String): EmailAuthResponse {
 
         if (duplicateEmail(email, role)) {
             throw RuntimeException("이미 존재하는 이메일입니다.")
@@ -77,9 +78,50 @@ class UserService(
 
         if (authCodeIsTrue) {
             redisUtils.deleteStringData("${AUTH_CODE_PREFIX}${email}")
+
+            return createUser(email, role)
         }
 
-        return authCodeIsTrue
+
+
+        return EmailAuthResponse(
+            id = -1,
+            isApproved = false,
+            role = role,
+        )
+    }
+
+    private fun createUser(email: String, role: UserRole): EmailAuthResponse {
+        val userId: Long
+        if (role == UserRole.BUYER) {
+            val buyer = Buyer(
+                nickname = "",
+                password = "",
+                email = email,
+                profileImage = "",
+                phoneNumber = "",
+                address = ""
+            )
+
+            userId = buyerRepository.saveAndFlush(buyer).id!!
+        } else {
+            val seller = Seller(
+                nickname = "",
+                password = "",
+                email = email,
+                profileImage = "",
+                phoneNumber = "",
+                address = ""
+            )
+
+            userId = sellerRepository.saveAndFlush(seller).id!!
+        }
+
+        return EmailAuthResponse(
+            id = userId,
+            isApproved = true,
+            role = role
+        )
     }
 
     private fun createCode(): String {

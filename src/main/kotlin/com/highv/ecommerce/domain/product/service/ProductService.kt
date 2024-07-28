@@ -26,13 +26,13 @@ class ProductService(
     private val favoriteService: FavoriteService,
     private val s3Manager: S3Manager,
 ) {
+
     fun createProduct(
         sellerId: Long,
         productRequest: CreateProductRequest,
         productBackOfficeRequest: ProductBackOfficeRequest,
         multipartFile: MultipartFile
     ): ProductResponse {
-
 
         s3Manager.uploadFile(multipartFile) // S3Manager를 통해 파일 업로드
 
@@ -58,12 +58,11 @@ class ProductService(
             soldQuantity = 0,
             product = savedProduct
         )
+
         savedProduct.productBackOffice = productBackOffice
         productBackOfficeRepository.save(productBackOffice)
 
-
-
-            productRepository.save(savedProduct)
+        productRepository.save(savedProduct)
 
         return ProductResponse.from(savedProduct)
     }
