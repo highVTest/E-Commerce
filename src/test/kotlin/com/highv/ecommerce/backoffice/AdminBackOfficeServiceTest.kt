@@ -1,12 +1,14 @@
 package com.highv.ecommerce.backoffice
 
 import com.highv.ecommerce.domain.backoffice.admin.entity.BlackList
+import com.highv.ecommerce.domain.backoffice.admin.entity.QBlackList.blackList
 import com.highv.ecommerce.domain.backoffice.admin.repository.BlackListRepository
 import com.highv.ecommerce.domain.backoffice.admin.service.AdminService
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.entity.Seller
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
+import com.highv.ecommerce.domain.shop.entity.Shop
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
@@ -40,11 +42,16 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             address = "서울시 용산구"
         )
         val blackListSlot = slot<BlackList>()
+        val blackList = BlackList(
+            nickname = seller.nickname,
+            email = seller.email,
+            sanctionsCount = 1
+        )
 
         When("판매자가 존재하고 블랙리스트에 없으면") {
             every { sellerRepository.findByIdOrNull(sellerId) } returns seller
             every { blackListRepository.findByEmail(seller.email) } returns null
-            every { blackListRepository.save(capture(blackListSlot)) } returns blackListSlot.captured
+            every { blackListRepository.save(capture(blackListSlot)) } returns blackList
 
             Then("블랙리스트에 추가된다") {
                 val response = adminService.sanctionSeller(sellerId)
@@ -95,17 +102,27 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             updatedAt = LocalDateTime.now(),
             isSoldOut = false,
             categoryId = 1L,
-            shop = mockk {
-                every { this@mockk.sellerId } returns sellerId
-            }
+            shop = Shop(
+                sellerId = sellerId,
+                name = "testShop",
+                description = "testShopDescription",
+                shopImage = "testShopImage",
+                rate = 0.5f
+            ).apply { id = 1L }
         )
         val blackListSlot = slot<BlackList>()
+
+        val blackList = BlackList(
+            nickname = seller.nickname,
+            email = seller.email,
+            sanctionsCount = 1
+        )
 
         When("상품과 판매자가 존재하고 블랙리스트에 없으면") {
             every { productRepository.findByIdOrNull(productId) } returns product
             every { sellerRepository.findByIdOrNull(sellerId) } returns seller
             every { blackListRepository.findByEmail(seller.email) } returns null
-            every { blackListRepository.save(capture(blackListSlot)) } returns blackListSlot.captured
+            every { blackListRepository.save(capture(blackListSlot)) } returns blackList
 
             Then("블랙리스트에 추가된다") {
                 val response = adminService.sanctionProduct(productId)
