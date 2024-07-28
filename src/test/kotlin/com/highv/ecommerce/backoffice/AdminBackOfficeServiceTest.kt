@@ -9,6 +9,7 @@ import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.entity.Seller
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.domain.shop.entity.Shop
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
@@ -211,6 +212,18 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
                 response.sanctionsCount shouldBe 3
             }
         }
+        // 블랙리스트 항목이 존재하지 않을 때
+        When("블랙리스트 항목이 존재하지 않으면") {
+            every { blackListRepository.findByIdOrNull(blackListId) } returns null
+
+            // 예외를 발생시키는 테스트
+            Then("예외를 발생시킨다") {
+                val exception = shouldThrow<RuntimeException> {
+                    adminService.getBlackList(blackListId)
+                }
+                exception.message shouldBe "블랙리스트가 존재하지 않습니다."
+            }
+        }
     }
 
     // 블랙리스트 항목 삭제 관련 테스트
@@ -234,6 +247,18 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
                 val response = adminService.deleteBlackList(blackListId)
                 response.msg shouldBe "블랙리스트 삭제 완료"
                 verify { blackListRepository.delete(blackList) }
+            }
+        }
+        // 블랙리스트 항목이 존재하지 않을 때
+        When("블랙리스트 항목이 존재하지 않으면") {
+            every { blackListRepository.findByIdOrNull(blackListId) } returns null
+
+            // 예외를 발생시키는 테스트
+            Then("예외를 발생시킨다") {
+                val exception = shouldThrow<RuntimeException> {
+                    adminService.deleteBlackList(blackListId)
+                }
+                exception.message shouldBe "블랙리스트 id $blackListId 존재하지 않습니다."
             }
         }
     }

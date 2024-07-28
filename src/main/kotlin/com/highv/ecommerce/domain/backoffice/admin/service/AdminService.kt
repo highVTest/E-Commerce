@@ -98,14 +98,14 @@ class AdminService(
     // 블랙리스트 단건 조회 로직 구현
     fun getBlackList(blackListId: Long): BlackListResponse {
         val blackList = blackListRepository.findByIdOrNull(blackListId)
-            ?: throw RuntimeException("BlackList not found")
+            ?: throw RuntimeException("블랙리스트가 존재하지 않습니다.")
         return BlackListResponse(blackList.nickname, blackList.email,blackList.sanctionsCount,blackList.isSanctioned)
     }
 
     // 블랙리스트 삭제 로직 구현
     fun deleteBlackList(blackListId: Long): DefaultResponse {
         val blackList = blackListRepository.findByIdOrNull(blackListId)
-            ?: throw RuntimeException("BlackList id $blackListId not found")
+            ?: throw RuntimeException("블랙리스트 id $blackListId 존재하지 않습니다.")
         blackListRepository.delete(blackList)
         return DefaultResponse("블랙리스트 삭제 완료")
     }
