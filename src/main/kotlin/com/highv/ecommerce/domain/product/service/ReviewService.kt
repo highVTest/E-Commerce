@@ -17,7 +17,6 @@ class ReviewService(
     private val productRepository: ProductRepository,
 
     ) {
-    private val reviews = mutableListOf<Review>()
 
 
     fun addReview(productId: Long, reviewRequest: CreateReviewRequest,buyerId:Long): DefaultResponse {
@@ -46,25 +45,27 @@ class ReviewService(
     }
 
     fun updateReview(productId: Long, reviewRequest: UpdateReviewRequest,buyerId: Long): DefaultResponse {
-        val product = productRepository.findByIdOrNull(productId)
-        ?: throw RuntimeException("Product id $productId not found")
+        val review = reviewRepository.findByProductIdAndBuyerId(productId, buyerId)
+            ?: throw RuntimeException("Review not found for this product and buyer")
 
-        val review = Review(
-            buyerId = buyerId,
-            product = product,
-            rate = reviewRequest.rate,
+        review.apply {
+           rate = reviewRequest.rate
             content = reviewRequest.content
-        )
+        }
 
         reviewRepository.save(review)
         return DefaultResponse("Review updated successfully")
-    }
 
-    fun deleteReview(productId: Long, reviewId: Long) {
+        }
+
+
+    fun deleteReview(productId: Long, reviewId: Long): DefaultResponse {
         productRepository.findByIdOrNull(productId)
             ?: throw RuntimeException("Product id $productId not found")
 
-        reviews.removeIf { it.id == reviewId }
+        reviewRepository.deleteById(reviewId)
+        return DefaultResponse("Review deleted successfully")
+
     }
 
 }

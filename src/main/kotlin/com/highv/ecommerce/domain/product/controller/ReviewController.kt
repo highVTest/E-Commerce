@@ -57,7 +57,7 @@ class ReviewController(
     fun deleteReview(
         @PathVariable productId: Long,
         @AuthenticationPrincipal buyerId: UserPrincipal
-    ): ResponseEntity<Unit> {
+    ): ResponseEntity<DefaultResponse> {
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
             .body(reviewService.deleteReview(productId, buyerId.id))

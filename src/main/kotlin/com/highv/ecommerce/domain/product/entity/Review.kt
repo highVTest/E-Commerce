@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.product.entity
 
 import com.highv.ecommerce.domain.buyer.entity.Buyer
+import com.highv.ecommerce.domain.product.dto.ReviewResponse
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -21,14 +22,15 @@ class Review(
     val isDeleted: Boolean = false,
 
     @Column(name = "rate")
-    val rate: Float,
+    var rate: Float,
 
     @Column(name = "content")
-    val content: String,
+    var content: String,
 
     ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
+
 
 }
