@@ -1,11 +1,10 @@
 package com.highv.ecommerce.domain.product.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.product.dto.CreateReviewRequest
 import com.highv.ecommerce.domain.product.dto.ReviewResponse
 import com.highv.ecommerce.domain.product.dto.UpdateReviewRequest
-import com.highv.ecommerce.domain.product.entity.QReview.review
+
 import com.highv.ecommerce.domain.product.entity.Review
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.product.repository.ReviewRepository
@@ -79,7 +78,7 @@ class ReviewService(
     }
 
     fun getBuyerReviews(buyerId: Long): List<ReviewResponse> {
-        val reviews = reviewRepository.findByBuyerId(buyerId)
+        val reviews = reviewRepository.findAllByBuyerId(buyerId)
 
         return reviews.map { review ->
             ReviewResponse(
