@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.*
 
 
 @RestController
-@RequestMapping("/api/v1/product/reviews")
+@RequestMapping("/api/v1/reviews")
 class ReviewController(
     private val reviewService: ReviewService
 ) {
-    @PostMapping("/{productId}")
+    @PostMapping("/{productId}") //현재는 reviewId사용중
     @PreAuthorize("hasRole('BUYER')")
     fun addReview(
-        @PathVariable productId: Long,
+        @PathVariable productId: Long, //현재는 reviewId사용중
         @RequestBody reviewRequest: CreateReviewRequest,
         @AuthenticationPrincipal buyerId: UserPrincipal
     ): ResponseEntity<DefaultResponse> {
@@ -31,9 +31,9 @@ class ReviewController(
             .body(reviewService.addReview(productId, reviewRequest, buyerId.id))
     }
 
-    @GetMapping("/{productId}")
+    @GetMapping()
     fun getReviews(
-        @PathVariable productId: Long
+        @RequestParam productId: Long,
     ): ResponseEntity<List<ReviewResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -43,7 +43,7 @@ class ReviewController(
     @PatchMapping("/{productId}")
     @PreAuthorize("hasRole('BUYER')")
     fun updateReview(
-        @PathVariable productId: Long,
+        @PathVariable productId: Long, //현재는 reviewId사용중
         @RequestBody reviewRequest: UpdateReviewRequest,
         @AuthenticationPrincipal buyerId: UserPrincipal
     ): ResponseEntity<DefaultResponse> {
@@ -55,12 +55,23 @@ class ReviewController(
     @DeleteMapping("/{productId}")
     @PreAuthorize("hasRole('BUYER')")
     fun deleteReview(
-        @PathVariable productId: Long,
+        @PathVariable productId: Long, //현재는 reviewId사용중
         @AuthenticationPrincipal buyerId: UserPrincipal
     ): ResponseEntity<DefaultResponse> {
         return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
+            .status(HttpStatus.OK)
             .body(reviewService.deleteReview(productId, buyerId.id))
     }
+
+    @GetMapping("/buyer")
+    @PreAuthorize("hasRole('BUYER')")
+    fun getBuyerReviews(
+        @AuthenticationPrincipal buyerId: UserPrincipal
+    ): ResponseEntity<List<ReviewResponse>> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(reviewService.getBuyerReviews(buyerId.id))
+    }
+
 }
 
