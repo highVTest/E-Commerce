@@ -226,33 +226,38 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
         }
     }
 
-    // 블랙리스트 항목 삭제 관련 테스트
-    Given("관리자가 블랙리스트 항목을 삭제할 때") {
+// 블랙리스트 항목 삭제 관련 테스트
+    Given("블랙리스트 항목이 존재해서") {
         val blackListId = 1L
 
-        // 블랙리스트 항목이 존재할 때
-        When("블랙리스트 항목이 존재하면") {
-            val blackList = BlackList(
-                id = blackListId,
-                nickname = "nickname",
-                email = "email",
-                sanctionsCount = 3,
-                isSanctioned = true
-            )
-            every { blackListRepository.findByIdOrNull(blackListId) } returns blackList
+        // 블랙리스트 항목 객체를 생성합니다.
+        val blackList = BlackList(
+            id = blackListId,
+            nickname = "nickname",
+            email = "email",
+            sanctionsCount = 3,
+            isSanctioned = true
+        )
+        every { blackListRepository.findByIdOrNull(blackListId) } returns blackList
+
+        When("관리자가 블랙리스트 항목을 삭제하면") {
             every { blackListRepository.delete(blackList) } returns Unit
 
-            // 블랙리스트 항목을 삭제하는 테스트
             Then("블랙리스트 항목을 삭제하고 응답을 반환한다") {
                 val response = adminService.deleteBlackList(blackListId)
                 response.msg shouldBe "블랙리스트 삭제 완료"
                 verify { blackListRepository.delete(blackList) }
             }
         }
-        // 블랙리스트 항목이 존재하지 않을 때
-        When("블랙리스트 항목이 존재하지 않으면") {
-            every { blackListRepository.findByIdOrNull(blackListId) } returns null
+    }
 
+// 블랙리스트 항목이 존재하지 않을 때
+    Given("블랙리스트 항목이 존재하지 않아서") {
+        val blackListId = 1L
+
+        every { blackListRepository.findByIdOrNull(blackListId) } returns null
+
+        When("관리자가 블랙리스트 항목을 삭제하면") {
             // 예외를 발생시키는 테스트
             Then("예외를 발생시킨다") {
                 val exception = shouldThrow<RuntimeException> {
