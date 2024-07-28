@@ -175,7 +175,7 @@ class BuyerServiceTest : DescribeSpec({
             )
 
             every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
-            every { s3Manager.uploadFile(any()) } returns "lemon.jpg"
+            every { s3Manager.uploadFile(any()) } returns Unit
             every { s3Manager.getFile(any()) } returns "lemon.jpg"
             every { buyerRepository.save(any()) } returns buyer
 
@@ -203,7 +203,7 @@ class BuyerServiceTest : DescribeSpec({
             )
 
             every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
-            every { s3Manager.uploadFile(any()) } returns "lemon.jpg"
+            every { s3Manager.uploadFile(any()) } returns Unit
             every { s3Manager.getFile(any()) } returns "lemon.jpg"
             every { buyerRepository.save(any()) } returns buyer
 
