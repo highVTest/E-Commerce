@@ -46,7 +46,7 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             password = "password",
             profileImage = "profileImage",
             phoneNumber = "010-1234-5678",
-            address = "서울시 용산구"
+            address = "광주광역시 서구"
         )
         // BlackList 객체를 캡처하기 위해 슬롯을 사용합니다.
         val blackListSlot = slot<BlackList>()
@@ -107,15 +107,17 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             password = "password",
             profileImage = "profileImage",
             phoneNumber = "010-1234-5678",
-            address = "서울시 용산구"
+            address = "광주광역시 서구"
         )
         // 상품 객체를 생성합니다.
+        val specificDate = LocalDateTime.of(1995, 4, 29, 0, 0)
+
         val product = Product(
             name = "TestProduct",
             description = "Description",
             productImage = "image",
-            createdAt = LocalDateTime.now(),
-            updatedAt = LocalDateTime.now(),
+            createdAt = specificDate,
+            updatedAt = specificDate,
             isSoldOut = false,
             categoryId = 1L,
             shop = Shop(
