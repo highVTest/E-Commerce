@@ -32,9 +32,7 @@ class OrderMasterService(
 
         val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw RuntimeException("구매자 정보가 존재 하지 않습니다")
 
-        val cart = if (paymentRequest.cartIdList.isNotEmpty()) itemCartRepository.findAllByBuyerId(buyerId)
-        else
-            itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
+        val cart = itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
 
         val couponToBuyer =
             couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(paymentRequest.couponIdList, buyerId)
