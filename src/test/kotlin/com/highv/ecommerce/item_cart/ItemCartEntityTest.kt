@@ -75,20 +75,21 @@ class ItemCartEntityTest : AnnotationSpec() {
             product = product,
             shopId = 1L,
             quantity = 1,
-            buyerId = 1L
+            buyerId = 1L,
         ).apply { id = 1L }
 
         cart.updateQuantity(6)
     }
 
-    companion object{
+    companion object {
         private val shop = Shop(
             sellerId = 1L,
             name = "testName",
             description = "testDescription",
             shopImage = "testImage",
             rate = 1f
-        )
+        ).apply { id = 1L }
+
         private val product = Product(
             name = "productName",
             description = "productDescription",

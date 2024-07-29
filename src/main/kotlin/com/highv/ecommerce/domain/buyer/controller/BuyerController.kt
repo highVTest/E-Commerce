@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -40,6 +41,14 @@ class BuyerController(private val buyerService: BuyerService) {
             .status(HttpStatus.CREATED)
             .body(buyerService.signUp(request, file))
     }
+
+    @PreAuthorize("hasRole('BUYER')")
+    @GetMapping("/profile")
+    fun getMyProfile(
+        @AuthenticationPrincipal user: UserPrincipal
+    ): ResponseEntity<BuyerResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(buyerService.getMyProfile(user.id))
 
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/profile/pw")

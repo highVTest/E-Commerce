@@ -32,10 +32,9 @@ class CouponServiceTest {
     private val buyerRepository = mockk<BuyerRepository>()
     private val itemCartRepository = mockk<ItemCartRepository>()
     private val couponService = CouponService(
-        couponRepository, productRepository, couponToBuyerRepository, buyerRepository, itemCartRepository)
+        couponRepository, productRepository, couponToBuyerRepository, buyerRepository, itemCartRepository
+    )
     private val userPrincipal = mockk<UserPrincipal>()
-
-
 
     @Test
     fun `쿠폰의 정책이 DISCOUNT_RATE 이고 CreateCouponRequest 의 값이 100 이상일 경우 RuntimeException을 벌생`() {
@@ -48,14 +47,12 @@ class CouponServiceTest {
         }.let {
             it.message shouldBe "할인율은 40%를 넘길 수 없습 니다"
         }
-
     }
 
-
-
-
     @Test
-    fun `쿠폰이 정상적으로 등록이 되는 지 확인`(){
+    fun `쿠폰이 정상적으로 등록이 되는 지 확인`() {
+        createCouponRequest.discountPolicy = DiscountPolicy.DISCOUNT_PRICE
+        createCouponRequest.discount = 5000
 
         every { userPrincipal.id } returns 1
         every { productRepository.findByIdOrNull(any()) } returns product
@@ -68,7 +65,7 @@ class CouponServiceTest {
     }
 
     @Test
-    fun `쿠폰이 정상적으로 업데이트가 되는지 확인`(){
+    fun `쿠폰이 정상적으로 업데이트가 되는지 확인`() {
 
         every { userPrincipal.id } returns 1
 
@@ -80,7 +77,7 @@ class CouponServiceTest {
     }
 
     @Test
-    fun `쿠폰이 다른 사용자가 업데이트 하려고 할 경우 RuntimeException`(){
+    fun `쿠폰이 다른 사용자가 업데이트 하려고 할 경우 RuntimeException`() {
 
         every { userPrincipal.id } returns 2
 
@@ -91,11 +88,10 @@ class CouponServiceTest {
         }.let {
             it.message shouldBe "다른 사용자는 해당 쿠폰을 수정할 수 없습니다"
         }
-
     }
 
     @Test
-    fun `쿠폰이 정상적으로 삭제가 되는지 확인`(){
+    fun `쿠폰이 정상적으로 삭제가 되는지 확인`() {
 
         every { userPrincipal.id } returns 1
 
@@ -108,7 +104,7 @@ class CouponServiceTest {
     }
 
     @Test
-    fun `쿠폰이 다른 사용자가 삭제 하려고 할 경우 RuntimeException`(){
+    fun `쿠폰이 다른 사용자가 삭제 하려고 할 경우 RuntimeException`() {
 
         every { userPrincipal.id } returns 2
 
@@ -119,11 +115,10 @@ class CouponServiceTest {
         }.let {
             it.message shouldBe "다른 사용자는 해당 쿠폰을 삭제할 수 없습니다"
         }
-
     }
 
     @Test
-    fun `판메자가 쿠폰을 단건 조회 할 수 있게 확인`(){
+    fun `판메자가 쿠폰을 단건 조회 할 수 있게 확인`() {
 
         coupon.product.id = 1L
         every { userPrincipal.id } returns 1
@@ -139,7 +134,7 @@ class CouponServiceTest {
     }
 
     @Test
-    fun `판메자가 쿠폰을 여러건 조회 할 수 있게 확인`(){
+    fun `판메자가 쿠폰을 여러건 조회 할 수 있게 확인`() {
 
         coupon.product.id = 1L
         coupon2.product.id = 1L
@@ -163,9 +158,8 @@ class CouponServiceTest {
         result[1].discount shouldBe 50
     }
 
-
     @Test
-    fun `구메자가 쿠폰을 단건 조회 할 수 있게 확인`(){
+    fun `구메자가 쿠폰을 단건 조회 할 수 있게 확인`() {
 
         coupon.product.id = 1L
         every { userPrincipal.id } returns 1
@@ -182,9 +176,8 @@ class CouponServiceTest {
         result.discount shouldBe 30000
     }
 
-
     @Test
-    fun `구메자가 쿠폰을 여러건 조회 할 수 있게 확인`(){
+    fun `구메자가 쿠폰을 여러건 조회 할 수 있게 확인`() {
 
         coupon.product.id = 1L
         coupon2.product.id = 1L
@@ -206,7 +199,6 @@ class CouponServiceTest {
         result[1].discountPolicy shouldBe DiscountPolicy.DISCOUNT_RATE.name
         result[1].discount shouldBe 50
     }
-
 
     //동시성 문제
 //    @Test
@@ -271,10 +263,8 @@ class CouponServiceTest {
 //        verify(exactly = threadCount) { couponRepository.releaseLock(any()) }
 //    }
 
-
-
     //Given
-    companion object{
+    companion object {
         private val shop = Shop(
             sellerId = 1L,
             name = "name",
@@ -361,9 +351,6 @@ class CouponServiceTest {
             buyer = buyer1,
         )
 
-
         fun defaultResponse(msg: String) = DefaultResponse(msg)
     }
-
-
 }
