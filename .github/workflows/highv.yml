@@ -3,13 +3,11 @@ name: Run Test
 
 # Event Trigger 특정 액션 (Push, Pull_Request)등이 명시한 Branch 에서 일어나면 동작을 수행한다.
 on:
-  push:
-    # 배열로 여러 브랜치를 넣을 수 있다.
-    branches: [ fix/*, feat/*, refactor/*, test/*]
   # github pull request 생성시
   pull_request:
     branches:
-      - dev # -로 여러 브랜치를 명시하는 것도 가능
+      - dev
+      - main # -로 여러 브랜치를 명시하는 것도 가능
 
   # 실제 어떤 작업을 실행할지에 대한 명시
 jobs:
@@ -24,7 +22,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
         with:
-          ref: dev
+          ref: main
 
       # with은 plugin 파라미터 입니다. (java 17버전 셋업)
       - name: java setup
