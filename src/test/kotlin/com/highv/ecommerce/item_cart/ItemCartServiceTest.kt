@@ -45,7 +45,6 @@ class ItemCartServiceTest : BehaviorSpec() {
                 name = "Test Product",
                 description = "Test Description",
                 productImage = "image.jpg",
-                favorite = 0,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now(),
                 isSoldOut = false,
@@ -60,8 +59,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                 val request: SelectProductQuantity = SelectProductQuantity(quantity = 1)
                 val itemCart = ItemCart(
                     product = product,
-                    productName = product.name,
-                    price = 3000 * request.quantity, // 추후 프로덕트에서 price 관련된 게 생길 예정
+                    shopId = 1L,
                     quantity = request.quantity,
                     buyerId = buyerId
                 ).apply { id = buyerId }
@@ -124,7 +122,6 @@ class ItemCartServiceTest : BehaviorSpec() {
                 name = "Test Product",
                 description = "Test Description",
                 productImage = "image.jpg",
-                favorite = 0,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now(),
                 isSoldOut = false,
@@ -136,10 +133,9 @@ class ItemCartServiceTest : BehaviorSpec() {
 
             val itemCart: ItemCart = ItemCart(
                 product = product,
-                productName = product.name,
-                price = 3000,
                 quantity = 5,
-                buyerId = buyerId
+                buyerId = buyerId,
+                shopId = 1L
             ).apply { id = 1L }
 
 

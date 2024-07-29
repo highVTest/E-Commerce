@@ -24,7 +24,6 @@ class ItemCartEntityTest : AnnotationSpec() {
             name = "Test Product",
             description = "Test Description",
             productImage = "image.jpg",
-            favorite = 0,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
             isSoldOut = false,
@@ -36,10 +35,9 @@ class ItemCartEntityTest : AnnotationSpec() {
 
         val cart = ItemCart(
             product = product,
-            productName = "testName",
-            price = 3000,
             quantity = 1,
-            buyerId = 1L
+            buyerId = 1L,
+            shopId = 1L
         ).apply { id = 1L }
 
         shouldThrow<RuntimeException> {
@@ -64,7 +62,6 @@ class ItemCartEntityTest : AnnotationSpec() {
             name = "Test Product",
             description = "Test Description",
             productImage = "image.jpg",
-            favorite = 0,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
             isSoldOut = false,
@@ -76,8 +73,7 @@ class ItemCartEntityTest : AnnotationSpec() {
 
         val cart = ItemCart(
             product = product,
-            productName = "testName",
-            price = 3000,
+            shopId = 1L,
             quantity = 1,
             buyerId = 1L
         ).apply { id = 1L }
@@ -97,7 +93,6 @@ class ItemCartEntityTest : AnnotationSpec() {
             name = "productName",
             description = "productDescription",
             productImage = "image",
-            favorite = 1,
             createdAt = LocalDateTime.of(2021, 1, 1, 1, 1, 0),
             updatedAt = LocalDateTime.of(2021, 1, 1, 1, 1, 1),
             isSoldOut = false,
