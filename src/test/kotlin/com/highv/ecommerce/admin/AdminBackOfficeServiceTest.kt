@@ -1,4 +1,4 @@
-package com.highv.ecommerce.backoffice
+package com.highv.ecommerce.admin
 
 import com.highv.ecommerce.domain.admin.entity.BlackList
 import com.highv.ecommerce.domain.admin.repository.BlackListRepository
