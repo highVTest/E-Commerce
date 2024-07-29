@@ -2,6 +2,7 @@ package com.highv.ecommerce.infra.s3
 
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.ObjectMetadata
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
@@ -16,7 +17,7 @@ class S3Manager(
         val util = FileUtil()
         val type = util.validImgFile(file.inputStream)
         if (type.isNullOrEmpty()) {
-            throw RuntimeException("이미지 파일만 업로드 해주세요")
+            throw CustomRuntimeException(400, "이미지 파일만 업로드 해주세요")
         }
         val fileName = file.originalFilename
 
@@ -30,7 +31,7 @@ class S3Manager(
 
     fun getFile(fileName: String?): String {
         if (fileName.isNullOrBlank()) {
-            throw RuntimeException("이미지 명이 없음")
+            throw CustomRuntimeException(400, "이미지 명이 없음")
         }
         return amazonS3Client.getUrl(bucket, fileName).toString()
     }

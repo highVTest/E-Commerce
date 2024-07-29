@@ -83,6 +83,7 @@ class ProductService(
         product.apply {
             name = updateProductRequest.name
             description = updateProductRequest.description
+            productImage = ""
             updatedAt = LocalDateTime.now()
             isSoldOut = updateProductRequest.isSoldOut
             categoryId = updateProductRequest.categoryId

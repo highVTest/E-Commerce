@@ -1,5 +1,6 @@
 package com.highv.ecommerce.infra.email
 
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import org.slf4j.LoggerFactory
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
@@ -22,7 +23,7 @@ class EmailUtils(
             emailSender.send(emailForm)
         } catch (ex: RuntimeException) {
             logger.debug("MailService.sendEmail exception occur toEmail: ${toEmail}, title : ${title}, text : ${text}")
-            throw RuntimeException("이메일 보내기 실패")
+            throw CustomRuntimeException(500, "이메일 보내기 실패")
         }
     }
 

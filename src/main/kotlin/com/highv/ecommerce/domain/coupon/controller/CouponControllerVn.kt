@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.coupon.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.coupon.service.CouponServiceVn
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
@@ -24,7 +25,7 @@ class CouponControllerVn(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<DefaultResponse> {
 
-        if(userPrincipal == null) throw RuntimeException()
+        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -38,7 +39,7 @@ class CouponControllerVn(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<DefaultResponse> {
 
-        if(userPrincipal == null) throw RuntimeException()
+        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -53,7 +54,7 @@ class CouponControllerVn(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<DefaultResponse> {
 
-        if(userPrincipal == null) throw RuntimeException()
+        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.OK)
