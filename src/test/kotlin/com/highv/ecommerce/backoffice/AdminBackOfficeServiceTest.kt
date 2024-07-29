@@ -1,7 +1,6 @@
 package com.highv.ecommerce.backoffice
 
 import com.highv.ecommerce.domain.admin.entity.BlackList
-import com.highv.ecommerce.domain.backoffice.admin.entity.QBlackList.blackList
 import com.highv.ecommerce.domain.admin.repository.BlackListRepository
 import com.highv.ecommerce.domain.admin.service.AdminService
 import com.highv.ecommerce.domain.product.entity.Product
@@ -12,13 +11,9 @@ import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.slot
-import io.mockk.verify
-import java.time.LocalDateTime
+import io.mockk.*
 import org.springframework.data.repository.findByIdOrNull
+import java.time.LocalDateTime
 
 class AdminBackOfficeServiceTest : BehaviorSpec({
 
