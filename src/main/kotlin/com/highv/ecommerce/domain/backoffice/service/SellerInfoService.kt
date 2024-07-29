@@ -5,8 +5,8 @@ import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateSellerRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateShopRequest
 import com.highv.ecommerce.domain.seller.dto.SellerResponse
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
-import com.highv.ecommerce.domain.shop.dto.ShopResponse
-import com.highv.ecommerce.domain.shop.repository.ShopRepository
+import com.highv.ecommerce.domain.seller.shop.dto.ShopResponse
+import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service

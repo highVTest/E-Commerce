@@ -1,12 +1,13 @@
 package com.highv.ecommerce.domain.buyer.service
 
+import com.highv.ecommerce.domain.auth.oauth.naver.dto.OAuthLoginUserInfo
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerResponse
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
-import com.highv.ecommerce.s3.config.S3Manager
+import com.highv.ecommerce.infra.s3.S3Manager
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -108,5 +109,24 @@ class BuyerService(
         val saveBuyer = buyerRepository.save(buyer)
 
         return BuyerResponse.from(saveBuyer)
+    }
+
+    fun registerIfAbsent(userInfo: OAuthLoginUserInfo): Buyer {
+        return buyerRepository.findByProviderNameAndProviderId(userInfo.provider.toString(), userInfo.id)
+            ?: buyerRepository.save(
+                Buyer(
+                    // ----------------------
+                    // 수정하기
+                    email = "null", // 소셜 로그인 한 사람은 업데이트 못하게 하기
+                    password = "null", // 소셜 로그인 한 사람은 업데이트 못하게 하기
+                    phoneNumber = "null", // 소셜 로그인 한 사람은 업데이트 하기
+                    address = "null", // 소셜 로그인 한 사람은 업데이트 하기
+                    // -----------------
+                    providerName = userInfo.provider.toString(),
+                    providerId = userInfo.id,
+                    nickname = userInfo.nickname,
+                    profileImage = userInfo.profileImage
+                )
+            )
     }
 }

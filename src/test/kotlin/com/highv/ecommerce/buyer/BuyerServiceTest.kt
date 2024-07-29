@@ -1,12 +1,14 @@
 package com.highv.ecommerce.buyer
 
+import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.buyer.service.BuyerService
-import com.highv.ecommerce.s3.config.S3Manager
+import com.highv.ecommerce.infra.s3.S3Manager
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks

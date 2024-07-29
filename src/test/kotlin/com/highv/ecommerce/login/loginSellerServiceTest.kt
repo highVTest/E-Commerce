@@ -1,0 +1,9 @@
+import com.highv.ecommerce.domain.seller.dto.CreateSellerRequest
+import com.highv.ecommerce.domain.seller.entity.Seller
+import com.highv.ecommerce.domain.seller.repository.SellerRepository
+import com.highv.ecommerce.domain.seller.service.SellerService
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.mockito.Mockito.*
+import org.springframework.security.crypto.password.PasswordEncoder

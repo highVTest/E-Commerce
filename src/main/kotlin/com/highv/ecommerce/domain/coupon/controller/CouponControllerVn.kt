@@ -18,7 +18,7 @@ class CouponControllerVn(
     private val couponService: CouponServiceVn
 ){
     @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/v2/{couponId}")
+    @PatchMapping("/v2/buyer/coupon/{couponId}")
     fun issuedCouponV2(
         @PathVariable couponId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
@@ -32,7 +32,7 @@ class CouponControllerVn(
     }
 
     @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/v3/{couponId}")
+    @PatchMapping("/v3/buyer/coupon/{couponId}")
     fun issuedCouponV3(
         @PathVariable couponId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
@@ -47,7 +47,7 @@ class CouponControllerVn(
 
 
     @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/v4/{couponId}")
+    @PatchMapping("/v4/buyer/coupon/{couponId}")
     fun issuedCouponV4(
         @PathVariable couponId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal?

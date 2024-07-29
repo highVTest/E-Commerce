@@ -6,7 +6,7 @@ annotation class RedissonLock(
 
     val value: String, // Lock 이름
 
-    val waitTime: Long = 5000L,  // Lock획득을 시도하는 최대 시간 (ms)
+    val waitTime: Long = 2000L,  // Lock획득을 시도하는 최대 시간 (ms)
 
-    val leaseTime: Long = 2000L,
+    val leaseTime: Long = 5000L,
 )

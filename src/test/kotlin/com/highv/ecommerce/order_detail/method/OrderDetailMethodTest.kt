@@ -15,7 +15,7 @@ import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.product.entity.Product
-import com.highv.ecommerce.domain.shop.entity.Shop
+import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe

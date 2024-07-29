@@ -6,7 +6,7 @@ import com.highv.ecommerce.domain.favorite.repository.FavoriteRepository
 import com.highv.ecommerce.domain.favorite.service.FavoriteService
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
-import com.highv.ecommerce.domain.shop.entity.Shop
+import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
