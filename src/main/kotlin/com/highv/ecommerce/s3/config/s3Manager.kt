@@ -18,7 +18,6 @@ class S3Manager(
         val type = util.validImgFile(file.inputStream)
         if (type.isNullOrEmpty()){throw RuntimeException("이미지 파일만 업로드 해주세요")}
         val fileName = file.originalFilename
-        val fileUrl = "https://$bucket/test/${fileName}"
 
         val metadata = ObjectMetadata().apply { // 파일의 컨텐츠 타입과 크기를 설정
             contentType = type
@@ -27,7 +26,7 @@ class S3Manager(
 
         amazonS3Client.putObject(bucket, fileName, file.inputStream, metadata) // Amazon S3 클라이언트를 사용하여 파일을 S3 버킷에 업로드
 
-        return ResponseEntity.ok(fileUrl).toString()
+        return ResponseEntity.ok(fileName).toString()
     }
 
     fun getFile(fileName: String?): String {
