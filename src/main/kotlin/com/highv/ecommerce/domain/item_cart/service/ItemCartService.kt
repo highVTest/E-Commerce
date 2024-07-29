@@ -1,7 +1,8 @@
 package com.highv.ecommerce.domain.item_cart.service
 
 import com.highv.ecommerce.domain.item_cart.dto.request.SelectProductQuantity
-import com.highv.ecommerce.domain.item_cart.dto.response.ItemCartResponse
+import com.highv.ecommerce.domain.item_cart.dto.response.CartResponse
+import com.highv.ecommerce.domain.item_cart.dto.response.ItemResponse
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.product.entity.Product
@@ -15,6 +16,7 @@ class ItemCartService(
     private val itemCartRepository: ItemCartRepository,
     private val productRepository: ProductRepository
 ) {
+    @Transactional
     fun addItemIntoCart(productId: Long, request: SelectProductQuantity, buyerId: Long) {
 
         if (request.quantity < 1) {
@@ -24,7 +26,7 @@ class ItemCartService(
         val product: Product =
             productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
 
-        val existsCart: ItemCart? = itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(productId, buyerId)
+        val existsCart: ItemCart? = itemCartRepository.findByProductIdAndBuyerId(productId, buyerId)
 
         if (existsCart != null) {
             val quantity: Int = existsCart.quantity + request.quantity
@@ -34,10 +36,9 @@ class ItemCartService(
         } else {
             val item: ItemCart = ItemCart(
                 product = product,
-                productName = product.name,
-                price = product.productBackOffice!!.price,
                 quantity = request.quantity,
-                buyerId = buyerId
+                buyerId = buyerId,
+                shopId = product.shop.id!!
             )
 
             itemCartRepository.save(item)
@@ -45,10 +46,18 @@ class ItemCartService(
     }
 
     @Transactional(readOnly = true)
-    fun getMyCart(buyerId: Long): List<ItemCartResponse> {
-        val cart: List<ItemCart> = itemCartRepository.findByBuyerIdAndIsDeletedFalse(buyerId)
+    fun getMyCart(buyerId: Long): List<CartResponse> {
+        val cart: List<ItemCart> = itemCartRepository.findByBuyerId(buyerId)
+        val shopGroupItem: MutableMap<Long, MutableList<ItemResponse>> = mutableMapOf()
 
-        return cart.map { ItemCartResponse.from(it) }
+        cart.forEach {
+            if (!shopGroupItem.containsKey(it.shopId)) {
+                shopGroupItem[it.shopId] = mutableListOf()
+            }
+            shopGroupItem[it.shopId]!!.add(ItemResponse.from(it))
+        }
+
+        return shopGroupItem.map { (key, value) -> CartResponse(key, value) }
     }
 
     @Transactional
@@ -58,7 +67,7 @@ class ItemCartService(
             productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
 
         val item: ItemCart =
-            itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(productId, buyerId)
+            itemCartRepository.findByProductIdAndBuyerId(productId, buyerId)
                 ?: throw RuntimeException("Item not found")
 
         item.updateQuantity(request.quantity) // 추후 프로덕트에서 price 관련된 게 생길 예정
@@ -69,7 +78,7 @@ class ItemCartService(
     @Transactional
     fun deleteItemIntoCart(productId: Long, buyerId: Long) {
 
-        val item: ItemCart = itemCartRepository.findByProductIdAndBuyerIdAndIsDeletedFalse(productId, buyerId)
+        val item: ItemCart = itemCartRepository.findByProductIdAndBuyerId(productId, buyerId)
             ?: throw RuntimeException("Item not found")
 
         // 구매자가 장바구니에서 물품을 지우는 경우 하드? 소프트?

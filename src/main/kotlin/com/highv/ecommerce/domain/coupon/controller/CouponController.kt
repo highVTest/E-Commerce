@@ -16,13 +16,13 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1/coupon")
+@RequestMapping("/api/v1")
 class CouponController(
     private val couponService: CouponService
 ){
 
     @PreAuthorize("hasRole('SELLER')")
-    @PostMapping
+    @PostMapping("/seller/coupon")
     fun createCoupon(
         @Valid @RequestBody couponRequest: CreateCouponRequest,
         bindingResult: BindingResult,
@@ -38,7 +38,7 @@ class CouponController(
     }
 
     @PreAuthorize("hasRole('SELLER')")
-    @PutMapping("/{couponId}")
+    @PutMapping("/seller/coupon/{couponId}")
     fun updateCoupon(
         @PathVariable("couponId") couponId:Long,
         @Valid @RequestBody updateCouponRequest: UpdateCouponRequest,
@@ -58,7 +58,7 @@ class CouponController(
 
 
     @PreAuthorize("hasRole('SELLER')")
-    @DeleteMapping("/{couponId}")
+    @DeleteMapping("/seller/coupon/{couponId}")
     fun deleteCoupon(
         @PathVariable couponId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
@@ -73,7 +73,7 @@ class CouponController(
 
 
     @PreAuthorize("hasRole('SELLER')")
-    @GetMapping("/seller/{couponId}")
+    @GetMapping("/seller/coupon/{couponId}")
     fun getSellerCouponById(
         @PathVariable("couponId") couponId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
@@ -88,7 +88,7 @@ class CouponController(
 
 
     @PreAuthorize("hasRole('SELLER')")
-    @GetMapping("/seller")
+    @GetMapping("/seller/coupon")
     fun getSellerCouponList(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<List<CouponResponse>> {
@@ -101,7 +101,7 @@ class CouponController(
     }
 
     @PreAuthorize("hasRole('BUYER')")
-    @GetMapping("/buyer/{couponId}")
+    @GetMapping("/buyer/coupon/{couponId}")
     fun getBuyerCouponById(
         @PathVariable("couponId") couponId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
@@ -115,7 +115,7 @@ class CouponController(
     }
 
     @PreAuthorize("hasRole('BUYER')")
-    @GetMapping("/buyer")
+    @GetMapping("/buyer/coupon")
     fun getBuyerCouponList(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<List<CouponResponse>> {
@@ -128,7 +128,7 @@ class CouponController(
     }
 
     @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/{couponId}")
+    @PatchMapping("/buyer/coupon/{couponId}")
     fun issuedCoupon(
         @PathVariable couponId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
@@ -141,6 +141,7 @@ class CouponController(
             .body(couponService.issuedCoupon(couponId, userPrincipal))
     }
 
+    // 최후의 보루
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/apply/{couponId}")
     fun applyCoupon(

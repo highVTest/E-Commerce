@@ -19,4 +19,15 @@ class CouponToBuyer(
     @JoinColumn(name = "buyer_id")
     val buyer: Buyer,
 
-)
+    @Column(name = "is_used", nullable = false)
+    var isUsed: Boolean = false,
+
+) {
+    fun useCoupon() {
+        isUsed = true
+    }
+
+    fun returnCoupon() {
+        isUsed = false
+    }
+}

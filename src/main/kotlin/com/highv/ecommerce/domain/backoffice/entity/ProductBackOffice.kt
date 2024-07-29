@@ -24,7 +24,7 @@ class ProductBackOffice(
     var price: Int,
 
     @Column(name = "sold_quantity")
-    var soldQuantity: Int,
+    var soldQuantity: Long, // TODO("BIGINT 라서 Long 으로 변경 사용 중인 곳은 우선 toInt() 처리")
 
     @OneToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")

@@ -1,31 +1,34 @@
 /*
 package com.highv.ecommerce.buyer
 
-import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.buyer.service.BuyerService
+import com.highv.ecommerce.s3.config.S3Manager
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.mock.web.MockMultipartFile
 import org.springframework.security.crypto.password.PasswordEncoder
+import java.nio.charset.StandardCharsets
 
-class BuyerServiceTest : BehaviorSpec({
+class BuyerServiceTest : DescribeSpec({
     val buyerRepository: BuyerRepository = mockk<BuyerRepository>()
     val passwordEncoder: PasswordEncoder = mockk<PasswordEncoder>()
-    val buyerService: BuyerService = BuyerService(buyerRepository, passwordEncoder)
+    val s3Manager: S3Manager = mockk<S3Manager>()
+    val buyerService: BuyerService = BuyerService(buyerRepository, passwordEncoder, s3Manager)
 
     afterEach {
         clearAllMocks()
     }
 
-    Given("일반 회원이 비밀번호를 바꿀 때") {
+    describe("일반 회원이 비밀번호를 바꿀 때") {
         val buyerId = 1L
         val buyer = Buyer(
             nickname = "TestName",
@@ -39,7 +42,7 @@ class BuyerServiceTest : BehaviorSpec({
         )
 
 
-        When("현재 비밀번호와 확인 비밀번호가 일치하지 않는다면") {
+        context("현재 비밀번호와 확인 비밀번호가 일치하지 않는다면") {
 
             val request = UpdateBuyerPasswordRequest(
                 currentPassword = "testPassword1",
@@ -49,7 +52,7 @@ class BuyerServiceTest : BehaviorSpec({
             every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
             every { passwordEncoder.matches(any(), any()) } returns false
 
-            Then("예외가 발생한다.") {
+            it("예외가 발생한다.") {
                 shouldThrow<RuntimeException> {
                     buyerService.changePassword(request, buyerId)
                 }.run {
@@ -58,7 +61,7 @@ class BuyerServiceTest : BehaviorSpec({
             }
         }
 
-        When("새 비밀번호와 확인 비밀번호 값이 다르다면") {
+        context("새 비밀번호와 확인 비밀번호 값이 다르다면") {
 
             val request = UpdateBuyerPasswordRequest(
                 currentPassword = "testPassword",
@@ -69,7 +72,7 @@ class BuyerServiceTest : BehaviorSpec({
             every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
             every { passwordEncoder.matches(any(), any()) } returns true
 
-            Then("예외가 발생한다.") {
+            it("예외가 발생한다.") {
                 shouldThrow<RuntimeException> {
                     buyerService.changePassword(request, buyerId)
                 }.run {
@@ -78,7 +81,7 @@ class BuyerServiceTest : BehaviorSpec({
             }
         }
 
-        When("변경 전 비밀번호와 변경 후 비밀번호가 같다면") {
+        context("변경 전 비밀번호와 변경 후 비밀번호가 같다면") {
             val request = UpdateBuyerPasswordRequest(
                 currentPassword = "testPassword",
                 newPassword = "testPassword",
@@ -89,7 +92,7 @@ class BuyerServiceTest : BehaviorSpec({
             every { passwordEncoder.matches(request.currentPassword, buyer.password) } returns true
             every { passwordEncoder.matches(request.newPassword, buyer.password) } returns true
 
-            Then("예외가 발생한다.") {
+            it("예외가 발생한다.") {
                 shouldThrow<RuntimeException> {
                     buyerService.changePassword(request, buyerId)
                 }.run {
@@ -98,7 +101,7 @@ class BuyerServiceTest : BehaviorSpec({
             }
         }
 
-        When("모든 조건이 만족될 경우") {
+        context("모든 조건이 만족될 경우") {
             val request = UpdateBuyerPasswordRequest(
                 currentPassword = "testPassword",
                 newPassword = "testPassword1",
@@ -110,14 +113,14 @@ class BuyerServiceTest : BehaviorSpec({
             every { passwordEncoder.matches(request.newPassword, buyer.password) } returns false
             every { passwordEncoder.encode(any()) } returns "testPassword1"
 
-            Then("비밀번호가 변경된다.") {
+            it("비밀번호가 변경된다.") {
                 buyerService.changePassword(request, buyerId)
             }
         }
 
     }
 
-    Given("소셜 로그인 이용자가") {
+    describe("소셜 로그인 이용자가") {
 
         val buyerId = 1L
         val buyer = Buyer(
@@ -131,7 +134,7 @@ class BuyerServiceTest : BehaviorSpec({
             providerName = "naver"
         )
 
-        When("비밀번호를 바꿀때") {
+        context("비밀번호를 바꿀때") {
 
             val request = UpdateBuyerPasswordRequest(
                 currentPassword = "testPassword",
@@ -140,7 +143,7 @@ class BuyerServiceTest : BehaviorSpec({
             )
             every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
 
-            Then("예외가 발생한다.") {
+            it("예외가 발생한다.") {
                 shouldThrow<RuntimeException> {
                     buyerService.changePassword(request, buyerId)
                 }.apply {
@@ -151,10 +154,10 @@ class BuyerServiceTest : BehaviorSpec({
 
     }
 
-    Given("회원이 프로필 이미지를 변경하면") {
+    describe("회원이 프로필 이미지를 변경하면") {
         val buyerId = 1L
 
-        When("소셜 회원이면") {
+        context("소셜 회원이면") {
             val buyer = Buyer(
                 nickname = "TestName",
                 email = "null",
@@ -166,17 +169,23 @@ class BuyerServiceTest : BehaviorSpec({
                 providerName = "naver"
             )
 
-            val request = UpdateBuyerImageRequest("updateTestImage")
+            val file = MockMultipartFile(
+                "file", "test.txt", "text/plain", "hello file".byteInputStream(
+                    StandardCharsets.UTF_8
+                )
+            )
 
             every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
+            every { s3Manager.uploadFile(any()) } returns Unit
+            every { s3Manager.getFile(any()) } returns "lemon.jpg"
             every { buyerRepository.save(any()) } returns buyer
 
-            Then("이미지가 변경된다.") {
-                buyerService.changeProfileImage(request, buyerId)
+            it("이미지가 변경된다.") {
+                buyerService.changeProfileImage(buyerId, file)
             }
         }
 
-        When("일반 회원이면") {
+        context("일반 회원이면") {
             val buyer = Buyer(
                 nickname = "TestName",
                 email = "test@test.com",
@@ -188,23 +197,29 @@ class BuyerServiceTest : BehaviorSpec({
                 providerName = null
             )
 
-            val request = UpdateBuyerImageRequest("updateTestImage")
+            val file = MockMultipartFile(
+                "file", "test.txt", "text/plain", "hello file".byteInputStream(
+                    StandardCharsets.UTF_8
+                )
+            )
 
             every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
+            every { s3Manager.uploadFile(any()) } returns Unit
+            every { s3Manager.getFile(any()) } returns "lemon.jpg"
             every { buyerRepository.save(any()) } returns buyer
 
-            Then("이미지가 변경된다.") {
-                buyerService.changeProfileImage(request, buyerId)
+            it("이미지가 변경된다.") {
+                buyerService.changeProfileImage(buyerId, file)
             }
         }
 
     }
 
-    Given("프로필을 수정할 때") {
+    describe("프로필을 수정할 때") {
 
         val buyerId = 1L
 
-        When("일반 로그인 유저이면") {
+        context("일반 로그인 유저이면") {
             val buyer = Buyer(
                 nickname = "TestName",
                 email = "test@test.com",
@@ -225,7 +240,7 @@ class BuyerServiceTest : BehaviorSpec({
             every { buyerRepository.findByIdOrNull(any()) } returns buyer
             every { buyerRepository.save(any()) } returns buyer
 
-            Then("닉네임, 핸드폰 번호, 주소가 수정된다.") {
+            it("닉네임, 핸드폰 번호, 주소가 수정된다.") {
                 val result = buyerService.changeProfile(request, buyerId)
 
                 result.nickname shouldBe "수정한 닉네임"
@@ -236,7 +251,7 @@ class BuyerServiceTest : BehaviorSpec({
 
         }
 
-        When("소셜 로그인 유저면") {
+        context("소셜 로그인 유저면") {
 
             val buyer = Buyer(
                 nickname = "TestName",
@@ -258,7 +273,7 @@ class BuyerServiceTest : BehaviorSpec({
             every { buyerRepository.findByIdOrNull(any()) } returns buyer
             every { buyerRepository.save(any()) } returns buyer
 
-            Then("핸드폰 번호, 주소만 수정된다.") {
+            it("핸드폰 번호, 주소만 수정된다.") {
                 val result = buyerService.changeProfile(request, buyerId)
 
                 result.nickname shouldBe "TestName"

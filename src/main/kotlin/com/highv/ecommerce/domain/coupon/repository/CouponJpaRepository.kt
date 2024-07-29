@@ -7,8 +7,6 @@ import org.springframework.data.repository.query.Param
 
 interface CouponJpaRepository: JpaRepository<Coupon, Long>{
 
-    fun findByIdAndIsDeletedFalse(id: Long): Coupon?
-
     fun existsByProductId(productId: Long): Boolean
 
     fun findByIdAndSellerId(id: Long, sellerId: Long): Coupon?
@@ -21,4 +19,7 @@ interface CouponJpaRepository: JpaRepository<Coupon, Long>{
 
     @Query("SELECT RELEASE_LOCK(:name)", nativeQuery = true)
     fun releaseLock(@Param("name") name: String): Int
+
+    @Query("SELECT c.id FROM Coupon c WHERE c.product.id in :productIdList ")
+    fun findAllByProductIdList(productIdList: List<Long>): List<Long>
 }

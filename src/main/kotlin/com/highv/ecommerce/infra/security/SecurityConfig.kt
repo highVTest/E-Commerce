@@ -37,7 +37,7 @@ class SecurityConfig(
                     "/v3/api-docs/**",
                     "/api/v1/**", // 구현 완료 후 삭제
                     "/oauth/login/**",
-                    "/api/v1/emails/**"
+                    "/api/v1/emails/**",
                 ).permitAll()
                     .anyRequest().authenticated()
             }

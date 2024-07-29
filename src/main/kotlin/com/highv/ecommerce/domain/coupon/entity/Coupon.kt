@@ -9,8 +9,6 @@ import org.hibernate.annotations.SQLRestriction
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
-@SQLDelete(sql = "UPDATE coupon SET deleted_at = CURRENT_TIMESTAMP, is_deleted = true WHERE id = ?")
-@SQLRestriction("is_deleted = false")
 @Entity
 @Table(name = "coupon")
 class Coupon(
@@ -34,24 +32,19 @@ class Coupon(
     @Column(name = "created_at", nullable = false)
     val createdAt: LocalDateTime,
 
-    @Column(name = "deleted_At", nullable = true)
-    val deletedAt: LocalDateTime? = null,
-
-    @Column(name = "is_deleted", nullable = false)
-    val isDeleted: Boolean = false,
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     val product: Product,
 
     @Column(name = "seller_id", nullable = false)
-    val sellerId: Long
+    val sellerId: Long,
 
 ){
 
     fun update(updateCouponRequest: UpdateCouponRequest) {
-        if(updateCouponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && updateCouponRequest.discount > 100){
-            throw RuntimeException("할인율은 100%를 넘길 수 없습 니다")
+
+        if(updateCouponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && updateCouponRequest.discount > 40){
+            throw RuntimeException("할인율은 40%를 넘길 수 없습 니다")
         }
 
         discountPolicy = updateCouponRequest.discountPolicy

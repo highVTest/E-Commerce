@@ -1,12 +1,9 @@
 package com.highv.ecommerce.domain.buyer.controller
 
 import com.highv.ecommerce.common.exception.LoginException
-import com.highv.ecommerce.domain.buyer.dto.request.BuyerOrderStatusUpdateRequest
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
-import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
-import com.highv.ecommerce.domain.buyer.dto.response.BuyerOrderResponse
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerResponse
 import com.highv.ecommerce.domain.buyer.service.BuyerService
 import com.highv.ecommerce.infra.security.UserPrincipal
@@ -16,7 +13,13 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
 @RestController
@@ -27,7 +30,7 @@ class BuyerController(private val buyerService: BuyerService) {
     fun signUp(
         @RequestPart @Valid request: CreateBuyerRequest,
         bindingResult: BindingResult,
-        @RequestPart(value ="file", required = false) file: MultipartFile
+        @RequestPart(value = "file", required = false) file: MultipartFile?
     ): ResponseEntity<BuyerResponse> {
 
         if (bindingResult.hasErrors()) {
@@ -36,11 +39,19 @@ class BuyerController(private val buyerService: BuyerService) {
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(buyerService.signUp(request,file))
+            .body(buyerService.signUp(request, file))
     }
 
     @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/profile/password")
+    @GetMapping("/profile")
+    fun getMyProfile(
+        @AuthenticationPrincipal user: UserPrincipal
+    ): ResponseEntity<BuyerResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(buyerService.getMyProfile(user.id))
+
+    @PreAuthorize("hasRole('BUYER')")
+    @PatchMapping("/profile/pw")
     fun changePassword(
         @Valid @RequestBody request: UpdateBuyerPasswordRequest,
         bindingResult: BindingResult,
@@ -57,36 +68,20 @@ class BuyerController(private val buyerService: BuyerService) {
     }
 
     @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/profile/profile-image")
+    @PatchMapping("/profile/image")
     fun changeImage(
-        @RequestBody request: UpdateBuyerImageRequest,
         @AuthenticationPrincipal user: UserPrincipal,
-        @RequestPart(value ="file", required = false) file: MultipartFile
-
+        @RequestPart(value = "file", required = false) file: MultipartFile?
     ): ResponseEntity<Unit> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(buyerService.changeProfileImage(request, user.id,file))
+        .body(buyerService.changeProfileImage(user.id, file))
 
     @PreAuthorize("hasRole('BUYER')")
-    @PutMapping("/profile")
+    @PatchMapping("/profile")
     fun changeProfile(
         @RequestBody request: UpdateBuyerProfileRequest,
         @AuthenticationPrincipal user: UserPrincipal,
     ): ResponseEntity<BuyerResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(buyerService.changeProfile(request, user.id))
-
-    @PreAuthorize("hasRole('BUYER')")
-    @GetMapping("/orders")
-    fun getMyOrders(@AuthenticationPrincipal user: UserPrincipal): ResponseEntity<List<BuyerOrderResponse>> =
-        ResponseEntity.status(HttpStatus.OK).body(buyerService.getOrders(user.id))
-
-    @PreAuthorize("hasRole('BUYER')")
-    @PutMapping("/orders/{orderId}")
-    fun updateOrder(
-        @AuthenticationPrincipal user: UserPrincipal,
-        @PathVariable(value = "orderId") orderId: Long,
-        @RequestBody request: BuyerOrderStatusUpdateRequest
-    ): ResponseEntity<BuyerOrderResponse> =
-        ResponseEntity.status(HttpStatus.OK).body(buyerService.updateStatus(user.id, orderId, request))
 }

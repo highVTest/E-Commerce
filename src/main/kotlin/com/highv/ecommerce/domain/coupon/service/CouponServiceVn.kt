@@ -41,7 +41,8 @@ class CouponServiceVn(
                 couponToBuyerRepository.save(
                     CouponToBuyer(
                         buyer = buyer,
-                        coupon = coupon
+                        coupon = coupon,
+                        isUsed = false,
                     )
                 )
 
@@ -77,7 +78,8 @@ class CouponServiceVn(
                 couponToBuyerRepository.save(
                     CouponToBuyer(
                         buyer = buyer,
-                        coupon = coupon
+                        coupon = coupon,
+                        isUsed = false,
                     )
                 )
 
@@ -113,7 +115,8 @@ class CouponServiceVn(
         couponToBuyerRepository.save(
             CouponToBuyer(
                 buyer = buyer,
-                coupon = coupon
+                coupon = coupon,
+                isUsed = false,
             )
         )
 
