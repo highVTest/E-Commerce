@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.review.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.review.dto.CreateReviewRequest
 import com.highv.ecommerce.domain.review.dto.ReviewResponse
 import com.highv.ecommerce.domain.review.dto.UpdateReviewRequest
@@ -21,7 +22,7 @@ class ReviewService(
 
     fun addReview(productId: Long, reviewRequest: CreateReviewRequest, buyerId: Long): DefaultResponse {
         val product = productRepository.findByIdOrNull(productId)
-            ?: throw RuntimeException("Product id $productId not found")
+            ?: throw CustomRuntimeException(404, "Product id $productId not found")
 
         val review = Review(
             buyerId = buyerId,
@@ -46,10 +47,10 @@ class ReviewService(
 
     fun updateReview(productId: Long, reviewRequest: UpdateReviewRequest, buyerId: Long): DefaultResponse {
         val review = reviewRepository.findByIdAndBuyerId(productId, buyerId) //수정필요
-            ?: throw RuntimeException("Review not found for this product and buyer")
+            ?: throw CustomRuntimeException(404, "Review not found for this product and buyer")
 
         if (review.buyerId != buyerId) {
-            throw RuntimeException("Buyer not found")
+            throw CustomRuntimeException(403, "Unauthorized action")
         }
 
         review.apply {
@@ -65,11 +66,11 @@ class ReviewService(
 
     fun deleteReview(productId: Long, buyerId: Long): DefaultResponse {
         val review = reviewRepository.findByIdAndBuyerId(productId, buyerId) //수정필요
-            ?: throw RuntimeException("Review not found for this product and buyer")
+            ?: throw CustomRuntimeException(404, "Review not found for this product and buyer")
 
 
         if (review.buyerId != buyerId) {
-            throw RuntimeException("Buyer not found")
+            throw CustomRuntimeException(403, "Unauthorized action")
         }
 
         reviewRepository.delete(review)

@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.backoffice.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.order_master.dto.OrderStatusRequest
 import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
 import org.springframework.stereotype.Service
@@ -23,7 +24,7 @@ class SalesHistoryService(
         // seller 검증 구문 필요 ( 추후 refactoring 시 수정 )
 
         val order = productsOrderRepository.findByIdOrNull(orderId)
-            ?: throw RuntimeException("Order not found")
+            ?: throw CustomRuntimeException(404, "Order not found")
 
 //        order.update(orderStatusRequest) 수정 예정
         productsOrderRepository.save(order)

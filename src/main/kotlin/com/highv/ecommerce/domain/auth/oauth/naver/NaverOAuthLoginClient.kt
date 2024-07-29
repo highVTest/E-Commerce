@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.auth.oauth.naver
 
 
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.type.OAuthProvider
 import com.highv.ecommerce.domain.auth.oauth.OAuthClient
 import com.highv.ecommerce.domain.auth.oauth.naver.dto.NaverLoginUserInfoResponse
@@ -48,7 +49,7 @@ class NaverOAuthLoginClient(
             .retrieve()
             .body<NaverTokenResponse>()
             ?.accessToken
-            ?: throw RuntimeException("네이버 AccessToken 조회 실패")
+            ?: throw CustomRuntimeException(500, "네이버 AccessToken 조회 실패")
     }
 
     override fun retrieveUserInfo(accessToken: String): OAuthLoginUserInfo {
@@ -58,7 +59,7 @@ class NaverOAuthLoginClient(
             .retrieve()
             .body<NaverResponse<NaverLoginUserInfoResponse>>()
             ?.response
-            ?: throw RuntimeException("네이버 UserInfo 조회 실패")
+            ?: throw CustomRuntimeException(500, "네이버 UserInfo 조회 실패")
     }
 
     override fun supports(provider: OAuthProvider): Boolean {

@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.item_cart.entity
 
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.product.entity.Product
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -36,7 +37,7 @@ class ItemCart(
 
     fun updateQuantity(quantity: Int) {
 
-        if (quantity <= 0) throw RuntimeException("물품의 수량이 0보다 작거나 같을 수 없습니다.")
+        if (quantity <= 0) throw CustomRuntimeException(400, "물품의 수량이 0보다 작거나 같을 수 없습니다.")
 
         this.quantity = quantity
     }

@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.order_details.service
 
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderDetailProductResponse
@@ -94,12 +95,12 @@ class OrderDetailsService(
     fun getBuyerOrderDetails(buyerId: Long, orderId: Long): BuyerOrderResponse {
 
         val orderMaster: OrderMaster =
-            orderMasterRepository.findByIdOrNull(orderId) ?: throw RuntimeException("주문 내역이 없습니다.")
+            orderMasterRepository.findByIdOrNull(orderId) ?: throw CustomRuntimeException(404, "주문 내역이 없습니다.")
 
         val orderDetails: List<OrderDetails> = orderDetailsRepository.findAllByBuyerIdAndOrderMasterId(buyerId, orderId)
 
         if (orderDetails.isEmpty()) {
-            throw RuntimeException("주문 내역이 없습니다.")
+            throw CustomRuntimeException(404, "주문 내역이 없습니다.")
         }
 
         val shopGroup: MutableMap<Long, MutableList<BuyerOrderDetailProductResponse>> = mutableMapOf()
@@ -200,7 +201,7 @@ class OrderDetailsService(
                 }
             }
 
-            else -> throw RuntimeException("구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
+            else -> throw CustomRuntimeException(400, "구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
         }
 
 

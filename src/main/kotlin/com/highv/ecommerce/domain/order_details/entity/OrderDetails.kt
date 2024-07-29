@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.order_details.entity
 
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
@@ -70,16 +71,16 @@ class OrderDetails(
 
         when (buyerOrderStatusRequest.complainType.name) {
             "EXCHANGE" -> {
-                if (this.orderStatus != OrderStatus.DELIVERED) throw RuntimeException("물건 수령 전에는 교환 요청이 어렵습니다")
+                if (this.orderStatus != OrderStatus.DELIVERED) throw CustomRuntimeException(400, "물건 수령 전에는 교환 요청이 어렵습니다")
                 this.complainStatus = ComplainStatus.EXCHANGE_REQUESTED
                 this.orderStatus = OrderStatus.PENDING
             }
 
             "REFUND" -> {
                 when (this.orderStatus) {
-                    OrderStatus.DELIVERY_PREPARING -> throw RuntimeException("배송 준비 중에는 환불 요청이 어렵습니다")
-                    OrderStatus.SHIPPING -> throw RuntimeException("배송 중에는 환불 요청이 어렵습니다")
-                    OrderStatus.PENDING -> throw RuntimeException("이미 환불 및 교환 요청이 접수 되었습니다")
+                    OrderStatus.DELIVERY_PREPARING -> throw CustomRuntimeException(400, "배송 준비 중에는 환불 요청이 어렵습니다")
+                    OrderStatus.SHIPPING -> throw CustomRuntimeException(400, "배송 중에는 환불 요청이 어렵습니다")
+                    OrderStatus.PENDING -> throw CustomRuntimeException(400, "이미 환불 및 교환 요청이 접수 되었습니다")
                     else -> this.orderStatus = orderStatus
                 }
                 this.complainStatus = ComplainStatus.REFUND_REQUESTED
@@ -103,7 +104,7 @@ class OrderDetails(
             ComplainStatus.REFUND_REQUESTED -> this.complainStatus = ComplainStatus.REFUND_REJECTED
             ComplainStatus.REFUNDED -> this.complainStatus = ComplainStatus.REFUNDED
             ComplainStatus.EXCHANGED -> this.complainStatus = ComplainStatus.EXCHANGED
-            else -> throw RuntimeException("잘못된 접근 입니다")
+            else -> throw CustomRuntimeException(400, "잘못된 접근 입니다")
         }
         this.sellerDateTime = LocalDateTime.now()
         this.sellerDescription = sellerOrderStatusRequest.description

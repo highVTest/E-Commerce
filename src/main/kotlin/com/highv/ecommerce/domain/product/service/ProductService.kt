@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.product.service
 
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.ProductBackOfficeRequest
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
@@ -68,8 +69,8 @@ class ProductService(
     }
 
     fun updateProduct(sellerId: Long, productId: Long, updateProductRequest: UpdateProductRequest): ProductResponse {
-        val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
-        if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")
+        val product = productRepository.findByIdOrNull(productId) ?: throw CustomRuntimeException(404, "Product not found")
+        if (product.shop.sellerId != sellerId) throw CustomRuntimeException(403, "No Authority")
         product.apply {
             name = updateProductRequest.name
             description = updateProductRequest.description
@@ -83,8 +84,8 @@ class ProductService(
     }
 
     fun deleteProduct(sellerId: Long, productId: Long) {
-        val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
-        if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")
+        val product = productRepository.findByIdOrNull(productId) ?: throw CustomRuntimeException(404, "Product not found")
+        if (product.shop.sellerId != sellerId) throw CustomRuntimeException(403, "No Authority")
         product.apply {
             isDeleted = true
             deletedAt = LocalDateTime.now()
@@ -93,7 +94,7 @@ class ProductService(
     }
 
     fun getProductById(productId: Long): ProductResponse {
-        val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
+        val product = productRepository.findByIdOrNull(productId) ?: throw CustomRuntimeException(404, "Product not found")
         return ProductResponse.from(product, favoriteService.countFavorite(productId))
     }
 
