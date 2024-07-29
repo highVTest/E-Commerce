@@ -27,7 +27,7 @@ class CouponControllerVn(
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.issuedCouponV2(couponId, userPrincipal.id))
+            .body(couponService.issuedCouponV2(couponId, userPrincipal))
     }
 
     @PreAuthorize("hasRole('BUYER')")
@@ -39,7 +39,7 @@ class CouponControllerVn(
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.issuedCouponV3(couponId, userPrincipal.id))
+            .body(couponService.issuedCouponV3(couponId, userPrincipal))
     }
 
 
@@ -52,6 +52,6 @@ class CouponControllerVn(
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.issuedCouponV4(couponId, userPrincipal.id))
+            .body(couponService.issuedCouponV4(couponId, userPrincipal))
     }
 }

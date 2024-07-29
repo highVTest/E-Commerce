@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.coupon.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.coupon.dto.CouponResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
