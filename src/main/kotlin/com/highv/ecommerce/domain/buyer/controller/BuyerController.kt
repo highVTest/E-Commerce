@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.buyer.controller
 
+import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.LoginException
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
@@ -56,7 +57,7 @@ class BuyerController(private val buyerService: BuyerService) {
         @Valid @RequestBody request: UpdateBuyerPasswordRequest,
         bindingResult: BindingResult,
         @AuthenticationPrincipal user: UserPrincipal,
-    ): ResponseEntity<Unit> {
+    ): ResponseEntity<DefaultResponse> {
 
         if (bindingResult.hasErrors()) {
             throw RuntimeException(bindingResult.fieldError?.defaultMessage.toString())
@@ -72,7 +73,7 @@ class BuyerController(private val buyerService: BuyerService) {
     fun changeImage(
         @AuthenticationPrincipal user: UserPrincipal,
         @RequestPart(value = "file", required = false) file: MultipartFile?
-    ): ResponseEntity<Unit> = ResponseEntity
+    ): ResponseEntity<BuyerResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(buyerService.changeProfileImage(user.id, file))
 
