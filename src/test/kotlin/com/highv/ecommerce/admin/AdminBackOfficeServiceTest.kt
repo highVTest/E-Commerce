@@ -1,7 +1,6 @@
-package com.highv.ecommerce.backoffice
+package com.highv.ecommerce.admin
 
 import com.highv.ecommerce.domain.admin.entity.BlackList
-import com.highv.ecommerce.domain.backoffice.admin.entity.QBlackList.blackList
 import com.highv.ecommerce.domain.admin.repository.BlackListRepository
 import com.highv.ecommerce.domain.admin.service.AdminService
 import com.highv.ecommerce.domain.product.entity.Product
