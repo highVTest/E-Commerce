@@ -1,46 +1,61 @@
 package com.highv.ecommerce.OAuth
 
-import com.highv.ecommerce.Oauth.naver.dto.OAuthLoginUserInfo
 import com.highv.ecommerce.common.type.OAuthProvider
+import com.highv.ecommerce.domain.auth.oauth.naver.dto.OAuthLoginUserInfo
+import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
-import com.highv.ecommerce.socialmember.service.SocialMemberDomainService
+import com.highv.ecommerce.domain.buyer.service.BuyerService
+import com.highv.ecommerce.infra.s3.S3Manager
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.every
 import io.mockk.mockk
+import org.springframework.security.crypto.password.PasswordEncoder
 import kotlin.test.Test
 
-class SocialMemberDomainServiceTest (
+class SocialMemberDomainServiceTest  (
 
 ) {
     private val buyerRepository: BuyerRepository = mockk()
+    private val passwordEncoder: PasswordEncoder = mockk()
+    private val s3Manager: S3Manager = mockk()
 
-    private val socialMemberDomainService = SocialMemberDomainService(buyerRepository)
+    private val buyerService = BuyerService(buyerRepository,passwordEncoder,s3Manager)
+
 
     @Test
     fun `사용자 정보 없을 경우 회원가입처리`() {
         //GIVEN
-        buyerRepository.deleteAll() //테스트전 사용자정보 전부 삭제
+        val buyer = Buyer(
+            // ----------------------
+            // 수정하기
+            email = "null", // 소셜 로그인 한 사람은 업데이트 못하게 하기
+            password = "null", // 소셜 로그인 한 사람은 업데이트 못하게 하기
+            phoneNumber = "null", // 소셜 로그인 한 사람은 업데이트 하기
+            address = "null", // 소셜 로그인 한 사람은 업데이트 하기
+            // -----------------
+            providerName = OAuthProvider.KAKAO.name,
+            providerId = "0729",
+            nickname = "hysup",
+            profileImage = "String"
+        ).apply { id = 1L }
+
         val userinfo =
             OAuthLoginUserInfo(provider = OAuthProvider.KAKAO, id = "0729", nickname = "hysup", profileImage = "String")
 
+        every { buyerRepository.findByProviderNameAndProviderId(any(), any()) } returns buyer
+        every {buyerRepository.save(any())} returns buyer
         //WHEN
-        val result = socialMemberDomainService.registerIfAbsent(userinfo)
+        val result = buyerService.registerIfAbsent(userinfo)
 
         //THEN
-        result.address shouldBe
-            result.providerName shouldBe OAuthProvider.KAKAO
+        result.providerName shouldBe OAuthProvider.KAKAO.name
         result.id shouldNotBe null
-        result.nickname shouldBe 1L
+        result.nickname shouldBe "hysup"
         result.profileImage shouldBe "String"
         result.providerId shouldBe "0729"
-        buyerRepository.findAll().toList().let {
-            it.size shouldBe 1
-            it[0].id shouldBe 1L
-            it[0].nickname shouldBe "Hysup"
-            it[0].profileImage shouldBe "String"
-            it[0].providerId shouldBe "0729"
 
         }
 
     }
-}
+
