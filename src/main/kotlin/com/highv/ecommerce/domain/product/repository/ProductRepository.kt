@@ -25,6 +25,7 @@ interface ProductQueryDslRepository {
     fun findAllPaginated(pageable: Pageable): Page<Product>
     fun findByCategoryPaginated(categoryId: Long, pageable: Pageable): Page<Product>
     fun searchByKeywordPaginated(keyword: String, pageable: Pageable): Page<Product>
+    fun findAllById(productIds: Collection<Long>): List<Product>
 }
 
 class ProductQueryDslRepositoryImpl(
@@ -87,6 +88,18 @@ class ProductQueryDslRepositoryImpl(
 
         val results = query.fetch()
         return PageImpl(results, pageable, totalCount)
+    }
+
+    override fun findAllById(productIds: Collection<Long>): List<Product> {
+        val query = jpaQueryFactory
+            .select(product)
+            .from(product)
+            .innerJoin(product.productBackOffice()).fetchJoin()
+            .innerJoin(product.shop()).fetchJoin()
+            .where(product.id.`in`(productIds.toList()))
+            .fetch()
+
+        return query
     }
 
     private fun keywordLike(keyword: String): BooleanExpression? {
