@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ReviewRepository: JpaRepository<Review, Long> {
     fun findAllByProductId(productId: Long): List<Review>
-    fun findByIdAndBuyerId(Id: Long, buyerId: Long): Review? //수정필요
     fun findAllByBuyerId(buyerId: Long): List<Review>
 }
