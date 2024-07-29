@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.coupon.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.coupon.dto.CouponResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
@@ -34,11 +35,11 @@ class CouponService(
     fun createCoupon(couponRequest: CreateCouponRequest, userPrincipal: UserPrincipal): DefaultResponse {
 
         if (couponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && couponRequest.discount > 40)
-            throw RuntimeException("할인율은 40%를 넘길 수 없습 니다")
+            throw CustomRuntimeException(400, "할인율은 40%를 넘길 수 없습니다")
 
-        val product = productRepository.findByIdOrNull(couponRequest.productId) ?: throw RuntimeException("상품이 존재 하지 않습니다")
+        val product = productRepository.findByIdOrNull(couponRequest.productId) ?: throw CustomRuntimeException(404, "상품이 존재하지 않습니다")
 
-        if (couponRepository.existsByProductId(couponRequest.productId)) throw RuntimeException("이미 해당 상품에 쿠폰이 발급 되어 있습니다")
+        if (couponRepository.existsByProductId(couponRequest.productId)) throw CustomRuntimeException(400, "이미 해당 상품에 쿠폰이 발급되어 있습니다")
 
         couponRepository.save(
             Coupon(
@@ -58,9 +59,9 @@ class CouponService(
     @Transactional
     fun updateCoupon(couponId: Long, updateCouponRequest: UpdateCouponRequest, userPrincipal: UserPrincipal): DefaultResponse {
 
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw CustomRuntimeException(404, "쿠폰이 존재하지 않습니다")
 
-        if (result.sellerId != userPrincipal.id) throw RuntimeException("다른 사용자는 해당 쿠폰을 수정할 수 없습니다")
+        if (result.sellerId != userPrincipal.id) throw CustomRuntimeException(403, "다른 사용자는 해당 쿠폰을 수정할 수 없습니다")
 
         result.update(updateCouponRequest)
 
@@ -70,9 +71,9 @@ class CouponService(
     @Transactional
     fun deleteCoupon(couponId: Long, userPrincipal: UserPrincipal): DefaultResponse {
 
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
+        val result = couponRepository.findByIdOrNull(couponId) ?: throw CustomRuntimeException(404, "쿠폰이 존재하지 않습니다")
 
-        if (result.sellerId != userPrincipal.id) throw RuntimeException("다른 사용자는 해당 쿠폰을 삭제할 수 없습니다")
+        if (result.sellerId != userPrincipal.id) throw CustomRuntimeException(403, "다른 사용자는 해당 쿠폰을 삭제할 수 없습니다")
 
         couponRepository.delete(result)
 
@@ -82,7 +83,7 @@ class CouponService(
 
     fun getSellerCouponById(couponId: Long, userPrincipal: UserPrincipal): CouponResponse {
 
-        val coupon = couponRepository.findByIdAndSellerId(couponId, userPrincipal.id) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
+        val coupon = couponRepository.findByIdAndSellerId(couponId, userPrincipal.id) ?: throw CustomRuntimeException(404, "쿠폰이 존재하지 않습니다")
 
         return CouponResponse.from(coupon)
     }
@@ -94,7 +95,7 @@ class CouponService(
     fun getBuyerCouponById(couponId: Long, userPrincipal: UserPrincipal): CouponResponse {
 
         val result =
-            couponToBuyerRepository.findByCouponIdAndBuyerId(couponId, userPrincipal.id) ?: throw RuntimeException("쿠폰을 가지고 있지 않습 니다")
+            couponToBuyerRepository.findByCouponIdAndBuyerId(couponId, userPrincipal.id)  ?: throw CustomRuntimeException(404, "쿠폰을 가지고 있지 않습니다")
 
         return CouponResponse.from(result.coupon)
     }
@@ -111,14 +112,14 @@ class CouponService(
 
         val getLock = couponRepository.getLock("lock_$couponId", 10) == 1
 
-        if (!getLock) throw RuntimeException("락이 걸려있지 않습니다")
+        if (!getLock) throw CustomRuntimeException(400, "락이 걸려있지 않습니다")
 
-        val buyer = buyerRepository.findByEmail(userPrincipal.email) ?: throw RuntimeException("바이어가 존재 하지 않습니다")
+        val buyer = buyerRepository.findByEmail(userPrincipal.email) ?: throw CustomRuntimeException(404, "바이어가 존재하지 않습니다")
 
         kotlin.runCatching {
-            val coupon = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
+            val coupon = couponRepository.findByIdOrNull(couponId)  ?: throw CustomRuntimeException(404, "쿠폰이 존재하지 않습니다")
 
-//            if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw RuntimeException("동일한 쿠폰은 지급 받을 수 없습니다")
+//            if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw CustomRuntimeException(400, "동일한 쿠폰은 지급 받을 수 없습니다")
 
 
 
@@ -136,7 +137,7 @@ class CouponService(
 
             couponRepository.save(coupon)
         }.onFailure {
-            throw RuntimeException()
+            throw CustomRuntimeException(500, "쿠폰 지급 중 오류가 발생했습니다")
         }.also {
             couponRepository.releaseLock("lock_$couponId")
         }
@@ -148,10 +149,10 @@ class CouponService(
     fun applyCoupon(couponId: Long, buyerId: Long): DefaultResponse {
 
         val coupon = couponToBuyerRepository.findByCouponIdAndBuyerIdAndIsUsedFalse(couponId, buyerId)
-            ?: throw RuntimeException("쿠폰 정보가 존재 하지 않습니다")
+            ?: throw CustomRuntimeException(404, "쿠폰 정보가 존재하지 않습니다")
 
         val itemCart = itemCartRepository.findByProductIdAndBuyerId(coupon.coupon.product.id!!, buyerId)
-            ?: throw RuntimeException("장바구니에 아이템이 존재하지 않습니다")
+            ?: throw CustomRuntimeException(404, "장바구니에 아이템이 존재하지 않습니다")
 
         return DefaultResponse.from("쿠폰 적용이 완료 되었습니다")
     }

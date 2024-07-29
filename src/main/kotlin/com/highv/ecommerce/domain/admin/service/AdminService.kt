@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.admin.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.admin.dto.BlackListResponse
 import com.highv.ecommerce.domain.admin.entity.BlackList
 import com.highv.ecommerce.domain.admin.repository.BlackListRepository
@@ -20,7 +21,7 @@ class AdminService(
     @Transactional
     fun sanctionSeller(sellerId: Long): DefaultResponse {
         val seller = sellerRepository.findByIdOrNull(sellerId)
-            ?: throw RuntimeException("Seller id $sellerId not found")
+            ?: throw CustomRuntimeException(404, "Seller id $sellerId not found")
 
         val existingBlackList = blackListRepository.findByEmail(seller.email)
 
@@ -49,12 +50,12 @@ class AdminService(
     @Transactional
     fun sanctionProduct(productId: Long): DefaultResponse {
         val product = productRepository.findByIdOrNull(productId)
-            ?: throw RuntimeException("Product id $productId not found")
+            ?: throw CustomRuntimeException(404, "Product id $productId not found")
 
         // 상품에서 판매자 정보를 가져옵니다.
         val seller = product.shop.sellerId
             ?.let { sellerRepository.findByIdOrNull(it) }
-            ?: throw RuntimeException("Seller not found for product id $productId")
+            ?: throw CustomRuntimeException(404, "Seller not found for product id $productId")
 
         // 판매자의 이메일로 블랙리스트에서 검색합니다.
         val existingBlackList = blackListRepository.findByEmail(seller.email)
@@ -83,7 +84,7 @@ class AdminService(
     /*    //구매자 제재 로직 구현 (미구현)
     fun sanctionBuyer(buyerId: Long): DefaultResponse {
         val buyer = buyerRepository.findByIdOrNull(buyerId)
-            ?: throw RuntimeException("Buyer id $buyerId not found")
+            ?: throw CustomRuntimeException(404, "Buyer id $buyerId not found")
         buyerRepository.save(buyer)
         return DefaultResponse("구매자 제재 완료")
     }*/
@@ -98,14 +99,14 @@ class AdminService(
     // 블랙리스트 단건 조회 로직 구현
     fun getBlackList(blackListId: Long): BlackListResponse {
         val blackList = blackListRepository.findByIdOrNull(blackListId)
-            ?: throw RuntimeException("블랙리스트가 존재하지 않습니다.")
+            ?: throw CustomRuntimeException(404, "블랙리스트가 존재하지 않습니다.")
         return BlackListResponse(blackList.nickname, blackList.email,blackList.sanctionsCount,blackList.isSanctioned)
     }
 
     // 블랙리스트 삭제 로직 구현
     fun deleteBlackList(blackListId: Long): DefaultResponse {
         val blackList = blackListRepository.findByIdOrNull(blackListId)
-            ?: throw RuntimeException("블랙리스트 id $blackListId 존재하지 않습니다.")
+            ?: throw CustomRuntimeException(404, "블랙리스트 id $blackListId 존재하지 않습니다.")
         blackListRepository.delete(blackList)
         return DefaultResponse("블랙리스트 삭제 완료")
     }
@@ -114,7 +115,7 @@ class AdminService(
         @Transactional
         fun approveSellerResignation(sellerId: Long): DefaultResponse {
             val seller = sellerRepository.findByIdOrNull(sellerId)
-                ?: throw RuntimeException("Seller id $sellerId not found")
+                ?: throw CustomRuntimeException(404, "Seller id $sellerId not found")
             sellerRepository.delete(seller)
             return DefaultResponse("판매자 탈퇴 승인 완료")
         }
@@ -124,7 +125,7 @@ class AdminService(
         @Transactional
         fun promotePendingSeller(sellerId: Long): DefaultResponse {
             val seller = sellerRepository.findByIdOrNull(sellerId)
-                ?: throw RuntimeException("Seller id $sellerId not found")
+                ?: throw CustomRuntimeException(404, "Seller id $sellerId not found")
             seller.status = "APPROVED" //판매자의 상태 APPROVED로 변경한다고 가정
             sellerRepository.save(seller)
             return DefaultResponse("판매자 승격 완료")

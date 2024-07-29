@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.coupon.entity
 
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import com.highv.ecommerce.domain.product.entity.Product
@@ -44,7 +45,7 @@ class Coupon(
     fun update(updateCouponRequest: UpdateCouponRequest) {
 
         if(updateCouponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && updateCouponRequest.discount > 40){
-            throw RuntimeException("할인율은 40%를 넘길 수 없습 니다")
+            throw CustomRuntimeException(400, "할인율은 40%를 넘길 수 없습니다")
         }
 
         discountPolicy = updateCouponRequest.discountPolicy
@@ -54,11 +55,11 @@ class Coupon(
     }
 
     fun spendCoupon() {
-        if(quantity <= 0) throw RuntimeException("쿠폰이 매진 되었습니다")
+        if(quantity <= 0) throw CustomRuntimeException(400, "쿠폰이 매진되었습니다")
         quantity -= 1
     }
 
     fun validExpiredAt() {
-        if(expiredAt <= LocalDateTime.now()) throw RuntimeException("쿠폰 유호 기간이 지났 습니다")
+        if(expiredAt <= LocalDateTime.now()) throw CustomRuntimeException(400, "쿠폰 유효 기간이 지났습니다")
     }
 }
