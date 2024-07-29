@@ -11,23 +11,24 @@ import kotlin.test.Test
 
 class SocialMemberDomainServiceTest (
 
-)  {
-    private val buyerRepository : BuyerRepository = mockk()
+) {
+    private val buyerRepository: BuyerRepository = mockk()
 
     private val socialMemberDomainService = SocialMemberDomainService(buyerRepository)
 
     @Test
-    fun `사용자 정보 없을 경우 회원가입처리` () {
+    fun `사용자 정보 없을 경우 회원가입처리`() {
         //GIVEN
         buyerRepository.deleteAll() //테스트전 사용자정보 전부 삭제
-        val userinfo = OAuthLoginUserInfo(provider = OAuthProvider.KAKAO, id = "0729", nickname = "hysup", profileImage = "String" )
+        val userinfo =
+            OAuthLoginUserInfo(provider = OAuthProvider.KAKAO, id = "0729", nickname = "hysup", profileImage = "String")
 
         //WHEN
         val result = socialMemberDomainService.registerIfAbsent(userinfo)
 
         //THEN
         result.address shouldBe
-        result.providerName shouldBe OAuthProvider.KAKAO
+            result.providerName shouldBe OAuthProvider.KAKAO
         result.id shouldNotBe null
         result.nickname shouldBe 1L
         result.profileImage shouldBe "String"
@@ -42,4 +43,4 @@ class SocialMemberDomainServiceTest (
         }
 
     }
-    }
+}
