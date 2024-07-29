@@ -9,7 +9,7 @@ import com.highv.ecommerce.domain.product.dto.ProductResponse
 import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
-import com.highv.ecommerce.domain.shop.repository.ShopRepository
+import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
 import com.highv.ecommerce.infra.s3.S3Manager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

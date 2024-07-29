@@ -5,7 +5,7 @@ import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateSellerRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateShopRequest
 import com.highv.ecommerce.domain.backoffice.service.SellerInfoService
 import com.highv.ecommerce.domain.seller.dto.SellerResponse
-import com.highv.ecommerce.domain.shop.dto.ShopResponse
+import com.highv.ecommerce.domain.seller.shop.dto.ShopResponse
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

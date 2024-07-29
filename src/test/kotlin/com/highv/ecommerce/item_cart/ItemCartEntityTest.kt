@@ -2,7 +2,7 @@ package com.highv.ecommerce.item_cart
 
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.product.entity.Product
-import com.highv.ecommerce.domain.shop.entity.Shop
+import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.AnnotationSpec
 import io.kotest.matchers.shouldBe

@@ -1,6 +1,6 @@
 package com.highv.ecommerce.domain.seller.entity
 
-import com.highv.ecommerce.domain.shop.entity.Shop
+import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
