@@ -106,7 +106,7 @@ class CouponServiceVn(
 
         val coupon = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
-        if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw RuntimeException("동일한 쿠폰은 지급 받을 수 없습니다")
+//        if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw RuntimeException("동일한 쿠폰은 지급 받을 수 없습니다")
 
 
 

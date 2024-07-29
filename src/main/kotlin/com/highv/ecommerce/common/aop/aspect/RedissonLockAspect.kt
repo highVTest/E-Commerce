@@ -48,6 +48,8 @@ class RedissonLockAspect(
 
             val lockable = lock.tryLock(annotation.waitTime, annotation.leaseTime, TimeUnit.MILLISECONDS)
 
+            // 락 키를 Redis 에다 저장 하는 로직을 생성
+
             log.info("END : Attempting to acquire lock for key: $lockKey with waitTime: ${annotation.waitTime} and leaseTime: ${annotation.leaseTime}")
 
             if(!lockable) {
@@ -81,7 +83,7 @@ class RedissonLockAspect(
     private fun checkAndInitializeKey(lockKey: String): Boolean {
         val redisCommands = redissonClient.getScript(StringCodec.INSTANCE)
         val script = """
-            if (redis.call('type', KEYS[1]).ok ~= 'string') then
+            if (redis.call('type', KEYS[1]).ok ~= 'hset') then
                 redis.call('del', KEYS[1]);
                 redis.call('hset', KEYS[1], 'init', '1');
             end;
