@@ -4,7 +4,7 @@ import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import com.highv.ecommerce.domain.coupon.entity.Coupon
 import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import com.highv.ecommerce.domain.product.entity.Product
-import com.highv.ecommerce.domain.shop.entity.Shop
+import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test

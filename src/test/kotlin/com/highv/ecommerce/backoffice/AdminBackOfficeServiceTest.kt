@@ -1,14 +1,14 @@
 package com.highv.ecommerce.backoffice
 
-import com.highv.ecommerce.domain.backoffice.admin.entity.BlackList
+import com.highv.ecommerce.domain.admin.entity.BlackList
 import com.highv.ecommerce.domain.backoffice.admin.entity.QBlackList.blackList
-import com.highv.ecommerce.domain.backoffice.admin.repository.BlackListRepository
-import com.highv.ecommerce.domain.backoffice.admin.service.AdminService
+import com.highv.ecommerce.domain.admin.repository.BlackListRepository
+import com.highv.ecommerce.domain.admin.service.AdminService
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.entity.Seller
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
-import com.highv.ecommerce.domain.shop.entity.Shop
+import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
