@@ -27,9 +27,9 @@ class ReviewService(
             rate = reviewRequest.rate,
             content = reviewRequest.content
         )
-        reviewRepository.save(review)
+        val savedReview = reviewRepository.saveAndFlush(review)
         updateShopAverageRate(productId)
-        return ReviewResponse.from(review)
+        return ReviewResponse.from(savedReview)
     }
 
     fun updateReview(
@@ -44,9 +44,9 @@ class ReviewService(
             rate = reviewRequest.rate
             content = reviewRequest.content
         }
-        reviewRepository.save(review)
+        val savedReview = reviewRepository.saveAndFlush(review)
         updateShopAverageRate(productId)
-        return ReviewResponse.from(review)
+        return ReviewResponse.from(savedReview)
     }
 
     fun deleteReview(productId: Long, reviewId:Long, buyerId: Long): DefaultResponse {
