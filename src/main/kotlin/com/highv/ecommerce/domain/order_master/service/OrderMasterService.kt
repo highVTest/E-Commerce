@@ -60,7 +60,7 @@ class OrderMasterService(
             }
         )
 
-        couponToBuyer.map { it.useCoupon() }
+        couponToBuyer.forEach { it.useCoupon() }
 
         cart.forEach {
             if (it.product.productBackOffice!!.quantity < it.quantity) throw RuntimeException("재고가 부족 합니다")

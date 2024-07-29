@@ -39,4 +39,18 @@ class ItemCartQueryDslImpl(
 
         return query
     }
+
+    override fun findAllByIdAndBuyerId(id: List<Long>, buyerId: Long): List<ItemCart> {
+        val query = queryFactory
+            .select(itemCart)
+            .from(itemCart)
+            .innerJoin(itemCart.product()).fetchJoin()
+            .innerJoin(itemCart.product().productBackOffice()).fetchJoin()
+            .innerJoin(itemCart.product().shop()).fetchJoin()
+            .where(itemCart.buyerId.eq(buyerId))
+            .where(itemCart.id.`in`(id))
+            .fetch()
+
+        return query
+    }
 }

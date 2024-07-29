@@ -2,7 +2,6 @@ package com.highv.ecommerce.domain.item_cart.repository
 
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
 
 interface ItemCartRepository : JpaRepository<ItemCart, Long>, ItemCartQueryDsl {
     // fun findByProductIdAndBuyerId(productId: Long, buyerId: Long): ItemCart?
@@ -11,6 +10,6 @@ interface ItemCartRepository : JpaRepository<ItemCart, Long>, ItemCartQueryDsl {
 
     fun findAllByBuyerId(buyerId: Long): List<ItemCart>
 
-    @Query("SELECT ic FROM ItemCart ic WHERE ic.id IN :id AND ic.buyerId = :buyerId")
-    fun findAllByIdAndBuyerId(id: List<Long>, buyerId: Long): List<ItemCart>
+    // @Query("SELECT ic FROM ItemCart ic WHERE ic.id IN :id AND ic.buyerId = :buyerId")
+    // fun findAllByIdAndBuyerId(id: List<Long>, buyerId: Long): List<ItemCart>
 }
