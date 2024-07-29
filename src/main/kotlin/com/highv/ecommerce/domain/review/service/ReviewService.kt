@@ -58,28 +58,15 @@ class ReviewService(
     }
 
     fun getProductReviews(productId: Long): List<ReviewResponse> {
-        return reviewRepository.findAllByProductId(productId).map { review ->
-            ReviewResponse(
-                id = review.id!!,
-                rate = review.rate,
-                content = review.content
-            )
-        }
+        return reviewRepository.findAllByProductId(productId).map { ReviewResponse.from(it) }
     }
 
     fun getBuyerReviews(buyerId: Long): List<ReviewResponse> {
         val reviews = reviewRepository.findAllByBuyerId(buyerId)
-
-        return reviews.map { review ->
-            ReviewResponse(
-                id = review.id!!,
-                rate = review.rate,
-                content = review.content
-            )
-        }
+        return reviews.map { ReviewResponse.from(it)}
     }
 
-    fun updateShopAverageRate(productId:Long){
+    private fun updateShopAverageRate(productId:Long){
         val reviews = reviewRepository.findAllByProductId(productId)
         val shopId = productRepository.findByIdOrNull(productId)?.shop?.id ?:throw RuntimeException("Product id $productId not found")
         val shop = shopRepository.findByIdOrNull(shopId)?: throw RuntimeException("Shop not found for this product and shop")
