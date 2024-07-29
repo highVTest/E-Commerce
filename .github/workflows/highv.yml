@@ -4,6 +4,9 @@ name: Run Test
 # Event Trigger 특정 액션 (Push, Pull_Request)등이 명시한 Branch 에서 일어나면 동작을 수행한다.
 on:
   # github pull request 생성시
+  push:
+    branches:
+      - fix/*
   pull_request:
     branches:
       - dev
