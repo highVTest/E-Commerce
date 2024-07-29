@@ -22,11 +22,13 @@ import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.shop.entity.Shop
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
-import io.mockk.*
-import kotlin.test.Test
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDateTime
+import kotlin.test.Test
 
 class OrderMasterServiceService {
 
@@ -43,9 +45,8 @@ class OrderMasterServiceService {
         couponToBuyerRepository
     )
 
-
     @Test
-    fun `결제 시에 장바구니가 비었을 경우 애러 메세지 출력`(){
+    fun `결제 시에 장바구니가 비었을 경우 애러 메세지 출력`() {
         val paymentRequest = PaymentRequest(
             cartIdList = arrayListOf(),
             couponIdList = arrayListOf(),
@@ -59,7 +60,7 @@ class OrderMasterServiceService {
     }
 
     @Test
-    fun `쿠폰을 가져올 경우 유효시간 만료 시 애러 메세지 출력`(){
+    fun `쿠폰을 가져올 경우 유효시간 만료 시 애러 메세지 출력`() {
         val paymentRequest = PaymentRequest(
             cartIdList = arrayListOf(1),
             couponIdList = arrayListOf(1),
@@ -69,7 +70,8 @@ class OrderMasterServiceService {
 
         every { buyerRepository.findByIdOrNull(any()) } returns buyer
         every { itemCartRepository.findAllByIdAndBuyerId(any(), any()) } returns listOf(itemCart)
-        every { couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(any(), any())
+        every {
+            couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(any(), any())
         } returns listOf(couponToBuyer)
 
         shouldThrow<RuntimeException> {
@@ -80,7 +82,7 @@ class OrderMasterServiceService {
     }
 
     @Test
-    fun `결제가 제대로 이루어 졌을 때 로직 확인`(){
+    fun `결제가 제대로 이루어 졌을 때 로직 확인`() {
         val paymentRequest = PaymentRequest(
             cartIdList = arrayListOf(1),
             couponIdList = arrayListOf(1),
@@ -90,16 +92,17 @@ class OrderMasterServiceService {
 
         every { buyerRepository.findByIdOrNull(any()) } returns buyer
         every { itemCartRepository.findAllByIdAndBuyerId(any(), any()) } returns listOf(itemCart)
-        every { couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(any(), any())
+        every {
+            couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(any(), any())
         } returns listOf(couponToBuyer)
-        every { orderMasterRepository.discountTotalPriceList(1L, listOf(couponToBuyer))
-        } returns mapOf( 1L to 9000 )
+        every {
+            orderMasterRepository.discountTotalPriceList(1L, listOf(couponToBuyer))
+        } returns mapOf(1L to 9000)
         every { orderMasterRepository.saveAndFlush(any()) } returns orderMaster
         every { orderDetailsRepository.saveAll(any()) } answers {
             firstArg<List<OrderDetails>>()
         }
         every { itemCartRepository.deleteAll(any()) } returns Unit
-
 
         val result = orderMasterService.requestPayment(1L, paymentRequest)
         val savedOrderDetails = slot<List<OrderDetails>>()
@@ -112,39 +115,37 @@ class OrderMasterServiceService {
         productBackOffice.quantity shouldBe 99
         couponToBuyer.isUsed shouldBe true
         result shouldBe defaultResponse("주문이 완료 되었습니다, 주문 번호 : 1")
-
     }
 
     @Test
-    fun `재고가 부족할 경우 재고가 부족 합니다 메세지 출력`(){
+    fun `재고가 부족할 경우 재고가 부족 합니다 메세지 출력`() {
         val paymentRequest = PaymentRequest(
             cartIdList = arrayListOf(1),
             couponIdList = arrayListOf(1),
         )
-
+        couponToBuyer.coupon.expiredAt = LocalDateTime.of(2129, 1, 1, 1, 0)
         productBackOffice.quantity = 0
         product1.productBackOffice = productBackOffice
 
         every { buyerRepository.findByIdOrNull(any()) } returns buyer
         every { itemCartRepository.findAllByIdAndBuyerId(any(), any()) } returns listOf(itemCart)
-        every { couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(any(), any())
+        every {
+            couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(any(), any())
         } returns listOf(couponToBuyer)
-        every { orderMasterRepository.discountTotalPriceList(1L, listOf(couponToBuyer))
-        } returns mapOf( 1L to 9000 )
+        every {
+            orderMasterRepository.discountTotalPriceList(1L, listOf(couponToBuyer))
+        } returns mapOf(1L to 9000)
         every { orderMasterRepository.saveAndFlush(any()) } returns orderMaster
-        every { orderDetailsRepository.saveAll(any()) } returns  listOf(orderDetails)
+        every { orderDetailsRepository.saveAll(any()) } returns listOf(orderDetails)
 
         shouldThrow<RuntimeException> {
             orderMasterService.requestPayment(1L, paymentRequest)
         }.let {
             it.message shouldBe "재고가 부족 합니다"
         }
-
-
     }
 
-
-    companion object{
+    companion object {
         private fun defaultResponse(msg: String) = DefaultResponse(msg)
         private val orderMaster = OrderMaster(
             id = 1L,
@@ -225,5 +226,4 @@ class OrderMasterServiceService {
             shopId = 1L
         ).apply { id = 1L }
     }
-
 }

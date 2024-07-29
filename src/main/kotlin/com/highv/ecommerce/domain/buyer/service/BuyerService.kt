@@ -44,6 +44,12 @@ class BuyerService(
         return BuyerResponse.from(savedBuyer)
     }
 
+    fun getMyProfile(buyerId: Long): BuyerResponse {
+        val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw RuntimeException("구매자 정보가 없습니다.")
+
+        return BuyerResponse.from(buyer)
+    }
+
     @Transactional
     fun changePassword(request: UpdateBuyerPasswordRequest, userId: Long) {
 

@@ -9,20 +9,19 @@ import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.infra.email.EmailUtils
 import com.highv.ecommerce.infra.redis.RedisUtils
 import com.highv.ecommerce.infra.security.jwt.JwtPlugin
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
+import io.mockk.every
 import io.mockk.mockk
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
 import org.springframework.security.crypto.password.PasswordEncoder
 
 class loginUserServiceTest {
 
-    private val buyerRepository: BuyerRepository = mock(BuyerRepository::class.java)
-    private val sellerRepository: SellerRepository = mock(SellerRepository::class.java)
-    private val passwordEncoder: PasswordEncoder = mock(PasswordEncoder::class.java)
-    private val jwtPlugin: JwtPlugin = mock(JwtPlugin::class.java)
+    private val buyerRepository: BuyerRepository = mockk<BuyerRepository>()
+    private val sellerRepository: SellerRepository = mockk<SellerRepository>()
+    private val passwordEncoder: PasswordEncoder = mockk<PasswordEncoder>()
+    private val jwtPlugin: JwtPlugin = mockk<JwtPlugin>()
     private val redisUtils = mockk<RedisUtils>()
     private val emailUtils = mockk<EmailUtils>()
     private val userService: UserService =
@@ -44,15 +43,15 @@ class loginUserServiceTest {
             providerId = null
         )
 
-        `when`(buyerRepository.findByEmail(loginRequest.email)).thenReturn(buyer)
-        `when`(passwordEncoder.matches(loginRequest.password, buyer.password)).thenReturn(true)
-        `when`(jwtPlugin.generateAccessToken(buyer.id.toString(), buyer.email, "BUYER")).thenReturn("token")
+        every { buyerRepository.findByEmail(loginRequest.email) } returns buyer
+        every { passwordEncoder.matches(loginRequest.password, buyer.password) } returns true
+        every { jwtPlugin.generateAccessToken(buyer.id.toString(), buyer.email, "BUYER") } returns "token"
 
         // when
         val response = userService.loginBuyer(loginRequest)
 
         // then
-        assertEquals("token", response.accessToken)
+        response.accessToken shouldBe "token"
     }
 
     @Test
@@ -69,15 +68,15 @@ class loginUserServiceTest {
             address = "Seoul, Korea"
         )
 
-        `when`(sellerRepository.findByEmail(loginRequest.email)).thenReturn(seller)
-        `when`(passwordEncoder.matches(loginRequest.password, seller.password)).thenReturn(true)
-        `when`(jwtPlugin.generateAccessToken(seller.id.toString(), seller.email, "SELLER")).thenReturn("token")
+        every { sellerRepository.findByEmail(loginRequest.email) } returns seller
+        every { passwordEncoder.matches(loginRequest.password, seller.password) } returns true
+        every { jwtPlugin.generateAccessToken(seller.id.toString(), seller.email, "SELLER") } returns "token"
 
         // when
         val response = userService.loginSeller(loginRequest)
 
         // then
-        assertEquals("token", response.accessToken)
+        response.accessToken shouldBe "token"
     }
 
     @Test
@@ -85,23 +84,11 @@ class loginUserServiceTest {
         // given
         val loginRequest = LoginRequest(email = "nonexistent@example.com", password = "wrongpassword")
 
-        `when`(buyerRepository.findByEmail(loginRequest.email)).thenReturn(null)
+        every { buyerRepository.findByEmail(loginRequest.email) } returns null
+        every { passwordEncoder.matches(loginRequest.password, any()) } returns false
 
         // when & then
-        val exception = assertThrows<IllegalArgumentException> { userService.loginBuyer(loginRequest) }
-        assertEquals("Invalid email or password", exception.message)
+        val exception = shouldThrow<RuntimeException> { userService.loginBuyer(loginRequest) }
+        exception.message shouldBe "구매자 로그인 실패"
     }
-
-    // 아래 테스트는 함수를 변경해서 테스트하기 좀 애매한 것 같음
-    // 일단 나중에 리팩토링때 건들 예정임으로 일단 주석처리
-
-    // @Test
-    // fun `로그인 실패 테스트 - 역할 누락`() {
-    //     // given
-    //     val loginRequest = LoginRequest(email = "buyer@example.com", password = "password123", role = "UNKNOWN")
-    //
-    //     // when & then
-    //     val exception = assertThrows<IllegalArgumentException> { userService.login(loginRequest) }
-    //     assertEquals("Invalid email or password", exception.message)
-    // }
 }

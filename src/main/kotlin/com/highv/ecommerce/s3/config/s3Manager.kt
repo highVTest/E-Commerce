@@ -3,7 +3,6 @@ package com.highv.ecommerce.s3.config
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.ObjectMetadata
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 
@@ -13,12 +12,13 @@ class S3Manager(
     @Value("\${cloud.aws.s3.bucket}") val bucket: String
 ) {
 
-    fun uploadFile(file: MultipartFile): String {
+    fun uploadFile(file: MultipartFile) {
         val util = FileUtil()
         val type = util.validImgFile(file.inputStream)
-        if (type.isNullOrEmpty()){throw RuntimeException("이미지 파일만 업로드 해주세요")}
+        if (type.isNullOrEmpty()) {
+            throw RuntimeException("이미지 파일만 업로드 해주세요")
+        }
         val fileName = file.originalFilename
-        val fileUrl = "https://$bucket/test/${fileName}"
 
         val metadata = ObjectMetadata().apply { // 파일의 컨텐츠 타입과 크기를 설정
             contentType = type
@@ -26,8 +26,6 @@ class S3Manager(
         }
 
         amazonS3Client.putObject(bucket, fileName, file.inputStream, metadata) // Amazon S3 클라이언트를 사용하여 파일을 S3 버킷에 업로드
-
-        return ResponseEntity.ok(fileUrl).toString()
     }
 
     fun getFile(fileName: String?): String {
@@ -40,5 +38,4 @@ class S3Manager(
     fun deleteFile(fileName: String) {
         amazonS3Client.deleteObject(bucket, fileName)
     }
-
-    }
+}

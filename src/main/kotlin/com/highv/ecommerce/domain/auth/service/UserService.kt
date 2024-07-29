@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.auth.service
 
 import com.highv.ecommerce.common.dto.AccessTokenResponse
+import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.auth.dto.EmailAuthResponse
 import com.highv.ecommerce.domain.auth.dto.LoginRequest
 import com.highv.ecommerce.domain.auth.dto.UserRole
@@ -47,7 +48,7 @@ class UserService(
         throw RuntimeException("구매자 로그인 실패")
     }
 
-    fun sendMail(toEmail: String, role: UserRole): String {
+    fun sendMail(toEmail: String, role: UserRole): DefaultResponse {
 
         if (duplicateEmail(toEmail, role)) {
             throw RuntimeException("이미 존재하는 이메일입니다.")
@@ -64,7 +65,7 @@ class UserService(
             expiredTimeMillis = expirationMillis
         )
 
-        return authCode // TODO: 배포때는 인증번호 반환 X
+        return DefaultResponse("인증번호가 발송됐습니다.") // TODO: 배포때는 인증번호 반환 X
     }
 
     fun verifyCode(email: String, role: UserRole, code: String): EmailAuthResponse {

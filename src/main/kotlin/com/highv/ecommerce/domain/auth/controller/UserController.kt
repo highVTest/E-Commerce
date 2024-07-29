@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.auth.controller
 
 import com.highv.ecommerce.common.dto.AccessTokenResponse
+import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.auth.dto.EmailAuthRequest
 import com.highv.ecommerce.domain.auth.dto.EmailAuthResponse
 import com.highv.ecommerce.domain.auth.dto.LoginRequest
@@ -32,7 +33,7 @@ class UserController(
     fun sendMail(
         @RequestBody request: EmailAuthRequest,
         bindingResult: BindingResult
-    ): ResponseEntity<String> {
+    ): ResponseEntity<DefaultResponse> {
 
         if (bindingResult.hasErrors()) {
             throw RuntimeException(bindingResult.fieldError?.defaultMessage.toString())
