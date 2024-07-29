@@ -42,7 +42,8 @@ class ProductQueryDslRepositoryImpl(
 
         val query = jpaQueryFactory
             .selectFrom(product)
-            .leftJoin(product.productBackOffice(), productBackOffice)
+            .leftJoin(product.productBackOffice(), productBackOffice).fetchJoin()
+            .leftJoin(product.shop()).fetchJoin()
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .orderBy(*pageable.sort.map { it.toOrderSpecifier() }.toList().toTypedArray())
@@ -61,7 +62,8 @@ class ProductQueryDslRepositoryImpl(
 
         val query = jpaQueryFactory
             .selectFrom(product)
-            .leftJoin(product.productBackOffice(), productBackOffice)
+            .leftJoin(product.productBackOffice(), productBackOffice).fetchJoin()
+            .leftJoin(product.shop()).fetchJoin()
             .where(product.categoryId.eq(categoryId))
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
