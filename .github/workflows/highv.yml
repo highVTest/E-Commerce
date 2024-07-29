@@ -22,7 +22,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: dev
 
       # with은 plugin 파라미터 입니다. (java 17버전 셋업)
       - name: java setup
