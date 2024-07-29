@@ -1,9 +1,8 @@
 package com.highv.ecommerce.domain.review.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.domain.review.dto.CreateReviewRequest
+import com.highv.ecommerce.domain.review.dto.ReviewRequest
 import com.highv.ecommerce.domain.review.dto.ReviewResponse
-import com.highv.ecommerce.domain.review.dto.UpdateReviewRequest
 import com.highv.ecommerce.domain.review.service.ReviewService
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
@@ -18,48 +17,50 @@ import org.springframework.web.bind.annotation.*
 class ReviewController(
     private val reviewService: ReviewService
 ) {
-    @PostMapping("/{productId}") //현재는 reviewId사용중
+    @PostMapping("/{productId}")
     @PreAuthorize("hasRole('BUYER')")
     fun addReview(
-        @PathVariable productId: Long, //현재는 reviewId사용중
-        @RequestBody reviewRequest: CreateReviewRequest,
+        @PathVariable productId: Long,
+        @RequestBody reviewRequest: ReviewRequest,
         @AuthenticationPrincipal buyerId: UserPrincipal
-    ): ResponseEntity<DefaultResponse> {
+    ): ResponseEntity<ReviewResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(reviewService.addReview(productId, reviewRequest, buyerId.id))
     }
 
-    @GetMapping()
-    fun getReviews(
+    @PutMapping("/{productId}/{reviewId}")
+    @PreAuthorize("hasRole('BUYER')")
+    fun updateReview(
+        @PathVariable productId: Long,
+        @PathVariable reviewId: Long,
+        @RequestBody reviewRequest: ReviewRequest,
+        @AuthenticationPrincipal buyerId: UserPrincipal
+    ): ResponseEntity<ReviewResponse> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(reviewService.updateReview(productId, reviewId, reviewRequest, buyerId.id))
+    }
+
+    @DeleteMapping("/{productId}/{reviewId}")
+    @PreAuthorize("hasRole('BUYER')")
+    fun deleteReview(
+        @PathVariable productId: Long,
+        @PathVariable reviewId: Long,
+        @AuthenticationPrincipal buyerId: UserPrincipal
+    ): ResponseEntity<DefaultResponse> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(reviewService.deleteReview(productId, reviewId, buyerId.id))
+    }
+
+    @GetMapping
+    fun getProductReviews(
         @RequestParam productId: Long,
     ): ResponseEntity<List<ReviewResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(reviewService.getReviews(productId))
-    }
-
-    @PatchMapping("/{productId}")
-    @PreAuthorize("hasRole('BUYER')")
-    fun updateReview(
-        @PathVariable productId: Long, //현재는 reviewId사용중
-        @RequestBody reviewRequest: UpdateReviewRequest,
-        @AuthenticationPrincipal buyerId: UserPrincipal
-    ): ResponseEntity<DefaultResponse> {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(reviewService.updateReview(productId, reviewRequest, buyerId.id))
-    }
-
-    @DeleteMapping("/{productId}")
-    @PreAuthorize("hasRole('BUYER')")
-    fun deleteReview(
-        @PathVariable productId: Long, //현재는 reviewId사용중
-        @AuthenticationPrincipal buyerId: UserPrincipal
-    ): ResponseEntity<DefaultResponse> {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(reviewService.deleteReview(productId, buyerId.id))
+            .body(reviewService.getProductReviews(productId))
     }
 
     @GetMapping("/buyer")
@@ -73,4 +74,3 @@ class ReviewController(
     }
 
 }
-
