@@ -26,15 +26,14 @@ class CouponController(
     fun createCoupon(
         @Valid @RequestBody couponRequest: CreateCouponRequest,
         bindingResult: BindingResult,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<DefaultResponse>{
 
         if(bindingResult.hasErrors()) throw RuntimeException(bindingResult.fieldError?.defaultMessage.toString())
-        if(userPrincipal == null) throw RuntimeException()
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(couponService.createCoupon(couponRequest, userPrincipal))
+            .body(couponService.createCoupon(couponRequest, userPrincipal.id))
     }
 
     @PreAuthorize("hasRole('SELLER')")
@@ -43,102 +42,84 @@ class CouponController(
         @PathVariable("couponId") couponId:Long,
         @Valid @RequestBody updateCouponRequest: UpdateCouponRequest,
         bindingResult: BindingResult,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<DefaultResponse> {
 
         if(bindingResult.hasErrors()) throw RuntimeException(bindingResult.fieldError?.defaultMessage.toString())
 
-        if(userPrincipal == null) throw RuntimeException()
-
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.updateCoupon(couponId, updateCouponRequest, userPrincipal))
+            .body(couponService.updateCoupon(couponId, updateCouponRequest, userPrincipal.id))
     }
-
 
 
     @PreAuthorize("hasRole('SELLER')")
     @DeleteMapping("/seller/coupon/{couponId}")
     fun deleteCoupon(
         @PathVariable couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
-    ): ResponseEntity<DefaultResponse> {
-
-        if(userPrincipal == null) throw RuntimeException()
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(couponService.deleteCoupon(couponId, userPrincipal))
-    }
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(couponService.deleteCoupon(couponId, userPrincipal.id))
 
 
     @PreAuthorize("hasRole('SELLER')")
     @GetMapping("/seller/coupon/{couponId}")
     fun getSellerCouponById(
         @PathVariable("couponId") couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<CouponResponse> {
-
-        if(userPrincipal == null) throw RuntimeException()
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.getSellerCouponById(couponId, userPrincipal))
+            .body(couponService.getSellerCouponById(couponId, userPrincipal.id))
     }
 
 
     @PreAuthorize("hasRole('SELLER')")
     @GetMapping("/seller/coupon")
     fun getSellerCouponList(
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<List<CouponResponse>> {
-
-        if(userPrincipal == null) throw RuntimeException()
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.getSellerCouponList(userPrincipal))
+            .body(couponService.getSellerCouponList(userPrincipal.id))
     }
 
     @PreAuthorize("hasRole('BUYER')")
     @GetMapping("/buyer/coupon/{couponId}")
     fun getBuyerCouponById(
         @PathVariable("couponId") couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<CouponResponse> {
-
-        if(userPrincipal == null) throw RuntimeException()
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.getBuyerCouponById(couponId, userPrincipal))
+            .body(couponService.getBuyerCouponById(couponId, userPrincipal.id))
     }
 
     @PreAuthorize("hasRole('BUYER')")
     @GetMapping("/buyer/coupon")
     fun getBuyerCouponList(
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<List<CouponResponse>> {
-
-        if(userPrincipal == null) throw RuntimeException()
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.getBuyerCouponList(userPrincipal))
+            .body(couponService.getBuyerCouponList(userPrincipal.id))
     }
 
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/buyer/coupon/{couponId}")
     fun issuedCoupon(
         @PathVariable couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<DefaultResponse> {
-
-        if(userPrincipal == null) throw RuntimeException()
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.issuedCoupon(couponId, userPrincipal))
+            .body(couponService.issuedCoupon(couponId, userPrincipal.id))
     }
 
     // 최후의 보루

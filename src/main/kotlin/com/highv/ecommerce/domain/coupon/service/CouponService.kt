@@ -28,10 +28,10 @@ class CouponService(
     private val itemCartRepository: ItemCartRepository
 ) {
 
-    private val log = LoggerFactory.getLogger("CouponService::class.java")
-
     @Transactional
-    fun createCoupon(couponRequest: CreateCouponRequest, userPrincipal: UserPrincipal): DefaultResponse {
+    fun createCoupon(couponRequest: CreateCouponRequest, sellerId: Long): DefaultResponse {
+
+
 
         if (couponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && couponRequest.discount > 40)
             throw RuntimeException("할인율은 40%를 넘길 수 없습 니다")
@@ -48,7 +48,7 @@ class CouponService(
                 expiredAt = couponRequest.expiredAt,
                 createdAt = LocalDateTime.now(),
                 quantity = couponRequest.quantity,
-                sellerId = userPrincipal.id
+                sellerId = sellerId
             )
         )
 
@@ -56,11 +56,11 @@ class CouponService(
     }
 
     @Transactional
-    fun updateCoupon(couponId: Long, updateCouponRequest: UpdateCouponRequest, userPrincipal: UserPrincipal): DefaultResponse {
+    fun updateCoupon(couponId: Long, updateCouponRequest: UpdateCouponRequest, sellerId: Long): DefaultResponse {
 
         val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
-        if (result.sellerId != userPrincipal.id) throw RuntimeException("다른 사용자는 해당 쿠폰을 수정할 수 없습니다")
+        if (result.sellerId != sellerId) throw RuntimeException("다른 사용자는 해당 쿠폰을 수정할 수 없습니다")
 
         result.update(updateCouponRequest)
 
@@ -68,11 +68,11 @@ class CouponService(
     }
 
     @Transactional
-    fun deleteCoupon(couponId: Long, userPrincipal: UserPrincipal): DefaultResponse {
+    fun deleteCoupon(couponId: Long, sellerId: Long): DefaultResponse {
 
         val result = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
-        if (result.sellerId != userPrincipal.id) throw RuntimeException("다른 사용자는 해당 쿠폰을 삭제할 수 없습니다")
+        if (result.sellerId != sellerId) throw RuntimeException("다른 사용자는 해당 쿠폰을 삭제할 수 없습니다")
 
         couponRepository.delete(result)
 
@@ -80,40 +80,40 @@ class CouponService(
     }
 
 
-    fun getSellerCouponById(couponId: Long, userPrincipal: UserPrincipal): CouponResponse {
+    fun getSellerCouponById(couponId: Long, sellerId: Long): CouponResponse {
 
-        val coupon = couponRepository.findByIdAndSellerId(couponId, userPrincipal.id) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
+        val coupon = couponRepository.findByIdAndSellerId(couponId, sellerId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
 
         return CouponResponse.from(coupon)
     }
 
-    fun getSellerCouponList(userPrincipal: UserPrincipal): List<CouponResponse> {
-        return couponRepository.findAllBySellerId(userPrincipal.id).map { CouponResponse.from(it) }
+    fun getSellerCouponList(sellerId: Long): List<CouponResponse> {
+        return couponRepository.findAllBySellerId(sellerId).map { CouponResponse.from(it) }
     }
 
-    fun getBuyerCouponById(couponId: Long, userPrincipal: UserPrincipal): CouponResponse {
+    fun getBuyerCouponById(couponId: Long, buyerId: Long): CouponResponse {
 
         val result =
-            couponToBuyerRepository.findByCouponIdAndBuyerId(couponId, userPrincipal.id) ?: throw RuntimeException("쿠폰을 가지고 있지 않습 니다")
+            couponToBuyerRepository.findByCouponIdAndBuyerId(couponId, buyerId) ?: throw RuntimeException("쿠폰을 가지고 있지 않습 니다")
 
         return CouponResponse.from(result.coupon)
     }
 
-    fun getBuyerCouponList(userPrincipal: UserPrincipal): List<CouponResponse>? {
+    fun getBuyerCouponList(buyerId: Long): List<CouponResponse>? {
 
-        return couponToBuyerRepository.findAllProductIdWithBuyerId(userPrincipal.id).let {
+        return couponToBuyerRepository.findAllProductIdWithBuyerId(buyerId).let {
             couponRepository.findAllCouponIdWithBuyer(it).map { i -> CouponResponse.from(i) }
         }
     }
 
     @Transactional
-    fun issuedCoupon(couponId: Long, userPrincipal: UserPrincipal): DefaultResponse {
+    fun issuedCoupon(couponId: Long, buyerId: Long): DefaultResponse {
 
         val getLock = couponRepository.getLock("lock_$couponId", 10) == 1
 
         if (!getLock) throw RuntimeException("락이 걸려있지 않습니다")
 
-        val buyer = buyerRepository.findByEmail(userPrincipal.email) ?: throw RuntimeException("바이어가 존재 하지 않습니다")
+        val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw RuntimeException("바이어가 존재 하지 않습니다")
 
         kotlin.runCatching {
             val coupon = couponRepository.findByIdOrNull(couponId) ?: throw RuntimeException("쿠폰이 존재 하지 않습니다")
