@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.coupon.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.coupon.service.CouponServiceVn
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
@@ -21,28 +22,24 @@ class CouponControllerVn(
     @PatchMapping("/v2/buyer/coupon/{couponId}")
     fun issuedCouponV2(
         @PathVariable couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<DefaultResponse> {
-
-        if(userPrincipal == null) throw RuntimeException()
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.issuedCouponV2(couponId, userPrincipal))
+            .body(couponService.issuedCouponV2(couponId, userPrincipal.id))
     }
 
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/v3/buyer/coupon/{couponId}")
     fun issuedCouponV3(
         @PathVariable couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<DefaultResponse> {
-
-        if(userPrincipal == null) throw RuntimeException()
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.issuedCouponV3(couponId, userPrincipal))
+            .body(couponService.issuedCouponV3(couponId, userPrincipal.id))
     }
 
 
@@ -50,13 +47,11 @@ class CouponControllerVn(
     @PatchMapping("/v4/buyer/coupon/{couponId}")
     fun issuedCouponV4(
         @PathVariable couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<DefaultResponse> {
-
-        if(userPrincipal == null) throw RuntimeException()
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.issuedCouponV4(couponId, userPrincipal))
+            .body(couponService.issuedCouponV4(couponId, userPrincipal.id))
     }
 }

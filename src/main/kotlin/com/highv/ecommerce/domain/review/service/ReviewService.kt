@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.review.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.review.dto.ReviewRequest
 import com.highv.ecommerce.domain.review.dto.ReviewResponse
 import com.highv.ecommerce.domain.review.entity.Review
@@ -19,7 +20,7 @@ class ReviewService(
 ){
     fun addReview(productId: Long, reviewRequest: ReviewRequest, buyerId: Long): ReviewResponse {
         val product = productRepository.findByIdOrNull(productId)
-            ?: throw RuntimeException("Product id $productId not found")
+            ?: throw CustomRuntimeException(404, "Product id $productId not found")
 
         val review = Review(
             buyerId = buyerId,
@@ -38,7 +39,7 @@ class ReviewService(
         reviewRequest: ReviewRequest,
         buyerId: Long
     ): ReviewResponse {
-        val review = reviewRepository.findByIdOrNull(reviewId)?: throw RuntimeException("Review id $reviewId not found")
+        val review = reviewRepository.findByIdOrNull(reviewId)?: throw CustomRuntimeException(404, "Review id $reviewId not found")
 
         review.apply {
             rate = reviewRequest.rate
@@ -50,7 +51,7 @@ class ReviewService(
     }
 
     fun deleteReview(productId: Long, reviewId:Long, buyerId: Long): DefaultResponse {
-        val review = reviewRepository.findByIdOrNull(reviewId)?: throw RuntimeException("Review id $reviewId not found")
+        val review = reviewRepository.findByIdOrNull(reviewId)?: throw CustomRuntimeException(404, "Review id $reviewId not found")
 
         reviewRepository.delete(review)
         updateShopAverageRate(productId)
@@ -68,8 +69,8 @@ class ReviewService(
 
     private fun updateShopAverageRate(productId:Long){
         val reviews = reviewRepository.findAllByProductId(productId)
-        val shopId = productRepository.findByIdOrNull(productId)?.shop?.id ?:throw RuntimeException("Product id $productId not found")
-        val shop = shopRepository.findByIdOrNull(shopId)?: throw RuntimeException("Shop not found for this product and shop")
+        val shopId = productRepository.findByIdOrNull(productId)?.shop?.id ?: throw CustomRuntimeException(404, "Product id $productId not found")
+        val shop = shopRepository.findByIdOrNull(shopId)?: throw CustomRuntimeException(404, "Shop not found for this product and shop")
 
         val avgRate = if(reviews.isNotEmpty()){
             reviews.map{it.rate}.average().toFloat()

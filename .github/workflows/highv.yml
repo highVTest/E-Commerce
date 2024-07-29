@@ -1,7 +1,7 @@
 # Actions 이름 github 페이지에서 볼 수 있다.
 name: Run Test
 
-# Event Trigger 특정 액션 (Push, Pull_Request)등이 명시한 Branch에서 일어나면 동작을 수행한다.
+# Event Trigger 특정 액션 (Push, Pull_Request)등이 명시한 Branch 에서 일어나면 동작을 수행한다.
 on:
   push:
     # 배열로 여러 브랜치를 넣을 수 있다.

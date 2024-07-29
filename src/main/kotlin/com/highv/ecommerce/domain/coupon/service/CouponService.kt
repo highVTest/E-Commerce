@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.coupon.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.coupon.dto.CouponResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
@@ -34,13 +35,13 @@ class CouponService(
 
 
         if (couponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && couponRequest.discount > 40)
-            throw RuntimeException("할인율은 40%를 넘길 수 없습 니다")
+            throw CustomRuntimeException(400, "할인율은 40%를 넘길 수 없습니다")
 
-        val product = productRepository.findByIdOrNull(couponRequest.productId) ?: throw RuntimeException("상품이 존재 하지 않습니다")
+        val product = productRepository.findByIdOrNull(couponRequest.productId) ?: throw CustomRuntimeException(404, "상품이 존재하지 않습니다")
 
         if(product.shop.sellerId != sellerId) throw RuntimeException("다른 사용자는 해당 쿠폰을 생성 할 수 없습니다")
 
-        if (couponRepository.existsByProductId(couponRequest.productId)) throw RuntimeException("이미 해당 상품에 쿠폰이 발급 되어 있습니다")
+        if (couponRepository.existsByProductId(couponRequest.productId)) throw CustomRuntimeException(400, "이미 해당 상품에 쿠폰이 발급되어 있습니다")
 
         couponRepository.save(
             Coupon(

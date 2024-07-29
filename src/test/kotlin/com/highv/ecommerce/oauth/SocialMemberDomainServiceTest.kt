@@ -1,20 +1,24 @@
-package com.highv.ecommerce.OAuth
+package com.highv.ecommerce.oauth
 
-import com.highv.ecommerce.Oauth.naver.dto.OAuthLoginUserInfo
 import com.highv.ecommerce.common.type.OAuthProvider
+import com.highv.ecommerce.domain.auth.oauth.naver.dto.OAuthLoginUserInfo
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
-import com.highv.ecommerce.socialmember.service.SocialMemberDomainService
+import com.highv.ecommerce.domain.buyer.service.BuyerService
+import com.highv.ecommerce.infra.s3.S3Manager
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
+import org.springframework.security.crypto.password.PasswordEncoder
 import kotlin.test.Test
 
-class SocialMemberDomainServiceTest (
+class SocialMemberDomainServiceTest(
 
 ) {
     private val buyerRepository: BuyerRepository = mockk()
+    private val passwordEncoder: PasswordEncoder = mockk()
+    private val s3Manager: S3Manager = mockk()
 
-    private val socialMemberDomainService = SocialMemberDomainService(buyerRepository)
+    private val buyerService = BuyerService(buyerRepository, passwordEncoder, s3Manager)
 
     @Test
     fun `사용자 정보 없을 경우 회원가입처리`() {
@@ -24,7 +28,7 @@ class SocialMemberDomainServiceTest (
             OAuthLoginUserInfo(provider = OAuthProvider.KAKAO, id = "0729", nickname = "hysup", profileImage = "String")
 
         //WHEN
-        val result = socialMemberDomainService.registerIfAbsent(userinfo)
+        val result = buyerService.registerIfAbsent(userinfo)
 
         //THEN
         result.address shouldBe
@@ -41,6 +45,5 @@ class SocialMemberDomainServiceTest (
             it[0].providerId shouldBe "0729"
 
         }
-
     }
 }
