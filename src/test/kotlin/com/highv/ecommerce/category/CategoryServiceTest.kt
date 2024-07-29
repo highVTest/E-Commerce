@@ -6,6 +6,7 @@ import com.highv.ecommerce.domain.product.category.service.CategoryService
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -59,5 +60,9 @@ class CategoryServiceTest :BehaviorSpec({
                 verify(exactly = 0) { categoryRepository.delete(any<Category>()) }
             }
         }
+    }
+
+    afterEach {
+        clearAllMocks()
     }
 })
