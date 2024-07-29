@@ -49,7 +49,7 @@ class ProductService(
                 productBackOffice = null
             )
         if (file != null) {
-            s3Manager.uploadFile(file)
+            s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
             product.productImage = s3Manager.getFile(file.originalFilename)
         }
 
