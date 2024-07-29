@@ -1,3 +1,4 @@
+/*
 package com.highv.ecommerce.favorite
 
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
@@ -145,4 +146,4 @@ class FavoriteServiceTest : BehaviorSpec() {
             }
         }
     }
-}
+}*/

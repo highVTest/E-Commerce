@@ -41,8 +41,8 @@ class SellerInfoService(
 
     fun changePassword(sellerId: Long, updatePasswordRequest: UpdatePasswordRequest): String {
         val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw RuntimeException("Seller not found")
-        if (passwordEncoder.matches(
-                passwordEncoder.encode(updatePasswordRequest.oldPassword),
+        if (!passwordEncoder.matches(
+                updatePasswordRequest.oldPassword,
                 seller.password
             )
         ) throw RuntimeException("Old password not matched")
