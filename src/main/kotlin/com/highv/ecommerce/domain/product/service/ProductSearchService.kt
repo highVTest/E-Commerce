@@ -45,13 +45,9 @@ class ProductSearchService(
             return cachedData
         } else {
             cacheAllFilterCases(keyword, pageRequest)
-            val productInfo = productRepository.searchByKeywordPaginated(keyword, pageRequest)
-            if (productInfo.hasContent()) {
 
-                return productInfo.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
-            }
+            return searchHash.get("searchList", cacheKey) ?: Page.empty(pageRequest)
         }
-        return Page.empty(pageRequest)
     }
 
     private fun addTermTopSearch(term: String) {
