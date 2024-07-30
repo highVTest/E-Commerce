@@ -1,6 +1,9 @@
 package com.highv.ecommerce.order_master.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CartEmptyException
+import com.highv.ecommerce.common.exception.CouponExpiredException
+import com.highv.ecommerce.common.exception.InsufficientStockException
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
@@ -52,7 +55,7 @@ class OrderMasterServiceService {
             couponIdList = arrayListOf(),
         )
 
-        shouldThrow<RuntimeException> {
+        shouldThrow<CartEmptyException> {
             orderMasterService.requestPayment(1L, paymentRequest)
         }.let {
             it.message shouldBe "장바구니 에서 아이템 목록을 선택해 주세요"
@@ -74,7 +77,7 @@ class OrderMasterServiceService {
             couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(any(), any())
         } returns listOf(couponToBuyer)
 
-        shouldThrow<RuntimeException> {
+        shouldThrow<CouponExpiredException> {
             orderMasterService.requestPayment(1L, paymentRequest)
         }.let {
             it.message shouldBe "쿠폰 유효 시간이 만료 되었습니다"
@@ -138,7 +141,7 @@ class OrderMasterServiceService {
         every { orderMasterRepository.saveAndFlush(any()) } returns orderMaster
         every { orderDetailsRepository.saveAll(any()) } returns listOf(orderDetails)
 
-        shouldThrow<RuntimeException> {
+        shouldThrow<InsufficientStockException> {
             orderMasterService.requestPayment(1L, paymentRequest)
         }.let {
             it.message shouldBe "재고가 부족 합니다"

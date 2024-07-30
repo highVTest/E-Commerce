@@ -69,7 +69,7 @@ class FavoriteServiceTest : BehaviorSpec() {
                 every { productRepository.existsById(any()) } returns false
 
                 Then("상품이 존재하지 않는다고 예외가 발생한다.") {
-                    shouldThrow<RuntimeException> {
+                    shouldThrow<ProductNotFoundException> {
                         favoriteService.management(productId, buyerId)
                     }.let {
                         it.message shouldBe "Product with ID ${productId} not found"
@@ -84,7 +84,7 @@ class FavoriteServiceTest : BehaviorSpec() {
                 every { buyerRepository.existsById(buyerId) } returns false
 
                 Then("구매자가 존재하지 않는다고 예외가 발생한다.") {
-                    shouldThrow<RuntimeException> {
+                    shouldThrow<BuyerNotFoundException> {
                         favoriteService.management(productId, buyerId)
                     }.let {
                         it.message shouldBe "Buyer with ID ${buyerId} not found"

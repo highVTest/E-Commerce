@@ -1,5 +1,6 @@
 package com.highv.ecommerce.order_detail.service
 
+import com.highv.ecommerce.common.exception.InvalidRequestException
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.coupon.entity.Coupon
@@ -115,7 +116,7 @@ class OrderDetailsServiceTest: BehaviorSpec(){
                     } returns listOf(couponToBuyer)
                     every { orderDetailsRepository.saveAll(any()) } returns listOf(orderDetails)
 
-                    shouldThrow<RuntimeException> {
+                    shouldThrow<InvalidRequestException> {
                         orderDetailsService.requestComplainAccept(1L, 1L, sellerOrderStatusRequest)
                     }.let {
                         it.message shouldBe "구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다"

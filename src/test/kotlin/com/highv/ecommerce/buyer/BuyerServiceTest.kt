@@ -1,6 +1,10 @@
 /*
 package com.highv.ecommerce.buyer
 
+import com.highv.ecommerce.common.exception.DuplicatePasswordException
+import com.highv.ecommerce.common.exception.InvalidRequestException
+import com.highv.ecommerce.common.exception.OldPasswordNotMatchedException
+import com.highv.ecommerce.common.exception.SocialLoginException
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
@@ -55,7 +59,7 @@ class BuyerServiceTest : DescribeSpec({
             every { passwordEncoder.matches(any(), any()) } returns false
 
             it("예외가 발생한다.") {
-                shouldThrow<RuntimeException> {
+                shouldThrow<OldPasswordNotMatchedException> {
                     buyerService.changePassword(request, buyerId)
                 }.run {
                     message shouldBe "비밀번호가 일치하지 않습니다."
@@ -75,7 +79,7 @@ class BuyerServiceTest : DescribeSpec({
             every { passwordEncoder.matches(any(), any()) } returns true
 
             it("예외가 발생한다.") {
-                shouldThrow<RuntimeException> {
+                shouldThrow<InvalidRequestException> {
                     buyerService.changePassword(request, buyerId)
                 }.run {
                     message shouldBe "변경할 비밀번호와 확인 비밀번호가 다릅니다."
@@ -95,7 +99,7 @@ class BuyerServiceTest : DescribeSpec({
             every { passwordEncoder.matches(request.newPassword, buyer.password) } returns true
 
             it("예외가 발생한다.") {
-                shouldThrow<RuntimeException> {
+                shouldThrow<DuplicatePasswordException> {
                     buyerService.changePassword(request, buyerId)
                 }.run {
                     message shouldBe "현재 비밀번호와 수정할 비밀번호가 같습니다."
@@ -146,7 +150,7 @@ class BuyerServiceTest : DescribeSpec({
             every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
 
             it("예외가 발생한다.") {
-                shouldThrow<RuntimeException> {
+                shouldThrow<SocialLoginException> {
                     buyerService.changePassword(request, buyerId)
                 }.apply {
                     message shouldBe "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다."
@@ -286,4 +290,5 @@ class BuyerServiceTest : DescribeSpec({
         }
     }
 
-})*/
+})
+*/
