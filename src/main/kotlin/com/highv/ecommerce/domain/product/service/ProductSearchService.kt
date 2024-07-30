@@ -48,23 +48,24 @@ class ProductSearchService(
 
             return searchHash.get("searchList", cacheKey) ?: Page.empty(pageRequest)
         }
+        return Page.empty(pageRequest)
     }
 
-    private fun addTermTopSearch(term: String) {
+    fun addTermTopSearch(term: String) {
         topSearchZSet.incrementScore("topSearch", term, 1.0)
         redisTemplate.expire(term, 10, TimeUnit.MINUTES)
     }
 
-    private fun addTermSearch(term: String, showInfos: Page<ProductResponse>) {
+    fun addTermSearch(term: String, showInfos: Page<ProductResponse>) {
         searchHash.put("searchList", term, showInfos)
         redisTemplateForProductSearch.expire(term, 10, TimeUnit.MINUTES)
     }
 
-    private fun createCacheKey(keyword: String, sortProperty: String, sortDirection: String): String {
+    fun createCacheKey(keyword: String, sortProperty: String, sortDirection: String): String {
         return "searchList:$keyword:$sortProperty:$sortDirection"
     }
 
-    private fun cacheAllFilterCases(keyword: String, pageRequest: PageRequest) {
+    fun cacheAllFilterCases(keyword: String, pageRequest: PageRequest) {
         val filterCases = listOf("price", "createdAt")
         val directions = listOf("ASC", "DESC")
         for (filterCase in filterCases) {
