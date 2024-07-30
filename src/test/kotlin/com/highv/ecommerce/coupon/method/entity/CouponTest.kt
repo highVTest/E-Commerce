@@ -1,5 +1,8 @@
 package com.highv.ecommerce.coupon.method.entity
 
+import com.highv.ecommerce.common.exception.CouponExpiredException
+import com.highv.ecommerce.common.exception.CouponSoldOutException
+import com.highv.ecommerce.common.exception.InvalidDiscountPolicyException
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import com.highv.ecommerce.domain.coupon.entity.Coupon
 import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
@@ -12,10 +15,12 @@ import java.time.LocalDateTime
 
 class CouponTest {
 
-    @Test
-    fun `만료 시간이 다르면 RuntimeException 처리`() {
 
-        shouldThrow<RuntimeException> {
+
+    @Test
+    fun `만료 시간이 다르면 CouponExpiredException 처리`() {
+
+        shouldThrow<CouponExpiredException> {
             coupon.validExpiredAt()
         }.let {
             it.message shouldBe "쿠폰 유효 기간이 지났습니다"
@@ -23,10 +28,10 @@ class CouponTest {
     }
 
     @Test
-    fun `spendCoupon 에서 0 이하로 떨어질 경우 RuntimeException 처리`() {
+    fun `spendCoupon 에서 0 이하로 떨어질 경우 CouponSoldOutException 처리`(){
         coupon.quantity = 0
 
-        shouldThrow<RuntimeException> {
+        shouldThrow<CouponSoldOutException> {
             coupon.spendCoupon()
         }.let {
             it.message shouldBe "쿠폰이 매진되었습니다"
@@ -34,7 +39,7 @@ class CouponTest {
     }
 
     @Test
-    fun `update 시에 DiscountPolicy DISCOUNT_RATE 이고 값이 100을 넘을 경우 RuntimeException 처리`() {
+    fun `update 시에 DiscountPolicy DISCOUNT_RATE 이고 값이 100을 넘을 경우 InvalidDiscountPolicyException 처리`(){
 
         val updateCouponRequest = UpdateCouponRequest(
             discountPolicy = DiscountPolicy.DISCOUNT_RATE,
@@ -43,7 +48,7 @@ class CouponTest {
             expiredAt = LocalDateTime.of(2021, 1, 1, 1, 0),
         )
 
-        shouldThrow<RuntimeException> {
+        shouldThrow<InvalidDiscountPolicyException> {
             coupon.update(updateCouponRequest)
         }.let {
             it.message shouldBe "할인율은 40%를 넘길 수 없습니다"
@@ -51,7 +56,7 @@ class CouponTest {
     }
 
     //Given
-    companion object {
+    companion object{
         private val shop = Shop(
             sellerId = 1L,
             name = "name",
@@ -84,4 +89,5 @@ class CouponTest {
             sellerId = 1L,
         )
     }
+
 }

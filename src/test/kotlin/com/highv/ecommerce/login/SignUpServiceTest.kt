@@ -1,5 +1,9 @@
 package com.highv.ecommerce.login
 
+import com.highv.ecommerce.common.exception.EmailNotVerifiedException
+import com.highv.ecommerce.common.exception.EmailVerificationNotFoundException
+import com.highv.ecommerce.common.exception.UnauthorizedEmailException
+import com.highv.ecommerce.common.exception.UnverifiedEmailException
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
@@ -98,13 +102,13 @@ class SignUpServiceTest {
 
         // when & then
         every { buyerRepository.findByIdOrNull(buyerId) } returns buyer
-        shouldThrow<RuntimeException> {
+        shouldThrow<UnauthorizedEmailException> {
             buyerService.signUp(request, file)
         }.message shouldBe "인증되지 않은 이메일입니다."
 
         // When & then
         every { buyerRepository.findByIdOrNull(buyerId) } returns null
-        shouldThrow<RuntimeException> {
+        shouldThrow<EmailNotVerifiedException> {
             buyerService.signUp(request, file)
         }.message shouldBe "이메일 인증된 회원 정보가 없습니다."
     }
@@ -185,13 +189,13 @@ class SignUpServiceTest {
 
         // when & then
         every { sellerRepository.findByIdOrNull(sellerId) } returns seller
-        shouldThrow<RuntimeException> {
+        shouldThrow<UnverifiedEmailException> {
             sellerService.signUp(request, file)
         }.message shouldBe "인증되지 않은 이메일입니다."
 
         // When & then
         every { sellerRepository.findByIdOrNull(sellerId) } returns null
-        shouldThrow<RuntimeException> {
+        shouldThrow<EmailVerificationNotFoundException> {
             sellerService.signUp(request, file)
         }.message shouldBe "이메일 인증된 회원 정보가 없습니다."
     }

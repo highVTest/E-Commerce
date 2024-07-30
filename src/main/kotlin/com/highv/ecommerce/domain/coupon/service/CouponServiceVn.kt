@@ -2,7 +2,11 @@ package com.highv.ecommerce.domain.coupon.service
 
 import com.highv.ecommerce.common.aop.annotation_class.RedissonLock
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.BuyerNotFoundException
+import com.highv.ecommerce.common.exception.CouponDistributionException
+import com.highv.ecommerce.common.exception.CouponNotFoundException
 import com.highv.ecommerce.common.exception.CustomRuntimeException
+import com.highv.ecommerce.common.exception.DuplicateCouponException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
@@ -27,13 +31,13 @@ class CouponServiceVn(
     fun issuedCouponV2(couponId: Long, userPrincipal: UserPrincipal): DefaultResponse {
 
         synchronized(lock) {
-            val buyer = buyerRepository.findByEmail(userPrincipal.email) ?: throw CustomRuntimeException(404, "바이어가 존재하지 않습니다")
+            val buyer = buyerRepository.findByEmail(userPrincipal.email) ?: throw BuyerNotFoundException(404, "바이어가 존재하지 않습니다")
 
             kotlin.runCatching {
 
-                val coupon = couponRepository.findByIdOrNull(couponId) ?: throw CustomRuntimeException(404, "쿠폰이 존재하지 않습니다")
+                val coupon = couponRepository.findByIdOrNull(couponId) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
 
-                if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw CustomRuntimeException(400, "동일한 쿠폰은 지급 받을 수 없습니다")
+                if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw DuplicateCouponException(400, "동일한 쿠폰은 지급 받을 수 없습니다")
 
 
 
@@ -51,7 +55,7 @@ class CouponServiceVn(
 
                 couponRepository.save(coupon)
             }.onFailure {
-                throw CustomRuntimeException(500, "다시 시도 해주세요 ${it.message}")
+                throw CouponDistributionException(500, "다시 시도 해주세요 ${it.message}")
             }
         }
 
@@ -63,14 +67,14 @@ class CouponServiceVn(
 
         reentrantLock.lock()
 
-        val buyer = buyerRepository.findByEmail(userPrincipal.email) ?: throw CustomRuntimeException(404, "바이어가 존재하지 않습니다")
+        val buyer = buyerRepository.findByEmail(userPrincipal.email) ?: throw BuyerNotFoundException(404, "바이어가 존재하지 않습니다")
 
         if (reentrantLock.tryLock()) {
             //try - catch - finally
             kotlin.runCatching {
-                val coupon = couponRepository.findByIdOrNull(couponId) ?: throw CustomRuntimeException(404, "쿠폰이 존재하지 않습니다")
+                val coupon = couponRepository.findByIdOrNull(couponId) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
 
-                if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw CustomRuntimeException(400, "동일한 쿠폰은 지급 받을 수 없습니다")
+                if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw DuplicateCouponException(400, "동일한 쿠폰은 지급 받을 수 없습니다")
 
 
 
@@ -89,7 +93,7 @@ class CouponServiceVn(
                 couponRepository.save(coupon)
 
             }.onFailure {
-                throw CustomRuntimeException(500, "다시 시도 해주세요 ${it.message}")
+                throw CouponDistributionException(500, "다시 시도 해주세요 ${it.message}")
             }.also {
                 reentrantLock.unlock()
             }
@@ -103,11 +107,11 @@ class CouponServiceVn(
     @RedissonLock(value = "#couponId")
     fun issuedCouponV4(couponId: Long, userPrincipal: UserPrincipal): DefaultResponse {
 
-        val buyer = buyerRepository.findByEmail(userPrincipal.email) ?: throw CustomRuntimeException(404, "바이어가 존재하지 않습니다")
+        val buyer = buyerRepository.findByEmail(userPrincipal.email) ?: throw BuyerNotFoundException(404, "바이어가 존재하지 않습니다")
 
-        val coupon = couponRepository.findByIdOrNull(couponId) ?: throw CustomRuntimeException(404, "쿠폰이 존재하지 않습니다")
+        val coupon = couponRepository.findByIdOrNull(couponId) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
 
-        if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw CustomRuntimeException(400, "동일한 쿠폰은 지급 받을 수 없습니다")
+        if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw DuplicateCouponException(400, "동일한 쿠폰은 지급 받을 수 없습니다")
 
 
 

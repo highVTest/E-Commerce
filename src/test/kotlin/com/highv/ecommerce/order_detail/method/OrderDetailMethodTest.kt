@@ -1,6 +1,7 @@
 package com.highv.ecommerce.order_detail.method
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.InvalidRequestException
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.coupon.entity.Coupon
@@ -39,7 +40,7 @@ class OrderDetailMethodTest: BehaviorSpec({
                     description = "test"
                 )
 
-               shouldThrow<RuntimeException> {
+               shouldThrow<InvalidRequestException> {
                    orderDetails.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
                }.let {
                    it.message shouldBe "물건 수령 전에는 교환 요청이 어렵습니다"
@@ -55,7 +56,7 @@ class OrderDetailMethodTest: BehaviorSpec({
                     description = "test"
                 )
 
-                shouldThrow<RuntimeException> {
+                shouldThrow<InvalidRequestException> {
                     orderDetails.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
                 }.let {
                     it.message shouldBe "배송 준비 중에는 환불 요청이 어렵습니다"
@@ -71,7 +72,7 @@ class OrderDetailMethodTest: BehaviorSpec({
                     description = "test"
                 )
 
-                shouldThrow<RuntimeException> {
+                shouldThrow<InvalidRequestException> {
                     orderDetails.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
                 }.let {
                     it.message shouldBe "배송 중에는 환불 요청이 어렵습니다"
@@ -87,7 +88,7 @@ class OrderDetailMethodTest: BehaviorSpec({
                     description = "test"
                 )
 
-                shouldThrow<RuntimeException> {
+                shouldThrow<InvalidRequestException> {
                     orderDetails.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
                 }.let {
                     it.message shouldBe "이미 환불 및 교환 요청이 접수 되었습니다"

@@ -1,5 +1,8 @@
 package com.highv.ecommerce.item_cart
 
+import com.highv.ecommerce.common.exception.InvalidQuantityException
+import com.highv.ecommerce.common.exception.ItemNotFoundException
+import com.highv.ecommerce.common.exception.ProductNotFoundException
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.item_cart.dto.request.SelectProductQuantity
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
@@ -87,7 +90,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                 val request: SelectProductQuantity = SelectProductQuantity(quantity = 0)
 
                 Then("상품 개수 예외가 발생한다.") {
-                    shouldThrow<RuntimeException> {
+                    shouldThrow<InvalidQuantityException> {
                         itemCartService.addItemIntoCart(product.id!!, request, buyerId)
                     }.let {
                         it.message shouldBe "상품의 개수가 1개보다 적을 수 없습니다."
@@ -102,7 +105,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                 every { productRepository.findByIdOrNull(any()) } returns null
 
                 Then("상품이 없다는 예외가 발생한다.") {
-                    shouldThrow<RuntimeException> { itemCartService.addItemIntoCart(1L, request, buyerId) }
+                    shouldThrow<ProductNotFoundException> { itemCartService.addItemIntoCart(1L, request, buyerId) }
                         .let {
                             it.message shouldBe "Product not found"
                         }
@@ -189,7 +192,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                 every { itemCartRepository.findByProductIdAndBuyerId(any(), any()) } returns null
 
                 Then("상품이 없다는 예외가 발생한다.") {
-                    shouldThrow<RuntimeException> {
+                    shouldThrow<ItemNotFoundException> {
                         itemCartService.updateItemIntoCart(product.id!!, request, buyerId)
                     }.let {
                         it.message shouldBe "Item not found"
@@ -242,7 +245,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                 every { itemCartRepository.findByProductIdAndBuyerId(any(), any()) } returns null
 
                 Then("상품이 없다는 예외가 발생한다.") {
-                    val error = shouldThrow<RuntimeException> {
+                    val error = shouldThrow<ItemNotFoundException> {
                         itemCartService.deleteItemIntoCart(product.id!!, buyerId)
                     }
                     error.message shouldBe "Item not found"

@@ -1,6 +1,10 @@
 package com.highv.ecommerce.coupon.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.InvalidCouponDiscountException
+import com.highv.ecommerce.common.exception.InvalidDiscountPolicyException
+import com.highv.ecommerce.common.exception.UnauthorizedException
+import com.highv.ecommerce.common.exception.UnauthorizedUserException
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
@@ -36,12 +40,12 @@ class CouponServiceTest {
     private val userPrincipal = mockk<UserPrincipal>()
 
     @Test
-    fun `쿠폰의 정책이 DISCOUNT_RATE 이고 CreateCouponRequest 의 값이 100 이상일 경우 RuntimeException을 벌생`() {
+    fun `쿠폰의 정책이 DISCOUNT_RATE 이고 CreateCouponRequest 의 값이 100 이상일 경우 InvalidDiscountPolicyException을 벌생`() {
 
         createCouponRequest.discountPolicy = DiscountPolicy.DISCOUNT_RATE
         createCouponRequest.discount = 101
 
-        shouldThrow<RuntimeException> {
+        shouldThrow<InvalidCouponDiscountException> {
             couponService.createCoupon(createCouponRequest, userPrincipal)
         }.let {
             it.message shouldBe "할인율은 40%를 넘길 수 없습니다"
@@ -76,13 +80,13 @@ class CouponServiceTest {
     }
 
     @Test
-    fun `쿠폰이 다른 사용자가 업데이트 하려고 할 경우 RuntimeException`() {
+    fun `쿠폰이 다른 사용자가 업데이트 하려고 할 경우 UnauthorizedException`() {
 
         every { userPrincipal.id } returns 2
 
         every { couponRepository.findByIdOrNull(any()) } returns coupon
 
-        shouldThrow<RuntimeException> {
+        shouldThrow<UnauthorizedUserException> {
             couponService.updateCoupon(1L, updateCouponRequest, userPrincipal)
         }.let {
             it.message shouldBe "다른 사용자는 해당 쿠폰을 수정할 수 없습니다"
@@ -103,13 +107,13 @@ class CouponServiceTest {
     }
 
     @Test
-    fun `쿠폰이 다른 사용자가 삭제 하려고 할 경우 RuntimeException`() {
+    fun `쿠폰이 다른 사용자가 삭제 하려고 할 경우 UnauthorizedException`() {
 
         every { userPrincipal.id } returns 2
 
         every { couponRepository.findByIdOrNull(any()) } returns coupon
 
-        shouldThrow<RuntimeException> {
+        shouldThrow<UnauthorizedUserException> {
             couponService.deleteCoupon(1L, userPrincipal)
         }.let {
             it.message shouldBe "다른 사용자는 해당 쿠폰을 삭제할 수 없습니다"

@@ -1,15 +1,19 @@
 package com.highv.ecommerce.OAuth
 
-import com.highv.ecommerce.Oauth.naver.dto.OAuthLoginUserInfo
 import com.highv.ecommerce.common.type.OAuthProvider
+import com.highv.ecommerce.domain.auth.oauth.naver.dto.OAuthLoginUserInfo
+import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
-import com.highv.ecommerce.socialmember.service.SocialMemberDomainService
+import com.highv.ecommerce.domain.buyer.service.BuyerService
+import com.highv.ecommerce.infra.s3.S3Manager
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.every
 import io.mockk.mockk
+import org.springframework.security.crypto.password.PasswordEncoder
 import kotlin.test.Test
 
-class SocialMemberDomainServiceTest  (
+class SocialMemberDomainServiceTest(
 
 ) {
     private val buyerRepository: BuyerRepository = mockk()
@@ -17,7 +21,6 @@ class SocialMemberDomainServiceTest  (
     private val s3Manager: S3Manager = mockk()
 
     private val buyerService = BuyerService(buyerRepository, passwordEncoder, s3Manager)
-
 
     @Test
     fun `사용자 정보 없을 경우 회원가입처리`() {
@@ -50,9 +53,7 @@ class SocialMemberDomainServiceTest  (
         result.nickname shouldBe "hysup"
         result.profileImage shouldBe "String"
         result.providerId shouldBe "0729"
-
     }
-
 
     @Test
     fun `사용자 정보가 이미 존재하는 경우`() {
@@ -82,7 +83,6 @@ class SocialMemberDomainServiceTest  (
 
         //THEN
         result shouldBe 기존사용자정보
-
     }
 }
 
