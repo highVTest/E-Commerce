@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.order_details.service
 
 import com.highv.ecommerce.common.exception.CustomRuntimeException
+import com.highv.ecommerce.common.exception.InvalidRequestException
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderDetailProductResponse
@@ -221,7 +222,7 @@ class OrderDetailsService(
                 }
             }
 
-            else -> throw CustomRuntimeException(400, "구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
+            else -> throw InvalidRequestException(400, "구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
         }
 
 
