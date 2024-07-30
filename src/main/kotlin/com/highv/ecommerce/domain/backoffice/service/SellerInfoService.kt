@@ -31,7 +31,8 @@ class SellerInfoService(
     }
 
     fun updateSellerInfo(sellerId: Long, updateSellerRequest: UpdateSellerRequest): SellerResponse {
-        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "Seller not found")
+        val seller =
+            sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "Seller not found")
         seller.apply {
             address = updateSellerRequest.address
             nickname = updateSellerRequest.nickname
@@ -43,9 +44,10 @@ class SellerInfoService(
     }
 
     fun changePassword(sellerId: Long, updatePasswordRequest: UpdatePasswordRequest): String {
-        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "Seller not found")
-        if (passwordEncoder.matches(
-                passwordEncoder.encode(updatePasswordRequest.oldPassword),
+        val seller =
+            sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "Seller not found")
+        if (!passwordEncoder.matches(
+                updatePasswordRequest.oldPassword,
                 seller.password
             )
         ) throw OldPasswordNotMatchedException(message = "Old password not matched")

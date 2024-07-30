@@ -20,7 +20,7 @@ class ReviewService(
     private val reviewRepository: ReviewRepository,
     private val productRepository: ProductRepository,
     private val shopRepository: ShopRepository,
-){
+) {
     fun addReview(productId: Long, reviewRequest: ReviewRequest, buyerId: Long): ReviewResponse {
         val product = productRepository.findByIdOrNull(productId)
             ?: throw ProductNotFoundException(404, "Product id $productId not found")
@@ -38,7 +38,7 @@ class ReviewService(
 
     fun updateReview(
         productId: Long,
-        reviewId:Long,
+        reviewId: Long,
         reviewRequest: ReviewRequest,
         buyerId: Long
     ): ReviewResponse {
@@ -67,21 +67,21 @@ class ReviewService(
 
     fun getBuyerReviews(buyerId: Long): List<ReviewResponse> {
         val reviews = reviewRepository.findAllByBuyerId(buyerId)
-        return reviews.map { ReviewResponse.from(it)}
+        return reviews.map { ReviewResponse.from(it) }
     }
 
-    private fun updateShopAverageRate(productId:Long){
+    fun updateShopAverageRate(productId: Long) {
         val reviews = reviewRepository.findAllByProductId(productId)
         val shopId = productRepository.findByIdOrNull(productId)?.shop?.id ?: throw ProductNotFoundException(404, "Product id $productId not found")
         val shop = shopRepository.findByIdOrNull(shopId)?: throw ShopNotFoundException(404, "Shop not found for this product and shop")
 
-        val avgRate = if(reviews.isNotEmpty()){
-            reviews.map{it.rate}.average().toFloat()
-        }else{
+        val avgRate = if (reviews.isNotEmpty()) {
+            reviews.map { it.rate }.average().toFloat()
+        } else {
             0f
         }
 
-        shop.rate = round(avgRate*100)/100
+        shop.rate = round(avgRate * 100) / 100
         shopRepository.save(shop)
     }
 }

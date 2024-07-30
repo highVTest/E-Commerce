@@ -58,7 +58,7 @@ class OrderMasterServiceService {
         shouldThrow<CartEmptyException> {
             orderMasterService.requestPayment(1L, paymentRequest)
         }.let {
-            it.message shouldBe "장바구니 에서 아이템 목록을 선택해 주세요"
+            it.message shouldBe "장바구니에서 아이템 목록을 선택해 주세요"
         }
     }
 
@@ -144,7 +144,7 @@ class OrderMasterServiceService {
         shouldThrow<InsufficientStockException> {
             orderMasterService.requestPayment(1L, paymentRequest)
         }.let {
-            it.message shouldBe "재고가 부족 합니다"
+            it.message shouldBe "재고가 부족합니다"
         }
     }
 

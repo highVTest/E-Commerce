@@ -30,4 +30,6 @@ class Review(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
+
+
 }

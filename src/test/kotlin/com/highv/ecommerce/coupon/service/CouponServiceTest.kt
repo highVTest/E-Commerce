@@ -1,8 +1,10 @@
 package com.highv.ecommerce.coupon.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.InvalidCouponDiscountException
 import com.highv.ecommerce.common.exception.InvalidDiscountPolicyException
 import com.highv.ecommerce.common.exception.UnauthorizedException
+import com.highv.ecommerce.common.exception.UnauthorizedUserException
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
@@ -44,10 +46,10 @@ class CouponServiceTest {
         createCouponRequest.discountPolicy = DiscountPolicy.DISCOUNT_RATE
         createCouponRequest.discount = 101
 
-        shouldThrow<InvalidDiscountPolicyException> {
+        shouldThrow<InvalidCouponDiscountException> {
             couponService.createCoupon(createCouponRequest, userPrincipal)
         }.let {
-            it.message shouldBe "할인율은 40%를 넘길 수 없습 니다"
+            it.message shouldBe "할인율은 40%를 넘길 수 없습니다"
         }
     }
 
@@ -85,7 +87,7 @@ class CouponServiceTest {
 
         every { couponRepository.findByIdOrNull(any()) } returns coupon
 
-        shouldThrow<UnauthorizedException> {
+        shouldThrow<UnauthorizedUserException> {
             couponService.updateCoupon(1L, updateCouponRequest, userPrincipal)
         }.let {
             it.message shouldBe "다른 사용자는 해당 쿠폰을 수정할 수 없습니다"
@@ -112,7 +114,7 @@ class CouponServiceTest {
 
         every { couponRepository.findByIdOrNull(any()) } returns coupon
 
-        shouldThrow<UnauthorizedException> {
+        shouldThrow<UnauthorizedUserException> {
             couponService.deleteCoupon(1L, userPrincipal)
         }.let {
             it.message shouldBe "다른 사용자는 해당 쿠폰을 삭제할 수 없습니다"

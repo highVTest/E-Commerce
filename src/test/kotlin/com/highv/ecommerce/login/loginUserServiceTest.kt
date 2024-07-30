@@ -1,5 +1,6 @@
 package com.highv.ecommerce.login
 
+import com.highv.ecommerce.common.exception.BuyerLoginFailedException
 import com.highv.ecommerce.common.exception.LoginException
 import com.highv.ecommerce.domain.auth.dto.LoginRequest
 import com.highv.ecommerce.domain.auth.service.UserService
@@ -89,7 +90,7 @@ class loginUserServiceTest {
         every { passwordEncoder.matches(loginRequest.password, any()) } returns false
 
         // when & then
-        val exception = shouldThrow<LoginException> { userService.loginBuyer(loginRequest) }
+        val exception = shouldThrow<BuyerLoginFailedException> { userService.loginBuyer(loginRequest) }
         exception.message shouldBe "구매자 로그인 실패"
     }
 }
