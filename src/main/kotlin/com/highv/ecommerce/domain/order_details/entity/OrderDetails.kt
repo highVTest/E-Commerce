@@ -96,7 +96,7 @@ class OrderDetails(
         sellerOrderStatusRequest: SellerOrderStatusRequest,
         complainStatus: ComplainStatus
     ) {
-
+        // order_cancelled 일 경우 로직 작성 필요
         this.orderStatus = orderStatus
 
         when (complainStatus) {

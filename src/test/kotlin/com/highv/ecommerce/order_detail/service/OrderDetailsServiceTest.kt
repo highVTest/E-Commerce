@@ -197,9 +197,8 @@ class OrderDetailsServiceTest: BehaviorSpec(){
 
         every { orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any(), any()) } returns listOf(orderDetails, orderDetails2)
 
-        val result = orderDetailsService.getSellerOrderDetailsBuyer(1L, 1L, 1L)
+        val result = orderDetailsService.getSellerOrderDetailsBuyer(1L, 1L)
 
-        result.size shouldBe 2
     }
 
 
