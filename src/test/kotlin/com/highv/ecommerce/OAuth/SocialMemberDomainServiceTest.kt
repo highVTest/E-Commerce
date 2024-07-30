@@ -3,7 +3,6 @@ package com.highv.ecommerce.OAuth
 import com.highv.ecommerce.common.type.OAuthProvider
 import com.highv.ecommerce.domain.auth.oauth.naver.dto.OAuthLoginUserInfo
 import com.highv.ecommerce.domain.buyer.entity.Buyer
-import com.highv.ecommerce.domain.buyer.entity.QBuyer.buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.buyer.service.BuyerService
 import com.highv.ecommerce.infra.s3.S3Manager
