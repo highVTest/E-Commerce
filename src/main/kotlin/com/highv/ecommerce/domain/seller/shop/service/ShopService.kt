@@ -1,6 +1,6 @@
 package com.highv.ecommerce.domain.seller.shop.service
 
-import com.highv.ecommerce.common.exception.CustomRuntimeException
+import com.highv.ecommerce.common.exception.ShopAlreadyExistsException
 import com.highv.ecommerce.domain.seller.shop.dto.CreateShopRequest
 import com.highv.ecommerce.domain.seller.shop.dto.ShopResponse
 import com.highv.ecommerce.domain.seller.shop.entity.Shop
@@ -16,7 +16,7 @@ class ShopService(
 ) {
 
     fun createShop(sellerId: Long, createShopRequest: CreateShopRequest, file: MultipartFile?): ShopResponse {
-        if (shopRepository.existsBySellerId(sellerId)) throw CustomRuntimeException(409, "Shop with seller id $sellerId already exists")
+        if (shopRepository.existsBySellerId(sellerId)) throw ShopAlreadyExistsException(409, "Shop with seller id $sellerId already exists")
         val shop = Shop(
             sellerId = sellerId,
             name = createShopRequest.name,

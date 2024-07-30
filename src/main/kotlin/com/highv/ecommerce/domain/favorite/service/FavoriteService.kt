@@ -1,7 +1,9 @@
 package com.highv.ecommerce.domain.favorite.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.BuyerNotFoundException
 import com.highv.ecommerce.common.exception.CustomRuntimeException
+import com.highv.ecommerce.common.exception.ProductNotFoundException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.favorite.dto.FavoriteResponse
 import com.highv.ecommerce.domain.favorite.entity.Favorite
@@ -20,11 +22,11 @@ class FavoriteService(
     fun management(productId: Long, buyerId: Long): DefaultResponse {
 
         if (!productRepository.existsById(productId)) {
-            throw CustomRuntimeException(404, "Product with ID $productId not found")
+            throw ProductNotFoundException(404, "Product with ID $productId not found")
         }
 
         if (!buyerRepository.existsById(buyerId)) {
-            throw CustomRuntimeException(404, "Buyer with ID $buyerId not found")
+            throw BuyerNotFoundException(404, "Buyer with ID $buyerId not found")
         }
 
         val existsFavorite: Favorite? = favoriteRepository.findByProductIdAndBuyerId(productId, buyerId)

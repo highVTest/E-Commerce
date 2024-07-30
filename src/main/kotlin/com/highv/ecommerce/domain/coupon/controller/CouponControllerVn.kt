@@ -1,7 +1,7 @@
 package com.highv.ecommerce.domain.coupon.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.common.exception.CustomRuntimeException
+import com.highv.ecommerce.common.exception.UnauthorizedUserException
 import com.highv.ecommerce.domain.coupon.service.CouponServiceVn
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api")
 class CouponControllerVn(
     private val couponService: CouponServiceVn
-){
+) {
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/v2/buyer/coupon/{couponId}")
     fun issuedCouponV2(
@@ -25,7 +25,7 @@ class CouponControllerVn(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<DefaultResponse> {
 
-        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
+        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -39,13 +39,12 @@ class CouponControllerVn(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<DefaultResponse> {
 
-        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
+        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(couponService.issuedCouponV3(couponId, userPrincipal))
     }
-
 
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/v4/buyer/coupon/{couponId}")
@@ -54,7 +53,7 @@ class CouponControllerVn(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<DefaultResponse> {
 
-        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
+        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.OK)

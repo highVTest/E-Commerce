@@ -2,6 +2,8 @@ package com.highv.ecommerce.domain.auth.oauth.kakao
 
 
 import com.highv.ecommerce.common.exception.CustomRuntimeException
+import com.highv.ecommerce.common.exception.KakaoAccessTokenException
+import com.highv.ecommerce.common.exception.KakaoUserInfoException
 import com.highv.ecommerce.common.type.OAuthProvider
 import com.highv.ecommerce.domain.auth.oauth.OAuthClient
 import com.highv.ecommerce.domain.auth.oauth.kakao.dto.KakaoLoginUserInfoResponse
@@ -45,11 +47,11 @@ class KakaoOAuthLoginClient(
             .body(LinkedMultiValueMap<String, String>().apply { this.setAll(requestData) })
             .retrieve()
             .onStatus(HttpStatusCode::isError) { _, _ ->
-                throw CustomRuntimeException(500, "카카오 AccessToken 조회 실패")
+                throw KakaoAccessTokenException(message = "카카오 AccessToken 조회 실패")
             }
             .body<KakaoTokenResponse>()
             ?.accessToken
-            ?: throw CustomRuntimeException(500, "카카오 AccessToken 조회 실패")
+            ?: throw KakaoAccessTokenException(message = "카카오 AccessToken 조회 실패")
     }
 
     override fun retrieveUserInfo(accessToken: String): KakaoLoginUserInfoResponse {
@@ -58,10 +60,10 @@ class KakaoOAuthLoginClient(
             .header("Authorization", "Bearer $accessToken")
             .retrieve()
             .onStatus(HttpStatusCode::isError) { _, _ ->
-                throw CustomRuntimeException(500, "카카오 UserInfo 조회 실패")
+                throw KakaoUserInfoException(message = "카카오 UserInfo 조회 실패")
             }
             .body<KakaoLoginUserInfoResponse>()
-            ?: throw CustomRuntimeException(500, "카카오 UserInfo 조회 실패")
+            ?: throw KakaoUserInfoException(message = "카카오 UserInfo 조회 실패")
     }
 
     override fun supports(provider: OAuthProvider): Boolean {
