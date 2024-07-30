@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -50,4 +51,20 @@ class SellerInfoController(
     ): ResponseEntity<String> = ResponseEntity
         .status(HttpStatus.OK)
         .body(sellerInfoService.changePassword(seller.id, updatePasswordRequest))
+
+    //get seller info
+    @GetMapping("/myInfo")
+    fun getSellerInfo(
+        @AuthenticationPrincipal seller: UserPrincipal
+    ): ResponseEntity<SellerResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(sellerInfoService.getSellerInfo(seller.id))
+
+    //get shop info
+    @GetMapping("/myShopInfo")
+    fun getShopInfo(
+        @AuthenticationPrincipal seller: UserPrincipal
+    ): ResponseEntity<ShopResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(sellerInfoService.getShopInfo(seller.id))
 }
