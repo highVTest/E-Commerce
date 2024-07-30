@@ -1,4 +1,3 @@
-/*
 package com.highv.ecommerce.favorite
 
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
@@ -78,19 +77,21 @@ class FavoriteServiceTest : BehaviorSpec() {
                 }
             }
 
-            // 존재하는 케이스가 맞나?
-            When("구매자가 존재하지 않으면") {
-                every { productRepository.existsById(any()) } returns true
-                every { buyerRepository.existsById(buyerId) } returns false
-
-                Then("구매자가 존재하지 않는다고 예외가 발생한다.") {
-                    shouldThrow<RuntimeException> {
-                        favoriteService.management(productId, buyerId)
-                    }.let {
-                        it.message shouldBe "Buyer with ID ${buyerId} not found"
-                    }
-                }
-            }
+            // 서비스에서 구매자를 프론트에서 처리할 거라 삭제했기 때문에 아래 테스트는 실패가 됨
+            // 따라서 나중에 문제가 생겨 원래 코드로 복기 할 때 아래 테스트를 이용
+            
+            // When("구매자가 존재하지 않으면") {
+            //     every { productRepository.existsById(any()) } returns true
+            //     every { buyerRepository.existsById(buyerId) } returns false
+            //
+            //     Then("구매자가 존재하지 않는다고 예외가 발생한다.") {
+            //         shouldThrow<RuntimeException> {
+            //             favoriteService.management(productId, buyerId)
+            //         }.let {
+            //             it.message shouldBe "Buyer with ID ${buyerId} not found"
+            //         }
+            //     }
+            // }
 
         }
 
@@ -146,4 +147,4 @@ class FavoriteServiceTest : BehaviorSpec() {
             }
         }
     }
-}*/
+}

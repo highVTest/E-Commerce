@@ -350,3 +350,4 @@ class BuyerServiceTest : DescribeSpec({
         ).apply { id = 1L }
     }
 }
+})

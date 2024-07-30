@@ -20,7 +20,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDateTime
 import kotlin.test.Test
 

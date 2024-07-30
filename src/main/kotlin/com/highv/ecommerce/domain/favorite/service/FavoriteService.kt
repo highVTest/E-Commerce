@@ -23,10 +23,6 @@ class FavoriteService(
             throw CustomRuntimeException(404, "Product with ID $productId not found")
         }
 
-        if (!buyerRepository.existsById(buyerId)) {
-            throw CustomRuntimeException(404, "Buyer with ID $buyerId not found")
-        }
-
         val existsFavorite: Favorite? = favoriteRepository.findByProductIdAndBuyerId(productId, buyerId)
 
         if (existsFavorite != null) {
@@ -45,12 +41,10 @@ class FavoriteService(
     }
 
     fun getFavorites(buyerId: Long): List<FavoriteResponse> {
-        // TODO : 상품 정보를 담아서 보낼지? 아니면 상품의 id만 보낼지 추후 결정
 
         val favorites: List<Favorite> = favoriteRepository.findAllByBuyerId(buyerId)
         val products: List<Product> = productRepository.findAllById(favorites.map { it.productId })
 
-        // return favorites.map { FavoriteResponse(it.id!!, it.productId) }
         return products.map { FavoriteResponse(it.id!!, it.name, it.productBackOffice!!.price, it.productImage) }
     }
 

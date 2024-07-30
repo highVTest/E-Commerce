@@ -25,7 +25,7 @@ class ProductSearchService(
         redisTemplateForProductSearch.opsForHash()
 
     fun topSearch10(limit: Long): Set<TopSearchKeyword> {
-        val rangeWithScores = topSearchZSet.reverseRangeWithScores("topSearchKeyword", 0, limit - 1)
+        val rangeWithScores = topSearchZSet.reverseRangeWithScores("topSearch", 0, limit - 1)
         if (rangeWithScores != null) {
             return rangeWithScores.map { TopSearchKeyword(it.value, it.score) }.toSet()
         }
@@ -45,15 +45,9 @@ class ProductSearchService(
             return cachedData
         } else {
             cacheAllFilterCases(keyword, pageRequest)
-            val productInfo = productRepository.searchByKeywordPaginated(keyword, pageRequest)
-            if (productInfo.hasContent()) {
-                addTermSearch(
-                    cacheKey,
-                    productInfo.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) })
-                return productInfo.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
-            }
+
+            return searchHash.get("searchList", cacheKey) ?: Page.empty(pageRequest)
         }
-        return Page.empty(pageRequest)
     }
 
     private fun addTermTopSearch(term: String) {
