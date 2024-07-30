@@ -45,7 +45,6 @@ class ProductSearchService(
             return cachedData
         } else {
             cacheAllFilterCases(keyword, pageRequest)
-
             return searchHash.get("searchList", cacheKey) ?: Page.empty(pageRequest)
         }
     }
