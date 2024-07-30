@@ -3,6 +3,7 @@ package com.highv.ecommerce.domain.order_details.controller
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderResponse
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
+import com.highv.ecommerce.domain.order_details.dto.SellerOrderResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.service.OrderDetailsService
 import com.highv.ecommerce.domain.order_master.dto.ProductsOrderResponse
@@ -61,12 +62,11 @@ class OrderDetailsController(
         .body(orderDetailsService.requestComplainReject(sellerOrderStatusRequest, shopId, orderId))
 
     @PreAuthorize("hasRole('SELLER')")
-    @GetMapping("/shop/order-details/{shopId}")
+    @GetMapping("/shop/order-details")
     fun getSellerOrderDetailsAll(
-        @PathVariable("shopId") shopId: Long,  // Shop 추가 시 논의 후에 삭제 예정
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-    ): ResponseEntity<List<ProductsOrderResponse>> = ResponseEntity.status(HttpStatus.OK)
-        .body(orderDetailsService.getSellerOrderDetailsAll(shopId, userPrincipal.id))
+    ): ResponseEntity<List<SellerOrderResponse>> = ResponseEntity.status(HttpStatus.OK)
+        .body(orderDetailsService.getSellerOrderDetailsAll(userPrincipal.id))
 
     @PreAuthorize("hasRole('SELLER')")
     @GetMapping("/shop/order-details/{shopId}/{orderId}")

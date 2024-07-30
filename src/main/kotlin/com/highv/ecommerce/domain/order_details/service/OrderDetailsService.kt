@@ -8,6 +8,7 @@ import com.highv.ecommerce.domain.order_details.dto.BuyerOrderResponse
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderShopResponse
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
+import com.highv.ecommerce.domain.order_details.dto.SellerOrderResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
@@ -150,11 +151,26 @@ class OrderDetailsService(
         return OrderStatusResponse.from(complainType, "전체 요청 거절 완료 되었습니다")
     }
 
-    fun getSellerOrderDetailsAll(shopId: Long, sellerId: Long): List<ProductsOrderResponse> {
+    fun getSellerOrderDetailsAll(sellerId: Long): List<SellerOrderResponse> {
 
-        val orderDetails = orderDetailsRepository.findAllByShopId(shopId)
+        val orderDetails = orderDetailsRepository.findAllByShopId(sellerId)
 
-        return orderDetails.map { ProductsOrderResponse.from(it) }
+        val orderMasters =
+            orderMasterRepository.findByIdInOrderByIdDesc(orderDetails.map { it.orderMasterId }.toSet<Long>())
+
+        val orderMasterGroup: MutableMap<Long, MutableList<OrderDetails>> = mutableMapOf()
+
+        orderDetails.forEach {
+            if (!orderMasterGroup.containsKey(it.orderMasterId)) {
+                orderMasterGroup[it.orderMasterId] = mutableListOf()
+            }
+
+            orderMasterGroup[it.orderMasterId]?.add(it)
+
+        }
+
+
+        return orderMasters.map { SellerOrderResponse.from(it, orderMasterGroup[it.id!!]!!) }
     }
 
     fun getSellerOrderDetailsBuyer(shopId: Long, orderId: Long, buyerId: Long): List<ProductsOrderResponse> {

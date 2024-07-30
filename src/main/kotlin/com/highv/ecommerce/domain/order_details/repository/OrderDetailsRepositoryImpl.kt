@@ -67,17 +67,16 @@ class OrderDetailsRepositoryImpl(
 
     // TODO("수정 필요")
     override fun findAllByShopId(shopId: Long): List<OrderDetails> {
-//        val query = queryFactory
-//            .selectFrom(orderStatus)
-//            .where(
-//                orderStatus.shopId.eq(shopId),
-//                orderStatus.isDeleted.eq(false)
-//            )
-//            .leftJoin(orderStatus.productsOrder(),productsOrder).fetchJoin()
-//            .leftJoin(orderStatus.itemCart(), cartItem).fetchJoin()
-//            .fetch()
+        val query = queryFactory
+            .selectFrom(orderDetails)
+            .innerJoin(orderDetails.product()).fetchJoin()
+            .innerJoin(orderDetails.product().shop()).fetchJoin()
+            .innerJoin(orderDetails.buyer()).fetchJoin()
+            .innerJoin(orderDetails.product().productBackOffice()).fetchJoin()
+            .where(orderDetails.product().shop().sellerId.eq(shopId))
+            .fetch()
 
-        return listOf()
+        return query
     }
 
     override fun findByItemCartIdAndBuyerId(orderStatusId: Long, buyerId: Long): OrderDetails? {
@@ -93,7 +92,20 @@ class OrderDetailsRepositoryImpl(
         orderId: Long,
         buyerId: Long
     ): List<OrderDetails> {
-        return orderDetailsJpaRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId, orderId, buyerId)
+        val query = queryFactory
+            .select(orderDetails)
+            .from(orderDetails)
+            .innerJoin(orderDetails.product()).fetchJoin()
+            .innerJoin(orderDetails.product().productBackOffice()).fetchJoin()
+            .innerJoin(orderDetails.product().shop()).fetchJoin()
+            .innerJoin(orderDetails.buyer()).fetchJoin()
+            .where(orderDetails.buyer().id.eq(buyerId))
+            .where(orderDetails.orderMasterId.eq(orderId))
+            .where(orderDetails.shopId.eq(shopId))
+            .fetch()
+
+        return query
+        // return orderDetailsJpaRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId, orderId, buyerId)
     }
 
     override fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderDetails> {

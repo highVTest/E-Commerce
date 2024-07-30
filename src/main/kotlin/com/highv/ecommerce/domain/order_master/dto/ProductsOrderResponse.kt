@@ -6,19 +6,19 @@ import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import java.time.LocalDateTime
 
 data class ProductsOrderResponse(
-    val id : Long,
+    val orderMasterId: Long,
     val statusCode: OrderStatus,
     val complainStatus: ComplainStatus,
     val updatedDate: LocalDateTime,
-    val rejectDescription : String? = null,
-    val buyerName : String,
-    val totalPrice : Int,
-){
+    val rejectDescription: String? = null,
+    val buyerName: String,
+    val totalPrice: Int,
+) {
     // TODO("수정 필요")
-    companion object{
-        fun from(orderDetails: OrderDetails): ProductsOrderResponse{
+    companion object {
+        fun from(orderDetails: OrderDetails): ProductsOrderResponse {
             return ProductsOrderResponse(
-                id = orderDetails.orderMasterId,
+                orderMasterId = orderDetails.orderMasterId,
                 statusCode = orderDetails.orderStatus,
                 complainStatus = orderDetails.complainStatus,
                 updatedDate = LocalDateTime.now(),
