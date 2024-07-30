@@ -1,4 +1,11 @@
-//package com.highv.ecommerce.OAuth
+import com.highv.ecommerce.Oauth.naver.dto.OAuthLoginUserInfo
+import com.highv.ecommerce.common.type.OAuthProvider
+import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
+import com.highv.ecommerce.socialmember.service.SocialMemberDomainService
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.mockk.mockk
+import kotlin.test.Test
 //
 //import com.highv.ecommerce.domain.auth.oauth.naver.dto.OAuthLoginUserInfo
 //import com.highv.ecommerce.common.type.OAuthProvider

@@ -2,6 +2,7 @@ package com.highv.ecommerce.domain.auth.service
 
 import com.highv.ecommerce.common.dto.AccessTokenResponse
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.auth.dto.EmailAuthResponse
 import com.highv.ecommerce.domain.auth.dto.LoginRequest
 import com.highv.ecommerce.domain.auth.dto.UserRole
@@ -35,7 +36,7 @@ class UserService(
             val token = jwtPlugin.generateAccessToken(seller.id.toString(), seller.email, "SELLER")
             return AccessTokenResponse(token)
         }
-        throw RuntimeException("판매자 로그인 실패")
+        throw CustomRuntimeException(401, "판매자 로그인 실패")
     }
 
     fun loginBuyer(loginRequest: LoginRequest): AccessTokenResponse {
@@ -45,13 +46,13 @@ class UserService(
             return AccessTokenResponse(token)
         }
 
-        throw RuntimeException("구매자 로그인 실패")
+        throw CustomRuntimeException(401, "구매자 로그인 실패")
     }
 
     fun sendMail(toEmail: String, role: UserRole): DefaultResponse {
 
         if (duplicateEmail(toEmail, role)) {
-            throw RuntimeException("이미 존재하는 이메일입니다.")
+            throw CustomRuntimeException(409, "이미 존재하는 이메일입니다.")
         }
 
         val title = "HighV 이메일 인증"
@@ -71,7 +72,7 @@ class UserService(
     fun verifyCode(email: String, role: UserRole, code: String): EmailAuthResponse {
 
         if (duplicateEmail(email, role)) {
-            throw RuntimeException("이미 존재하는 이메일입니다.")
+            throw CustomRuntimeException(409, "이미 존재하는 이메일입니다.")
         }
 
         val redisAuthCode: String = redisUtils.getStringData("${AUTH_CODE_PREFIX}${email}")
