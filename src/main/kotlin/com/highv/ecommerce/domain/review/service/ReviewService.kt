@@ -77,7 +77,7 @@ class ReviewService(
             0f
         }
 
-        shop.rate = round(avgRate*100)/100
+        shop.rate = round(avgRate*100)/100 //// 상점의 평점을 소수점 둘째 자리까지 반올림하여 업데이트
         shopRepository.save(shop)
     }
 }
