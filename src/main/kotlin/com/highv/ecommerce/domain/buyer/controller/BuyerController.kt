@@ -75,7 +75,7 @@ class BuyerController(private val buyerService: BuyerService) {
     fun changeImage(
         @AuthenticationPrincipal user: UserPrincipal,
         @RequestPart(value = "file", required = false) file: MultipartFile?
-    ): ResponseEntity<BuyerResponse> = ResponseEntity
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(buyerService.changeProfileImage(user.id, file))
 

@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.buyer.service
 
+import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.*
 import com.highv.ecommerce.domain.auth.oauth.naver.dto.OAuthLoginUserInfo
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
@@ -24,7 +25,8 @@ class BuyerService(
 
     @Transactional
     fun signUp(request: CreateBuyerRequest, file: MultipartFile?): BuyerResponse {
-        val buyer: Buyer = buyerRepository.findByIdOrNull(request.id)  ?: throw EmailNotVerifiedException(404, "이메일 인증된 회원 정보가 없습니다.")
+        val buyer: Buyer =
+            buyerRepository.findByIdOrNull(request.id) ?: throw EmailNotVerifiedException(404, "이메일 인증된 회원 정보가 없습니다.")
 
         if (request.email != buyer.email) {
             throw UnauthorizedEmailException(400, "인증되지 않은 이메일입니다.")
@@ -53,7 +55,7 @@ class BuyerService(
     }
 
     @Transactional
-    fun changePassword(request: UpdateBuyerPasswordRequest, userId: Long) {
+    fun changePassword(request: UpdateBuyerPasswordRequest, userId: Long): DefaultResponse {
         val buyer = buyerRepository.findByIdOrNull(userId) ?: throw BuyerNotFoundException(404, "사용자가 존재하지 않습니다.")
 
         if (buyer.providerName != null) {
@@ -73,10 +75,11 @@ class BuyerService(
         }
 
         buyer.password = passwordEncoder.encode(request.newPassword)
+        return DefaultResponse("비밀번호가 변경되었습니다.")
     }
 
     @Transactional
-    fun changeProfileImage(userId: Long, file: MultipartFile?) {
+    fun changeProfileImage(userId: Long, file: MultipartFile?): DefaultResponse {
         val buyer = buyerRepository.findByIdOrNull(userId) ?: throw BuyerNotFoundException(404, "사용자가 존재하지 않습니다.")
 
         if (file != null) {
@@ -87,6 +90,7 @@ class BuyerService(
         }
 
         buyerRepository.save(buyer)
+        return DefaultResponse("프로필 이미지가 변경되었습니다.")
     }
 
     @Transactional
