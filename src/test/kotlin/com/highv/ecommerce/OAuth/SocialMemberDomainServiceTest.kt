@@ -1,17 +1,12 @@
 package com.highv.ecommerce.OAuth
 
+import com.highv.ecommerce.Oauth.naver.dto.OAuthLoginUserInfo
 import com.highv.ecommerce.common.type.OAuthProvider
-import com.highv.ecommerce.domain.auth.oauth.naver.dto.OAuthLoginUserInfo
-import com.highv.ecommerce.domain.buyer.entity.Buyer
-import com.highv.ecommerce.domain.buyer.entity.QBuyer.buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
-import com.highv.ecommerce.domain.buyer.service.BuyerService
-import com.highv.ecommerce.infra.s3.S3Manager
+import com.highv.ecommerce.socialmember.service.SocialMemberDomainService
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.mockk.every
 import io.mockk.mockk
-import org.springframework.security.crypto.password.PasswordEncoder
 import kotlin.test.Test
 
 class SocialMemberDomainServiceTest  (

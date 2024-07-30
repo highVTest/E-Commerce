@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.buyer.controller
 
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.LoginException
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
@@ -59,7 +60,7 @@ class BuyerController(private val buyerService: BuyerService) {
     ): ResponseEntity<Unit> {
 
         if (bindingResult.hasErrors()) {
-            throw RuntimeException(bindingResult.fieldError?.defaultMessage.toString())
+            throw CustomRuntimeException(400, bindingResult.fieldError?.defaultMessage.toString())
         }
 
         return ResponseEntity
