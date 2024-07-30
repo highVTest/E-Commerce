@@ -41,7 +41,7 @@ class ProductService(
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
             isSoldOut = false,
-            deletedAt = LocalDateTime.now(),
+            deletedAt = null,
             isDeleted = false,
             shop = shop,
             categoryId = productRequest.categoryId,
