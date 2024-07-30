@@ -47,9 +47,7 @@ class ProductSearchService(
             cacheAllFilterCases(keyword, pageRequest)
             val productInfo = productRepository.searchByKeywordPaginated(keyword, pageRequest)
             if (productInfo.hasContent()) {
-                addTermSearch(
-                    cacheKey,
-                    productInfo.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) })
+
                 return productInfo.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
             }
         }
