@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 
@@ -54,6 +53,7 @@ class CouponController(
             400,
             bindingResult.fieldError?.defaultMessage.toString()
         )
+
         if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
 
 

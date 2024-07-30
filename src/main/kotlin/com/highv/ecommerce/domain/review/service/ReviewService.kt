@@ -2,10 +2,10 @@ package com.highv.ecommerce.domain.review.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.CustomRuntimeException
-import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.review.dto.ReviewRequest
 import com.highv.ecommerce.domain.review.dto.ReviewResponse
 import com.highv.ecommerce.domain.review.entity.Review
+import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.review.repository.ReviewRepository
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
 import org.springframework.data.repository.findByIdOrNull
