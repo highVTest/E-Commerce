@@ -6,15 +6,14 @@ import com.highv.ecommerce.domain.product.entity.QProduct
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
 @Repository
 class CouponRepositoryImpl(
     private val couponJpaRepository: CouponJpaRepository,
     @PersistenceContext
-    private val em : EntityManager
-): CouponRepository {
+    private val em: EntityManager
+) : CouponRepository {
 
     private val queryFactory: JPAQueryFactory = JPAQueryFactory(em)
     val coupon: QCoupon = QCoupon.coupon
@@ -25,7 +24,16 @@ class CouponRepositoryImpl(
     }
 
     override fun findByIdOrNull(id: Long): Coupon? {
-        return couponJpaRepository.findByIdOrNull(id)
+        val query = queryFactory
+            .select(coupon)
+            .from(coupon)
+            .innerJoin(coupon.product()).fetchJoin()
+            .innerJoin(coupon.product().productBackOffice()).fetchJoin()
+            .innerJoin(coupon.product().shop()).fetchJoin()
+            .where(coupon.id.eq(id))
+            .fetchOne()
+
+        return query
     }
 
     override fun delete(coupon: Coupon) {
@@ -38,11 +46,11 @@ class CouponRepositoryImpl(
 
     override fun findAllCouponIdWithBuyer(couponIdList: List<Long>): List<Coupon> {
 
-
-       return queryFactory.selectFrom(coupon)
+        return queryFactory.selectFrom(coupon)
             .where(coupon.id.`in`(couponIdList))
-            .leftJoin(coupon.product(),product)
-            .fetchJoin()
+            .innerJoin(coupon.product(), product).fetchJoin()
+            .innerJoin(coupon.product().shop()).fetchJoin()
+            .innerJoin(coupon.product().productBackOffice()).fetchJoin()
             .fetch()
     }
 
@@ -51,11 +59,30 @@ class CouponRepositoryImpl(
     }
 
     override fun findByIdAndSellerId(couponId: Long, sellerId: Long): Coupon? {
-        return couponJpaRepository.findByIdAndSellerId(couponId, sellerId)
+        val query = queryFactory
+            .select(coupon)
+            .from(coupon)
+            .innerJoin(coupon.product()).fetchJoin()
+            .innerJoin(coupon.product().productBackOffice()).fetchJoin()
+            .innerJoin(coupon.product().shop()).fetchJoin()
+            .where(coupon.id.eq(couponId))
+            .where(coupon.sellerId.eq(sellerId))
+            .fetchOne()
+
+        return query
     }
 
     override fun findAllBySellerId(sellerId: Long): List<Coupon> {
-        return couponJpaRepository.findAllBySellerId(sellerId)
+        val query = queryFactory
+            .select(coupon)
+            .from(coupon)
+            .innerJoin(coupon.product()).fetchJoin()
+            .innerJoin(coupon.product().productBackOffice()).fetchJoin()
+            .innerJoin(coupon.product().shop()).fetchJoin()
+            .where(coupon.sellerId.eq(sellerId))
+            .fetch()
+
+        return query
     }
 
     override fun getLock(name: String, time: Int): Int {

@@ -47,11 +47,19 @@ class SalesStatisticsService(
     }
 
     private fun validateProductWithBackOffice(sellerId: Long, productId: Long): Product {
-        val product = productRepository.findProductWithBackOfficeById(productId)
+        // val product = productRepository.findProductWithBackOfficeById(productId)
+        //     ?: throw IllegalArgumentException("Product with ID $productId not found")
+        // if (product.shop.sellerId != sellerId) {
+        //     throw IllegalArgumentException("No Authority")
+        // }
+
+        val product = productRepository.findByIdOrNull(productId)
             ?: throw IllegalArgumentException("Product with ID $productId not found")
+
         if (product.shop.sellerId != sellerId) {
             throw IllegalArgumentException("No Authority")
         }
+        
         return product
     }
 }

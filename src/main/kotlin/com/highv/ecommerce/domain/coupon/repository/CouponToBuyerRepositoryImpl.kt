@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.coupon.repository
 
 import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
+import com.highv.ecommerce.domain.coupon.entity.QCoupon.coupon
 import com.highv.ecommerce.domain.coupon.entity.QCouponToBuyer
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
@@ -11,8 +12,8 @@ import org.springframework.stereotype.Repository
 class CouponToBuyerRepositoryImpl(
     private val couponToBuyerJpaRepository: CouponToBuyerJpaRepository,
     @PersistenceContext
-    private val em : EntityManager
-): CouponToBuyerRepository {
+    private val em: EntityManager
+) : CouponToBuyerRepository {
 
     private val queryFactory: JPAQueryFactory = JPAQueryFactory(em)
     private val couponToBuyer = QCouponToBuyer.couponToBuyer
@@ -23,11 +24,10 @@ class CouponToBuyerRepositoryImpl(
             .from(couponToBuyer)
             .where(couponToBuyer.buyer().id.eq(buyerId))
             .fetch()
-
     }
 
     override fun existsByCouponIdAndBuyerId(couponId: Long, buyerId: Long): Boolean {
-       return couponToBuyerJpaRepository.existsByCouponIdAndBuyerId(couponId, buyerId)
+        return couponToBuyerJpaRepository.existsByCouponIdAndBuyerId(couponId, buyerId)
     }
 
     override fun save(coupon: CouponToBuyer): CouponToBuyer {
@@ -35,10 +35,25 @@ class CouponToBuyerRepositoryImpl(
     }
 
     override fun findByCouponIdAndBuyerId(couponId: Long, buyerId: Long): CouponToBuyer? {
-        return couponToBuyerJpaRepository.findByCouponIdAndBuyerId(couponId, buyerId)
+        val query = queryFactory
+            .select(couponToBuyer)
+            .from(couponToBuyer)
+            .innerJoin(couponToBuyer.coupon()).fetchJoin()
+            .innerJoin(couponToBuyer.coupon().product()).fetchJoin()
+            .innerJoin(couponToBuyer.coupon().product().productBackOffice()).fetchJoin()
+            .innerJoin(couponToBuyer.coupon().product().shop()).fetchJoin()
+            .innerJoin(couponToBuyer.buyer()).fetchJoin()
+            .where(couponToBuyer.buyer().id.eq(buyerId))
+            .where(couponToBuyer.coupon().id.eq(coupon.id))
+            .fetchOne()
+
+        return query
     }
 
-    override fun findAllByCouponIdAndBuyerIdAndIsUsedFalse(couponIdList: List<Long>, buyerId: Long): List<CouponToBuyer> {
+    override fun findAllByCouponIdAndBuyerIdAndIsUsedFalse(
+        couponIdList: List<Long>,
+        buyerId: Long
+    ): List<CouponToBuyer> {
         return couponToBuyerJpaRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(couponIdList, buyerId)
     }
 
@@ -50,7 +65,7 @@ class CouponToBuyerRepositoryImpl(
         return couponToBuyerJpaRepository.findByCouponIdAndBuyerIdAndIsUsedFalse(couponId, buyerId)
     }
 
-    override fun findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons: List<Long>, buyerId: Long):List<CouponToBuyer> {
+    override fun findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons: List<Long>, buyerId: Long): List<CouponToBuyer> {
         return couponToBuyerJpaRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons, buyerId)
     }
 }
