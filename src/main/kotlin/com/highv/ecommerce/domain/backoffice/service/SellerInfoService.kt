@@ -53,4 +53,14 @@ class SellerInfoService(
         sellerRepository.save(seller)
         return "Password 변경 완료"
     }
+
+    fun getSellerInfo(sellerId: Long): SellerResponse {
+        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw CustomRuntimeException(404, "Seller not found")
+        return SellerResponse.from(seller)
+    }
+
+    fun getShopInfo(sellerId: Long): ShopResponse {
+        val shop = shopRepository.findShopBySellerId(sellerId)
+        return ShopResponse.from(shop)
+    }
 }

@@ -20,14 +20,15 @@ class SalesStatisticsServiceTest : BehaviorSpec({
     val productBackOfficeRepository = mockk<ProductBackOfficeRepository>()
     val salesStatisticsService = SalesStatisticsService(productBackOfficeRepository, productRepository)
 
-    Given("getTotalSalesQuantity 를 실행 시킬 때"){
-        When( "price가 10000원이고 soldQuantity 가 20를 판매한 상품과 20000원이고 2개 를 판 상품이 있을 경우"){
+    Given("getTotalSalesQuantity 를 실행 시킬 때") {
+        When("price가 10000원이고 soldQuantity 가 20를 판매한 상품과 20000원이고 2개 를 판 상품이 있을 경우") {
             val sellerId = 1L
-            val products: List<Long> = listOf(1,2)
-            Then("22 를 리턴 한다"){
+            val products: List<Long> = listOf(1, 2)
+            Then("22 를 리턴 한다") {
 
                 every { productRepository.findAllByShopId(sellerId) } returns listOf(product1, product2)
-                every { productBackOfficeRepository.findTotalSoldQuantitiesByProductIds(products)
+                every {
+                    productBackOfficeRepository.findTotalSoldQuantitiesByProductIds(products)
                 } returns 22
 
                 val result = salesStatisticsService.getTotalSalesQuantity(sellerId)
@@ -35,9 +36,9 @@ class SalesStatisticsServiceTest : BehaviorSpec({
                 result.totalQuantity shouldBe 22
             }
         }
-        When( "productIds 가 비어있을 경우"){
+        When("productIds 가 비어있을 경우") {
             val sellerId = 1L
-            Then("0 을 리턴 한다"){
+            Then("0 을 리턴 한다") {
 
                 every { productRepository.findAllByShopId(sellerId) } returns listOf()
 
@@ -48,14 +49,15 @@ class SalesStatisticsServiceTest : BehaviorSpec({
         }
     }
 
-    Given("getTotalSalesAmount 를 실행 시킬 때"){
-        When( "price가 10000원이고 soldQuantity 가 20를 판매한 상품과 20000원이고 2개 를 판 상품이 있을 경우"){
+    Given("getTotalSalesAmount 를 실행 시킬 때") {
+        When("price가 10000원이고 soldQuantity 가 20를 판매한 상품과 20000원이고 2개 를 판 상품이 있을 경우") {
             val sellerId = 1L
-            val products: List<Long> = listOf(1,2)
-            Then("240000 를 리턴 한다"){
+            val products: List<Long> = listOf(1, 2)
+            Then("240000 를 리턴 한다") {
 
                 every { productRepository.findAllByShopId(sellerId) } returns listOf(product1, product2)
-                every { productBackOfficeRepository.findTotalSalesAmountByProductIds(products)
+                every {
+                    productBackOfficeRepository.findTotalSalesAmountByProductIds(products)
                 } returns 240000
 
                 val result = salesStatisticsService.getTotalSalesAmount(sellerId)
@@ -63,9 +65,9 @@ class SalesStatisticsServiceTest : BehaviorSpec({
                 result.totalPrice shouldBe 240000
             }
         }
-        When( "productIds 가 비어있을 경우"){
+        When("productIds 가 비어있을 경우") {
             val sellerId = 1L
-            Then("0 을 리턴 한다"){
+            Then("0 을 리턴 한다") {
 
                 every { productRepository.findAllByShopId(sellerId) } returns listOf()
 
@@ -76,12 +78,12 @@ class SalesStatisticsServiceTest : BehaviorSpec({
         }
     }
 
-    Given("getProductSalesQuantity 를 실행 시킬 때"){
+    Given("getProductSalesQuantity 를 실행 시킬 때") {
         // validateProductWithBackOffice Throw 검증
-        When("validateProductWithBackOffice 에서 productId 가 없을 경우"){
+        When("validateProductWithBackOffice 에서 productId 가 없을 경우") {
             val productId = 1L
             every { productRepository.findByIdOrNull(productId) } returns null
-            Then("IllegalArgumentException 를 Throw 한다"){
+            Then("IllegalArgumentException 를 Throw 한다") {
                 shouldThrow<IllegalArgumentException> {
                     salesStatisticsService.getProductSalesQuantity(1L, productId)
                 }.let {
@@ -92,11 +94,11 @@ class SalesStatisticsServiceTest : BehaviorSpec({
         }
 
         // validateProductWithBackOffice Throw 검증
-        When("validateProductWithBackOffice 에서 shop의 sellerid와 sellerId가 다를 경우"){
+        When("validateProductWithBackOffice 에서 shop의 sellerid와 sellerId가 다를 경우") {
             product1.shop.sellerId = 1L
             val sellerId = 3L
             every { productRepository.findByIdOrNull(1L) } returns product1
-            Then("IllegalArgumentException 를 Throw 한다"){
+            Then("IllegalArgumentException 를 Throw 한다") {
                 shouldThrow<IllegalArgumentException> {
                     salesStatisticsService.getProductSalesQuantity(sellerId, 1L)
                 }.let {
@@ -106,24 +108,24 @@ class SalesStatisticsServiceTest : BehaviorSpec({
 
         }
 
-        When("productBackOffice 가 없을 경우"){
+        When("productBackOffice 가 없을 경우") {
             val sellerId = 1L
             val productId = 1L
             product1.productBackOffice = null
-            Then("IllegalArgumentException 을 Throw 한다"){
+            Then("IllegalArgumentException 을 Throw 한다") {
                 every { productRepository.findByIdOrNull(any()) } returns product1
 
-                shouldThrow<IllegalArgumentException>{
+                shouldThrow<IllegalArgumentException> {
                     salesStatisticsService.getProductSalesQuantity(sellerId, productId)
                 }.let {
                     it.message shouldBe "ProductBackOffice not found for product with ID $productId"
                 }
             }
         }
-        When( "product1 이 20개의 상품을 팔았을 경우"){
+        When("product1 이 20개의 상품을 팔았을 경우") {
             val sellerId = 1L
             val product = 1L
-            Then("productSalesQuantity 가 20 이고 productName 은 name 을 리턴 한다"){
+            Then("productSalesQuantity 가 20 이고 productName 은 name 을 리턴 한다") {
 
                 product1.productBackOffice = productBackOffice1
 
@@ -137,25 +139,25 @@ class SalesStatisticsServiceTest : BehaviorSpec({
         }
     }
 
-    Given("getProductSales 를 실행 시킬 때"){
-        When("productBackOffice 가 없을 경우"){
+    Given("getProductSales 를 실행 시킬 때") {
+        When("productBackOffice 가 없을 경우") {
             val sellerId = 1L
             val productId = 1L
             product1.productBackOffice = null
-            Then("IllegalArgumentException 을 Throw 한다"){
+            Then("IllegalArgumentException 을 Throw 한다") {
                 every { productRepository.findByIdOrNull(any()) } returns product1
 
-                shouldThrow<IllegalArgumentException>{
+                shouldThrow<IllegalArgumentException> {
                     salesStatisticsService.getProductSales(sellerId, productId)
                 }.let {
                     it.message shouldBe "ProductBackOffice not found for product with ID $productId"
                 }
             }
         }
-        When( "product1 이 20개의 상품을 팔았을 경우"){
+        When("product1 이 20개의 상품을 팔았을 경우") {
             val sellerId = 1L
             val product = 1L
-            Then("productPrice 가 20000 이고 productName 은 name 을 리턴 한다"){
+            Then("productPrice 가 20000 이고 productName 은 name 을 리턴 한다") {
 
                 product1.productBackOffice = productBackOffice1
 
@@ -168,13 +170,11 @@ class SalesStatisticsServiceTest : BehaviorSpec({
             }
         }
     }
-
-
     afterEach {
         clearAllMocks()
     }
-}){
-    companion object{
+}) {
+    companion object {
 
         private val shop = Shop(
             sellerId = 1L,
