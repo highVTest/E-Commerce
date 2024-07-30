@@ -6,7 +6,6 @@ import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.service.OrderDetailsService
-import com.highv.ecommerce.domain.order_master.dto.ProductsOrderResponse
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -62,11 +61,12 @@ class OrderDetailsController(
         .body(orderDetailsService.requestComplainReject(sellerOrderStatusRequest, shopId, orderId))
 
     @PreAuthorize("hasRole('SELLER')")
-    @GetMapping("/shop/order-details")
+    @GetMapping("/shop/order-details/{shopId}")
     fun getSellerOrderDetailsAll(
+        @PathVariable("shopId") shopId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<List<SellerOrderResponse>> = ResponseEntity.status(HttpStatus.OK)
-        .body(orderDetailsService.getSellerOrderDetailsAll(userPrincipal.id))
+        .body(orderDetailsService.getSellerOrderDetailsAll(shopId))
 
     @PreAuthorize("hasRole('SELLER')")
     @GetMapping("/shop/order-details/{shopId}/{orderId}")
@@ -74,9 +74,8 @@ class OrderDetailsController(
         @PathVariable("shopId") shopId: Long,  // Shop 추가 시 논의 후에 삭제 예정
         @PathVariable("orderId") orderId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
-        buyerId: Long
-    ): ResponseEntity<List<ProductsOrderResponse>> = ResponseEntity.status(HttpStatus.OK)
-        .body(orderDetailsService.getSellerOrderDetailsBuyer(shopId, orderId, buyerId))
+    ): ResponseEntity<SellerOrderResponse> = ResponseEntity.status(HttpStatus.OK)
+        .body(orderDetailsService.getSellerOrderDetailsBuyer(shopId, orderId))
 
     @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/shop/complain/{shopId}/{orderId}/accept")
