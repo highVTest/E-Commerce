@@ -9,15 +9,14 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository
 interface ProductRepository : JpaRepository<Product, Long>, ProductQueryDslRepository {
-    fun findAllByShopId(shopId: Long): List<Product>
+    // fun findAllByShopId(shopId: Long): List<Product>
 
-    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productBackOffice WHERE p.id = :productId")
-    fun findProductWithBackOfficeById(productId: Long): Product?
+    // @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productBackOffice WHERE p.id = :productId")
+    // fun findProductWithBackOfficeById(productId: Long): Product?
 }
 
 @Repository
@@ -27,6 +26,7 @@ interface ProductQueryDslRepository {
     fun searchByKeywordPaginated(keyword: String, pageable: Pageable): Page<Product>
     fun findAllById(productIds: Collection<Long>): List<Product>
     fun findByIdOrNull(id: Long): Product?
+    fun findAllByShopId(shopId: Long): List<Product>
 }
 
 class ProductQueryDslRepositoryImpl(
@@ -114,6 +114,17 @@ class ProductQueryDslRepositoryImpl(
             .innerJoin(product.shop()).fetchJoin()
             .where(product.id.eq(id))
             .fetchOne()
+
+        return query
+    }
+
+    override fun findAllByShopId(shopId: Long): List<Product> {
+        val query = jpaQueryFactory
+            .selectFrom(product)
+            .innerJoin(product.productBackOffice()).fetchJoin()
+            .innerJoin(product.shop()).fetchJoin()
+            .where(product.shop().sellerId.eq(shopId))
+            .fetch()
 
         return query
     }
