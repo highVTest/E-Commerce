@@ -48,7 +48,6 @@ class ProductSearchService(
 
             return searchHash.get("searchList", cacheKey) ?: Page.empty(pageRequest)
         }
-        return Page.empty(pageRequest)
     }
 
     fun addTermTopSearch(term: String) {
