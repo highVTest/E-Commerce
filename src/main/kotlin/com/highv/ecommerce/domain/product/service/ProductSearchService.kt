@@ -25,7 +25,7 @@ class ProductSearchService(
         redisTemplateForProductSearch.opsForHash()
 
     fun topSearch10(limit: Long): Set<TopSearchKeyword> {
-        val rangeWithScores = topSearchZSet.reverseRangeWithScores("topSearchKeyword", 0, limit - 1)
+        val rangeWithScores = topSearchZSet.reverseRangeWithScores("topSearch", 0, limit - 1)
         if (rangeWithScores != null) {
             return rangeWithScores.map { TopSearchKeyword(it.value, it.score) }.toSet()
         }

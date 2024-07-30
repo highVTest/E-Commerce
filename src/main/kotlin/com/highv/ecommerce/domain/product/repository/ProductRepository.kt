@@ -83,7 +83,8 @@ class ProductQueryDslRepositoryImpl(
 
         val query = jpaQueryFactory
             .selectFrom(product)
-            .leftJoin(product.productBackOffice(), productBackOffice)
+            .leftJoin(product.productBackOffice(), productBackOffice).fetchJoin()
+            .leftJoin(product.shop()).fetchJoin()
             .where(keywordLike(keyword))
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
