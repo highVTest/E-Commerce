@@ -55,7 +55,7 @@ class Coupon(
     }
 
     fun spendCoupon() {
-        if(quantity <= 0) throw CustomRuntimeException(400, "쿠폰이 매진되었습니다")
+        if(quantity <= 0) throw CustomRuntimeException(400, "쿠폰이 매진 되었습니다")
         quantity -= 1
     }
 

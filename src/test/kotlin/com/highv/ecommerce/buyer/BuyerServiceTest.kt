@@ -1,7 +1,7 @@
-/*
 package com.highv.ecommerce.buyer
 
-import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
+import com.highv.ecommerce.common.type.OAuthProvider
+import com.highv.ecommerce.domain.auth.oauth.naver.dto.OAuthLoginUserInfo
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
 import com.highv.ecommerce.domain.buyer.entity.Buyer
@@ -9,9 +9,9 @@ import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.buyer.service.BuyerService
 import com.highv.ecommerce.infra.s3.S3Manager
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -19,6 +19,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.nio.charset.StandardCharsets
+import kotlin.test.Test
 
 class BuyerServiceTest : DescribeSpec({
     val buyerRepository: BuyerRepository = mockk<BuyerRepository>()
@@ -286,4 +287,66 @@ class BuyerServiceTest : DescribeSpec({
         }
     }
 
-})*/
+    describe("사용자가 회원 가입을 할 때") {
+
+        context("DB 에 사용자 정보가 없을 경우") {
+
+            it("회원가입 처리를 진행한다") {
+                //GIVEN
+                val userinfo =
+                    OAuthLoginUserInfo(provider = OAuthProvider.KAKAO, id = "0729", nickname = "hysup", profileImage = "String")
+
+                every { buyerRepository.findByProviderNameAndProviderId(any(), any()) } returns buyer
+                every { buyerRepository.save(any()) } returns buyer
+                //WHEN
+                val result = buyerService.registerIfAbsent(userinfo)
+
+                result.providerName shouldBe OAuthProvider.KAKAO.name
+                result.id shouldNotBe null
+                result.nickname shouldBe "hysup"
+                result.profileImage shouldBe "String"
+                result.providerId shouldBe "0729"
+
+            }
+
+        }
+
+        context("사용자 정보가 이미 존재하는 경우"){
+            it("buyer 를 반환 한다"){
+                //GIVEN
+                val userinfo =
+                    OAuthLoginUserInfo(provider = OAuthProvider.KAKAO, id = "0729", nickname = "hysup", profileImage = "String")
+
+                every { buyerRepository.findByProviderNameAndProviderId(any(), any()) } returns buyer
+                every { buyerRepository.save(any()) } returns buyer
+
+                //WHEN
+                val result = buyerService.registerIfAbsent(userinfo)
+
+                //THEN
+                result shouldBe buyer
+            }
+        }
+
+        }
+
+
+
+}){
+
+    companion object{
+        private val buyer = Buyer(
+            // ----------------------
+            // 수정하기
+            email = "null", // 소셜 로그인 한 사람은 업데이트 못하게 하기
+            password = "null", // 소셜 로그인 한 사람은 업데이트 못하게 하기
+            phoneNumber = "null", // 소셜 로그인 한 사람은 업데이트 하기
+            address = "null", // 소셜 로그인 한 사람은 업데이트 하기
+            // -----------------
+            providerName = OAuthProvider.KAKAO.name,
+            providerId = "0729",
+            nickname = "hysup",
+            profileImage = "String"
+        ).apply { id = 1L }
+    }
+}

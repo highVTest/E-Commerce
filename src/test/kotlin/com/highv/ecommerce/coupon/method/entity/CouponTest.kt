@@ -20,7 +20,7 @@ class CouponTest {
         shouldThrow<RuntimeException> {
             coupon.validExpiredAt()
         }.let {
-            it.message shouldBe "쿠폰 유호 기간이 지났 습니다"
+            it.message shouldBe "쿠폰 유효 기간이 지났습니다"
         }
     }
 
@@ -48,7 +48,7 @@ class CouponTest {
         shouldThrow<RuntimeException> {
             coupon.update(updateCouponRequest)
         }.let {
-            it.message shouldBe "할인율은 40%를 넘길 수 없습 니다"
+            it.message shouldBe "할인율은 40%를 넘길 수 없습니다"
         }
     }
 
