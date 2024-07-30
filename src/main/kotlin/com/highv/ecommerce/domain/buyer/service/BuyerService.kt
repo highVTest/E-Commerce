@@ -1,5 +1,7 @@
 package com.highv.ecommerce.domain.buyer.service
 
+import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.auth.oauth.naver.dto.OAuthLoginUserInfo
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
@@ -23,10 +25,12 @@ class BuyerService(
 
     @Transactional
     fun signUp(request: CreateBuyerRequest, file: MultipartFile?): BuyerResponse {
-        val buyer: Buyer = buyerRepository.findByIdOrNull(request.id) ?: throw RuntimeException("이메일 인증된 회원 정보가 없습니다.")
+        val buyer: Buyer =
+            buyerRepository.findByIdOrNull(request.id) ?: throw CustomRuntimeException(404, "이메일 인증된 회원 정보가 없습니다.")
+
 
         if (request.email != buyer.email) {
-            throw RuntimeException("인증되지 않은 이메일입니다.")
+            throw CustomRuntimeException(400, "인증되지 않은 이메일입니다.")
         }
 
         buyer.apply {
@@ -46,41 +50,42 @@ class BuyerService(
     }
 
     fun getMyProfile(buyerId: Long): BuyerResponse {
-        val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw RuntimeException("구매자 정보가 없습니다.")
+        val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw CustomRuntimeException(404, "구매자 정보가 없습니다.")
 
         return BuyerResponse.from(buyer)
     }
 
     @Transactional
-    fun changePassword(request: UpdateBuyerPasswordRequest, userId: Long) {
+    fun changePassword(request: UpdateBuyerPasswordRequest, userId: Long): DefaultResponse {
 
-        val buyer = buyerRepository.findByIdOrNull(userId) ?: throw RuntimeException("사용자가 존재하지 않습니다.")
+        val buyer = buyerRepository.findByIdOrNull(userId) ?: throw CustomRuntimeException(404, "사용자가 존재하지 않습니다.")
 
 
         if (buyer.providerName != null) {
-            throw RuntimeException("소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.")
+            throw CustomRuntimeException(400, "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.")
         }
 
         if (!passwordEncoder.matches(request.currentPassword, buyer.password)) {
-            throw RuntimeException("비밀번호가 일치하지 않습니다.")
+            throw CustomRuntimeException(400, "비밀번호가 일치하지 않습니다.")
         }
 
         if (request.newPassword != request.confirmNewPassword) {
-            throw RuntimeException("변경할 비밀번호와 확인 비밀번호가 다릅니다.")
+            throw CustomRuntimeException(400, "변경할 비밀번호와 확인 비밀번호가 다릅니다.")
         }
 
         if (passwordEncoder.matches(request.newPassword, buyer.password)) {
-            throw RuntimeException("현재 비밀번호와 수정할 비밀번호가 같습니다.")
+            throw CustomRuntimeException(400, "현재 비밀번호와 수정할 비밀번호가 같습니다.")
         }
 
         buyer.password = passwordEncoder.encode(request.newPassword)
+
+        return DefaultResponse("비밀번호가 변경됐습니다.")
     }
 
     @Transactional
+    fun changeProfileImage(userId: Long, file: MultipartFile?): BuyerResponse {
 
-    fun changeProfileImage(userId: Long, file: MultipartFile?) {
-
-        val buyer = buyerRepository.findByIdOrNull(userId) ?: throw RuntimeException("사용자가 존재하지 않습니다.")
+        val buyer = buyerRepository.findByIdOrNull(userId) ?: throw CustomRuntimeException(404, "사용자가 존재하지 않습니다.")
 
         if (file != null) {
             s3Manager.uploadFile(file)
@@ -89,13 +94,15 @@ class BuyerService(
             buyer.profileImage = ""
         }
 
-        buyerRepository.save(buyer)
+        val saveBuyer = buyerRepository.save(buyer)
+
+        return BuyerResponse.from(saveBuyer)
     }
 
     @Transactional
     fun changeProfile(request: UpdateBuyerProfileRequest, userId: Long): BuyerResponse {
 
-        val buyer = buyerRepository.findByIdOrNull(userId) ?: throw RuntimeException("사용자가 존재하지 않습니다.")
+        val buyer = buyerRepository.findByIdOrNull(userId) ?: throw CustomRuntimeException(404, "사용자가 존재하지 않습니다.")
 
         if (buyer.providerName != null) {
             buyer.address = request.address

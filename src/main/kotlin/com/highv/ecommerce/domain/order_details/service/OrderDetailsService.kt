@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.order_details.service
 
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderDetailProductResponse
@@ -7,13 +8,13 @@ import com.highv.ecommerce.domain.order_details.dto.BuyerOrderResponse
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderShopResponse
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
+import com.highv.ecommerce.domain.order_details.dto.SellerOrderResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
-import com.highv.ecommerce.domain.order_master.dto.ProductsOrderResponse
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
 import org.springframework.stereotype.Service
@@ -94,12 +95,12 @@ class OrderDetailsService(
     fun getBuyerOrderDetails(buyerId: Long, orderId: Long): BuyerOrderResponse {
 
         val orderMaster: OrderMaster =
-            orderMasterRepository.findByIdOrNull(orderId) ?: throw RuntimeException("주문 내역이 없습니다.")
+            orderMasterRepository.findByIdOrNull(orderId) ?: throw CustomRuntimeException(404, "주문 내역이 없습니다.")
 
         val orderDetails: List<OrderDetails> = orderDetailsRepository.findAllByBuyerIdAndOrderMasterId(buyerId, orderId)
 
         if (orderDetails.isEmpty()) {
-            throw RuntimeException("주문 내역이 없습니다.")
+            throw CustomRuntimeException(404, "주문 내역이 없습니다.")
         }
 
         val shopGroup: MutableMap<Long, MutableList<BuyerOrderDetailProductResponse>> = mutableMapOf()
@@ -149,18 +150,38 @@ class OrderDetailsService(
         return OrderStatusResponse.from(complainType, "전체 요청 거절 완료 되었습니다")
     }
 
-    fun getSellerOrderDetailsAll(shopId: Long, sellerId: Long): List<ProductsOrderResponse> {
-
+    fun getSellerOrderDetailsAll(shopId: Long): List<SellerOrderResponse> {
+        // 샵 id에서 가져온 sellerId 와 sellerId가 같은지 판별 로직 필요하지 않을까?
         val orderDetails = orderDetailsRepository.findAllByShopId(shopId)
 
-        return orderDetails.map { ProductsOrderResponse.from(it) }
+        val orderMasters =
+            orderMasterRepository.findByIdInOrderByIdDesc(orderDetails.map { it.orderMasterId }.toSet<Long>())
+
+        val orderMasterGroup: MutableMap<Long, MutableList<OrderDetails>> = mutableMapOf()
+
+        orderDetails.forEach {
+            if (!orderMasterGroup.containsKey(it.orderMasterId)) {
+                orderMasterGroup[it.orderMasterId] = mutableListOf()
+            }
+
+            orderMasterGroup[it.orderMasterId]?.add(it)
+
+        }
+
+
+        return orderMasters.map { SellerOrderResponse.from(it, orderMasterGroup[it.id!!]!!) }
     }
 
-    fun getSellerOrderDetailsBuyer(shopId: Long, orderId: Long, buyerId: Long): List<ProductsOrderResponse> {
+    fun getSellerOrderDetailsBuyer(shopId: Long, orderId: Long): SellerOrderResponse {
 
-        val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId, orderId, buyerId)
+        val orderMaster =
+            orderMasterRepository.findByIdOrNull(orderId) ?: throw CustomRuntimeException(409, "주문 내역이 없습니다.")
 
-        return orderDetails.map { ProductsOrderResponse.from(it) }
+        val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(shopId, orderId)
+
+
+
+        return SellerOrderResponse.from(orderMaster, orderDetails)
     }
 
     @Transactional
@@ -200,7 +221,7 @@ class OrderDetailsService(
                 }
             }
 
-            else -> throw RuntimeException("구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
+            else -> throw CustomRuntimeException(400, "구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
         }
 
 

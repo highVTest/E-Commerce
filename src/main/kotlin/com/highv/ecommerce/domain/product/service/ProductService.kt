@@ -13,7 +13,6 @@ import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
 import com.highv.ecommerce.infra.s3.S3Manager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
@@ -34,84 +33,93 @@ class ProductService(
         file: MultipartFile?
     ): ProductResponse {
 
-            val shop = shopRepository.findShopBySellerId(sellerId)
-            val product = Product(
-                name = productRequest.name,
-                description = productRequest.description,
-                productImage ="", // Buyer 객체에 프로필 이미지 URL 저장
-                createdAt = LocalDateTime.now(),
-                updatedAt = LocalDateTime.now(),
-                isSoldOut = false,
-                deletedAt = LocalDateTime.now(),
-                isDeleted = false,
-                shop = shop,
-                categoryId = productRequest.categoryId,
-                productBackOffice = null
-            )
+        val shop = shopRepository.findShopBySellerId(sellerId)
+        val product = Product(
+            name = productRequest.name,
+            description = productRequest.description,
+            productImage = "", // Buyer 객체에 프로필 이미지 URL 저장
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now(),
+            isSoldOut = false,
+            deletedAt = null,
+            isDeleted = false,
+            shop = shop,
+            categoryId = productRequest.categoryId,
+            productBackOffice = null
+        )
+
         if (file != null) {
             s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
             product.productImage = s3Manager.getFile(file.originalFilename)
         }
 
-            val savedProduct = productRepository.save(product)
+        val savedProduct = productRepository.save(product)
 
+        val productBackOffice = ProductBackOffice(
+            quantity = productBackOfficeRequest.quantity,
+            price = productBackOfficeRequest.price,
+            soldQuantity = 0,
+            product = savedProduct
+        )
 
-            val productBackOffice = ProductBackOffice(
-                quantity = productBackOfficeRequest.quantity,
-                price = productBackOfficeRequest.price,
-                soldQuantity = 0,
-                product = savedProduct
-            )
+        savedProduct.productBackOffice = productBackOffice
+        productBackOfficeRepository.save(productBackOffice)
 
-            savedProduct.productBackOffice = productBackOffice
-            productBackOfficeRepository.save(productBackOffice)
-
-            productRepository.save(savedProduct)
-            return ProductResponse.from(savedProduct)
-        }
-
-
-        fun updateProduct(
-            sellerId: Long,
-            productId: Long,
-            updateProductRequest: UpdateProductRequest
-        ): ProductResponse {
-            val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
-            if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")
-            product.apply {
-                name = updateProductRequest.name
-                description = updateProductRequest.description
-                productImage = updateProductRequest.productImage
-                updatedAt = LocalDateTime.now()
-                isSoldOut = updateProductRequest.isSoldOut
-                categoryId = updateProductRequest.categoryId
-            }
-            val updatedProduct = productRepository.save(product)
-            return ProductResponse.from(updatedProduct, favoriteService.countFavorite(productId))
-        }
-
-        fun deleteProduct(sellerId: Long, productId: Long) {
-            val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
-            if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")
-            product.apply {
-                isDeleted = true
-                deletedAt = LocalDateTime.now()
-            }
-            productRepository.save(product)
-        }
-
-        fun getProductById(productId: Long): ProductResponse {
-            val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
-            return ProductResponse.from(product, favoriteService.countFavorite(productId))
-        }
-
-        fun getAllProducts(pageable: Pageable): Page<ProductResponse> {
-            val products = productRepository.findAllPaginated(pageable)
-            return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
-        }
-
-        fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductResponse> {
-            val products = productRepository.findByCategoryPaginated(categoryId, pageable)
-            return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
-        }
+        productRepository.save(savedProduct)
+        return ProductResponse.from(savedProduct)
     }
+
+    fun updateProduct(
+        sellerId: Long,
+        productId: Long,
+        updateProductRequest: UpdateProductRequest,
+        file: MultipartFile?
+    ): ProductResponse {
+
+        val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
+
+        if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")
+
+        product.apply {
+            name = updateProductRequest.name
+            description = updateProductRequest.description
+            productImage = ""
+            updatedAt = LocalDateTime.now()
+            isSoldOut = updateProductRequest.isSoldOut
+            categoryId = updateProductRequest.categoryId
+        }
+
+        if (file != null) {
+            s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
+            product.productImage = s3Manager.getFile(file.originalFilename)
+        }
+
+        val updatedProduct = productRepository.save(product)
+        return ProductResponse.from(updatedProduct, favoriteService.countFavorite(productId))
+    }
+
+    fun deleteProduct(sellerId: Long, productId: Long) {
+        val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
+        if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")
+        product.apply {
+            isDeleted = true
+            deletedAt = LocalDateTime.now()
+        }
+        productRepository.save(product)
+    }
+
+    fun getProductById(productId: Long): ProductResponse {
+        val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
+        return ProductResponse.from(product, favoriteService.countFavorite(productId))
+    }
+
+    fun getAllProducts(pageable: Pageable): Page<ProductResponse> {
+        val products = productRepository.findAllPaginated(pageable)
+        return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
+    }
+
+    fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductResponse> {
+        val products = productRepository.findByCategoryPaginated(categoryId, pageable)
+        return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
+    }
+}

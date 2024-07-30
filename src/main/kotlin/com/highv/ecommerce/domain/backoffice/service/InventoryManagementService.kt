@@ -4,7 +4,6 @@ import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.ProductBackOf
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -32,11 +31,19 @@ class InventoryManagementService(
     }
 
     private fun validateProduct(sellerId: Long, productId: Long): ProductBackOffice {
-        val product = productRepository.findByIdOrNull(productId)?.productBackOffice?.product
+        // val product = productRepository.findByIdOrNull(productId)?.productBackOffice?.product
+        //     ?: throw IllegalArgumentException("Product with id $productId not found")
+        // if (product.shop.sellerId != sellerId) throw IllegalArgumentException("No Authority")
+        // val productBackOffice = productBackOfficeRepository.findProductBackOfficesByProductId(product.id!!)
+        //     ?: throw IllegalArgumentException("Product not found for seller $sellerId")
+
+        val product = productRepository.findByIdOrNull(productId)
             ?: throw IllegalArgumentException("Product with id $productId not found")
+
         if (product.shop.sellerId != sellerId) throw IllegalArgumentException("No Authority")
-        val productBackOffice = productBackOfficeRepository.findProductBackOfficesByProductId(product.id!!)
-            ?: throw IllegalArgumentException("Product not found for seller $sellerId")
+
+        val productBackOffice = product.productBackOffice ?: throw IllegalArgumentException("No ProductBackOffice")
+
         return productBackOffice
     }
 }

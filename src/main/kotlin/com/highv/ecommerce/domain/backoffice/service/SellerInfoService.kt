@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.backoffice.service
 
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdatePasswordRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateSellerRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateShopRequest
@@ -28,7 +29,7 @@ class SellerInfoService(
     }
 
     fun updateSellerInfo(sellerId: Long, updateSellerRequest: UpdateSellerRequest): SellerResponse {
-        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw RuntimeException("Seller not found")
+        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw CustomRuntimeException(404, "Seller not found")
         seller.apply {
             address = updateSellerRequest.address
             nickname = updateSellerRequest.nickname
@@ -40,7 +41,7 @@ class SellerInfoService(
     }
 
     fun changePassword(sellerId: Long, updatePasswordRequest: UpdatePasswordRequest): String {
-        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw RuntimeException("Seller not found")
+        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw CustomRuntimeException(404, "Seller not found")
         if (passwordEncoder.matches(
                 passwordEncoder.encode(updatePasswordRequest.oldPassword),
                 seller.password

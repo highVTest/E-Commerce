@@ -49,10 +49,11 @@ class ProductController(
     fun updateProduct(
         @AuthenticationPrincipal seller: UserPrincipal,
         @PathVariable("productId") productId: Long,
-        updateProductRequest: UpdateProductRequest
+        @RequestPart updateProductRequest: UpdateProductRequest,
+        @RequestPart(value = "file", required = false) file: MultipartFile?
     ): ResponseEntity<ProductResponse> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(productService.updateProduct(seller.id, productId, updateProductRequest))
+        .body(productService.updateProduct(seller.id, productId, updateProductRequest, file))
 
     //상품 삭제
     @DeleteMapping("/{productId}")

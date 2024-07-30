@@ -20,7 +20,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDateTime
 import kotlin.test.Test
 
@@ -45,7 +44,7 @@ class CouponServiceTest {
         shouldThrow<RuntimeException> {
             couponService.createCoupon(createCouponRequest, userPrincipal)
         }.let {
-            it.message shouldBe "할인율은 40%를 넘길 수 없습 니다"
+            it.message shouldBe "할인율은 40%를 넘길 수 없습니다"
         }
     }
 

@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.item_cart.controller
 
+import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.item_cart.dto.request.SelectProductQuantity
 import com.highv.ecommerce.domain.item_cart.dto.response.CartResponse
 import com.highv.ecommerce.domain.item_cart.service.ItemCartService
@@ -29,7 +30,7 @@ class ItemCartController(
         @PathVariable(value = "productId") productId: Long,
         @AuthenticationPrincipal user: UserPrincipal,
         @RequestBody request: SelectProductQuantity
-    ): ResponseEntity<Unit> {
+    ): ResponseEntity<DefaultResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(itemCartService.addItemIntoCart(productId, request, user.id))
@@ -49,7 +50,7 @@ class ItemCartController(
         @PathVariable(value = "productId") productId: Long,
         @AuthenticationPrincipal user: UserPrincipal,
         @RequestBody request: SelectProductQuantity
-    ): ResponseEntity<Unit> = ResponseEntity
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(itemCartService.updateItemIntoCart(productId, request, user.id))
 
@@ -58,7 +59,7 @@ class ItemCartController(
     fun deleteItemIntoCart(
         @PathVariable(value = "productId") productId: Long,
         @AuthenticationPrincipal user: UserPrincipal,
-    ): ResponseEntity<Unit> = ResponseEntity
-        .status(HttpStatus.NO_CONTENT)
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
+        .status(HttpStatus.OK)
         .body(itemCartService.deleteItemIntoCart(productId, user.id))
 }

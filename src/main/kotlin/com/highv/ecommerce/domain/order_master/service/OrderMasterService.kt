@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.order_master.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
@@ -28,9 +29,9 @@ class OrderMasterService(
     @Transactional
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
 
-        if (paymentRequest.cartIdList.isEmpty()) throw RuntimeException("장바구니 에서 아이템 목록을 선택해 주세요")
+        if (paymentRequest.cartIdList.isEmpty()) throw CustomRuntimeException(400, "장바구니 에서 아이템 목록을 선택해 주세요")
 
-        val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw RuntimeException("구매자 정보가 존재 하지 않습니다")
+        val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw CustomRuntimeException(404, "구매자 정보가 존재 하지 않습니다")
 
         val cart = itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
 
@@ -38,7 +39,7 @@ class OrderMasterService(
             couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(paymentRequest.couponIdList, buyerId)
 
         couponToBuyer.forEach {
-            if (it.coupon.expiredAt < LocalDateTime.now()) throw RuntimeException("쿠폰 유효 시간이 만료 되었습니다")
+            if (it.coupon.expiredAt < LocalDateTime.now()) throw CustomRuntimeException(400, "쿠폰 유효 시간이 만료 되었습니다")
         }
 
         val productPrice = orderMasterRepository.discountTotalPriceList(buyerId, couponToBuyer)
@@ -60,10 +61,10 @@ class OrderMasterService(
             }
         )
 
-        couponToBuyer.map { it.useCoupon() }
+        couponToBuyer.forEach { it.useCoupon() }
 
         cart.forEach {
-            if (it.product.productBackOffice!!.quantity < it.quantity) throw RuntimeException("재고가 부족 합니다")
+            if (it.product.productBackOffice!!.quantity < it.quantity) throw CustomRuntimeException(400, "재고가 부족 합니다")
             it.product.productBackOffice!!.quantity -= it.quantity
         }
 

@@ -22,10 +22,6 @@ class OrderDetailsRepositoryImpl(
     private val cartItem = QItemCart.itemCart
     private val orderDetails = QOrderDetails.orderDetails
 
-    override fun findAllByShopIdAndOrderMasterId(shopId: Long, productsOrderId: Long): List<OrderDetails> {
-        TODO("Not yet implemented")
-    }
-
     override fun findAllByBuyerIdAndOrderMasterId(buyerId: Long, orderId: Long): List<OrderDetails> {
         val query = queryFactory
             .select(orderDetails)
@@ -67,17 +63,16 @@ class OrderDetailsRepositoryImpl(
 
     // TODO("수정 필요")
     override fun findAllByShopId(shopId: Long): List<OrderDetails> {
-//        val query = queryFactory
-//            .selectFrom(orderStatus)
-//            .where(
-//                orderStatus.shopId.eq(shopId),
-//                orderStatus.isDeleted.eq(false)
-//            )
-//            .leftJoin(orderStatus.productsOrder(),productsOrder).fetchJoin()
-//            .leftJoin(orderStatus.itemCart(), cartItem).fetchJoin()
-//            .fetch()
+        val query = queryFactory
+            .selectFrom(orderDetails)
+            .innerJoin(orderDetails.product()).fetchJoin()
+            .innerJoin(orderDetails.product().shop()).fetchJoin()
+            .innerJoin(orderDetails.buyer()).fetchJoin()
+            .innerJoin(orderDetails.product().productBackOffice()).fetchJoin()
+            .where(orderDetails.product().shop().id.eq(shopId))
+            .fetch()
 
-        return listOf()
+        return query
     }
 
     override fun findByItemCartIdAndBuyerId(orderStatusId: Long, buyerId: Long): OrderDetails? {
@@ -88,13 +83,44 @@ class OrderDetailsRepositoryImpl(
         return orderDetailsJpaRepository.findByIdAndBuyerId(shopId, orderStatusId)
     }
 
+    // ---------------------------- 판매자 가게 주문 단건 조회
     override fun findAllByShopIdAndOrderMasterIdAndBuyerId(
         shopId: Long,
         orderId: Long,
         buyerId: Long
     ): List<OrderDetails> {
-        return orderDetailsJpaRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId, orderId, buyerId)
+        val query = queryFactory
+            .select(orderDetails)
+            .from(orderDetails)
+            .innerJoin(orderDetails.product()).fetchJoin()
+            .innerJoin(orderDetails.product().productBackOffice()).fetchJoin()
+            .innerJoin(orderDetails.product().shop()).fetchJoin()
+            .innerJoin(orderDetails.buyer()).fetchJoin()
+            // .where(orderDetails.buyer().id.eq(buyerId))
+            .where(orderDetails.orderMasterId.eq(orderId))
+            .where(orderDetails.shopId.eq(shopId))
+            .fetch()
+
+        return query
+
+        // return orderDetailsJpaRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId, orderId, buyerId)
     }
+
+    override fun findAllByShopIdAndOrderMasterId(shopId: Long, orderMasterId: Long): List<OrderDetails> {
+        val query = queryFactory
+            .select(orderDetails)
+            .from(orderDetails)
+            .innerJoin(orderDetails.product()).fetchJoin()
+            .innerJoin(orderDetails.product().productBackOffice()).fetchJoin()
+            .innerJoin(orderDetails.product().shop()).fetchJoin()
+            .innerJoin(orderDetails.buyer()).fetchJoin()
+            .where(orderDetails.orderMasterId.eq(orderMasterId))
+            .where(orderDetails.product().shop().id.eq(shopId))
+            .fetch()
+
+        return query
+    }
+    // --------------------
 
     override fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderDetails> {
         return orderDetailsJpaRepository.findAllByShopIdAndBuyerId(shopId, buyerId)
