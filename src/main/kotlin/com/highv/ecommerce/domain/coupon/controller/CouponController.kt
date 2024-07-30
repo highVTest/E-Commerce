@@ -2,6 +2,8 @@ package com.highv.ecommerce.domain.coupon.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.CustomRuntimeException
+import com.highv.ecommerce.common.exception.InvalidCouponRequestException
+import com.highv.ecommerce.common.exception.UnauthorizedUserException
 import com.highv.ecommerce.domain.coupon.dto.CouponResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
@@ -12,6 +14,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 
@@ -29,11 +32,11 @@ class CouponController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<DefaultResponse> {
 
-        if (bindingResult.hasErrors()) throw CustomRuntimeException(
+        if (bindingResult.hasErrors()) throw InvalidCouponRequestException(
             400,
             bindingResult.fieldError?.defaultMessage.toString()
         )
-        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
+        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -49,12 +52,11 @@ class CouponController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?,
     ): ResponseEntity<DefaultResponse> {
 
-        if (bindingResult.hasErrors()) throw CustomRuntimeException(
+        if (bindingResult.hasErrors()) throw InvalidCouponRequestException(
             400,
             bindingResult.fieldError?.defaultMessage.toString()
         )
-
-        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
+        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
 
 
         return ResponseEntity
@@ -69,7 +71,7 @@ class CouponController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<DefaultResponse> {
 
-        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
+        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -83,7 +85,7 @@ class CouponController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<CouponResponse> {
 
-        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
+        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -96,7 +98,7 @@ class CouponController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<List<CouponResponse>> {
 
-        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
+        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -110,7 +112,7 @@ class CouponController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<CouponResponse> {
 
-        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
+        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -123,7 +125,7 @@ class CouponController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<List<CouponResponse>> {
 
-        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
+        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -137,7 +139,7 @@ class CouponController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal?
     ): ResponseEntity<DefaultResponse> {
 
-        if (userPrincipal == null) throw CustomRuntimeException(401, "인증되지 않은 사용자입니다.")
+        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.OK)

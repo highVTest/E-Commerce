@@ -1,5 +1,6 @@
 package com.highv.ecommerce.item_cart
 
+import com.highv.ecommerce.common.exception.InvalidQuantityException
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.seller.shop.entity.Shop
@@ -40,7 +41,7 @@ class ItemCartEntityTest : AnnotationSpec() {
             shopId = 1L
         ).apply { id = 1L }
 
-        shouldThrow<RuntimeException> {
+        shouldThrow<InvalidQuantityException> {
             cart.updateQuantity(0)
         }.let {
             it.message shouldBe "물품의 수량이 0보다 작거나 같을 수 없습니다."

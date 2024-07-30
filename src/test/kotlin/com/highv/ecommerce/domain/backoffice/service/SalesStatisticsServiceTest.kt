@@ -81,7 +81,7 @@ class SalesStatisticsServiceTest : BehaviorSpec({
         // validateProductWithBackOffice Throw 검증
         When("validateProductWithBackOffice 에서 productId 가 없을 경우"){
             val productId = 1L
-            every { productRepository.findProductWithBackOfficeById(productId) } returns null
+            every { productRepository.findByIdOrNull(productId) } returns null
             Then("IllegalArgumentException 를 Throw 한다"){
                 shouldThrow<IllegalArgumentException> {
                     salesStatisticsService.getProductSalesQuantity(1L, productId)
@@ -96,7 +96,7 @@ class SalesStatisticsServiceTest : BehaviorSpec({
         When("validateProductWithBackOffice 에서 shop의 sellerid와 sellerId가 다를 경우"){
             product1.shop.sellerId = 1L
             val sellerId = 3L
-            every { productRepository.findProductWithBackOfficeById(1L) } returns product1
+            every { productRepository.findByIdOrNull(1L) } returns product1
             Then("IllegalArgumentException 를 Throw 한다"){
                 shouldThrow<IllegalArgumentException> {
                     salesStatisticsService.getProductSalesQuantity(sellerId, 1L)
@@ -112,7 +112,7 @@ class SalesStatisticsServiceTest : BehaviorSpec({
             val productId = 1L
             product1.productBackOffice = null
             Then("IllegalArgumentException 을 Throw 한다"){
-                every { productRepository.findProductWithBackOfficeById(any()) } returns product1
+                every { productRepository.findByIdOrNull(any()) } returns product1
 
                 shouldThrow<IllegalArgumentException>{
                     salesStatisticsService.getProductSalesQuantity(sellerId, productId)
@@ -128,7 +128,7 @@ class SalesStatisticsServiceTest : BehaviorSpec({
 
                 product1.productBackOffice = productBackOffice1
 
-                every { productRepository.findProductWithBackOfficeById(product) } returns product1
+                every { productRepository.findByIdOrNull(product) } returns product1
 
                 val result = salesStatisticsService.getProductSalesQuantity(sellerId, product)
 
@@ -144,7 +144,7 @@ class SalesStatisticsServiceTest : BehaviorSpec({
             val productId = 1L
             product1.productBackOffice = null
             Then("IllegalArgumentException 을 Throw 한다"){
-                every { productRepository.findProductWithBackOfficeById(any()) } returns product1
+                every { productRepository.findByIdOrNull(any()) } returns product1
 
                 shouldThrow<IllegalArgumentException>{
                     salesStatisticsService.getProductSales(sellerId, productId)
@@ -160,7 +160,7 @@ class SalesStatisticsServiceTest : BehaviorSpec({
 
                 product1.productBackOffice = productBackOffice1
 
-                every { productRepository.findProductWithBackOfficeById(product) } returns product1
+                every { productRepository.findByIdOrNull(product) } returns product1
 
                 val result = salesStatisticsService.getProductSales(sellerId, product)
 

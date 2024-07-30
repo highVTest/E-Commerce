@@ -1,3 +1,6 @@
 package com.highv.ecommerce.common.exception
 
-data class CustomRuntimeException(val errorCode: Int, override val message: String) : RuntimeException(message)
+open class CustomRuntimeException(
+    open val errorCode: Int,
+    override val message: String
+) : RuntimeException(message)

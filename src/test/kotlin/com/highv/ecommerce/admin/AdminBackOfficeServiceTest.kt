@@ -1,5 +1,6 @@
 package com.highv.ecommerce.admin
 
+import com.highv.ecommerce.common.exception.BlackListNotFoundException
 import com.highv.ecommerce.domain.admin.entity.BlackList
 import com.highv.ecommerce.domain.admin.repository.BlackListRepository
 import com.highv.ecommerce.domain.admin.service.AdminService
@@ -215,7 +216,7 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
 
             // 예외를 발생시키는 테스트
             Then("예외를 발생시킨다") {
-                val exception = shouldThrow<RuntimeException> {
+                val exception = shouldThrow<BlackListNotFoundException> {
                     adminService.getBlackList(blackListId)
                 }
                 exception.message shouldBe "블랙리스트가 존재하지 않습니다."
@@ -257,7 +258,7 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
         When("관리자가 블랙리스트 항목을 삭제하면") {
             // 예외를 발생시키는 테스트
             Then("예외를 발생시킨다") {
-                val exception = shouldThrow<RuntimeException> {
+                val exception = shouldThrow<BlackListNotFoundException> {
                     adminService.deleteBlackList(blackListId)
                 }
                 exception.message shouldBe "블랙리스트 id $blackListId 존재하지 않습니다."

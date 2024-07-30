@@ -1,6 +1,8 @@
 package com.highv.ecommerce.domain.seller.service
 
 import com.highv.ecommerce.common.exception.CustomRuntimeException
+import com.highv.ecommerce.common.exception.EmailVerificationNotFoundException
+import com.highv.ecommerce.common.exception.UnverifiedEmailException
 import com.highv.ecommerce.domain.seller.dto.CreateSellerRequest
 import com.highv.ecommerce.domain.seller.dto.SellerResponse
 import com.highv.ecommerce.domain.seller.entity.Seller
@@ -9,6 +11,7 @@ import com.highv.ecommerce.domain.seller.shop.dto.CreateShopRequest
 import com.highv.ecommerce.domain.seller.shop.dto.ShopResponse
 import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
+
 import com.highv.ecommerce.infra.s3.S3Manager
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -26,8 +29,11 @@ class SellerService(
     fun signUp(request: CreateSellerRequest, file: MultipartFile?): SellerResponse {
 
         val seller: Seller =
-            sellerRepository.findByIdOrNull(request.id) ?: throw CustomRuntimeException(404, "이메일 인증된 회원 정보가 없습니다.")
-        if (request.email != seller.email) throw CustomRuntimeException(400, "인증되지 않은 이메일입니다.")
+            sellerRepository.findByIdOrNull(request.id) ?: throw EmailVerificationNotFoundException(404, "이메일 인증된 회원 정보가 없습니다.")
+
+        if (request.email != seller.email) {
+            throw UnverifiedEmailException(400, "인증되지 않은 이메일입니다.")
+        }
 
         seller.apply {
             nickname = request.nickname
