@@ -41,4 +41,4 @@ out/
 
 highv_ddl.sql
 
-.env*
+.env
