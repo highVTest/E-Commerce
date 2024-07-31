@@ -19,7 +19,7 @@ jobs:
 
       - name: set docker compose
         run: mkdir -p ./
-          echo "${{ secrets.DOCKER_COMPOSE_YML }}" | base64 --decode > ./
+          echo "${{ secrets.DOCKER_COMPOSE_YML }}" | base64 --decode > ./docker-compose.yml
           find ./
 
       - name: set yml
