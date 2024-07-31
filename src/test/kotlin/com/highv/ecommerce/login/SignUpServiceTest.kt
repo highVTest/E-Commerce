@@ -12,6 +12,7 @@ import com.highv.ecommerce.domain.seller.dto.CreateSellerRequest
 import com.highv.ecommerce.domain.seller.entity.Seller
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.domain.seller.service.SellerService
+import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
 import com.highv.ecommerce.infra.s3.S3Manager
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
@@ -29,6 +30,7 @@ class SignUpServiceTest {
     private val passwordEncoder: PasswordEncoder = mockk<PasswordEncoder>()
     private val s3Manager: S3Manager = mockk<S3Manager>()
     private val buyerService: BuyerService = BuyerService(buyerRepository, passwordEncoder, s3Manager)
+    private val shopRepository = mockk<ShopRepository>()
 
     @Test
     fun `이메일 인증을 마친 구매자가 회원가입 시 성공한다`() {
@@ -115,7 +117,7 @@ class SignUpServiceTest {
 
     // 판매자 테스트
     private val sellerRepository = mockk<SellerRepository>()
-    private val sellerService = SellerService(sellerRepository, passwordEncoder, s3Manager)
+    private val sellerService = SellerService(sellerRepository, passwordEncoder, s3Manager, shopRepository)
 
     @Test
     fun `이메일 인증을 마친 판매자 회원가입 시 성공한다`() {

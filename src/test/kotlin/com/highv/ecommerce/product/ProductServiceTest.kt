@@ -58,7 +58,6 @@ class ProductServiceTest : BehaviorSpec({
         val productRequest = CreateProductRequest(
             name = "Product Name",
             description = "Product Description",
-            productImage = "",
             categoryId = 1L
         )
 
@@ -79,7 +78,6 @@ class ProductServiceTest : BehaviorSpec({
         val productBackOfficeRequest = ProductBackOfficeRequest(
             quantity = 10,
             price = 100,
-            product = product
         )
 
         val file = mockk<MultipartFile>()
@@ -152,7 +150,6 @@ class ProductServiceTest : BehaviorSpec({
         val updateProductRequest = UpdateProductRequest(
             name = "Updated Product Name",
             description = "Updated Product Description",
-            productImage = "updated_image.jpg",
             isSoldOut = true,
             categoryId = 2L
         )
@@ -160,7 +157,6 @@ class ProductServiceTest : BehaviorSpec({
         val updatedProduct = product.apply {
             name = updateProductRequest.name
             description = updateProductRequest.description
-            productImage = updateProductRequest.productImage
             isSoldOut = updateProductRequest.isSoldOut
             categoryId = updateProductRequest.categoryId
             updatedAt = LocalDateTime.now()
@@ -182,12 +178,12 @@ class ProductServiceTest : BehaviorSpec({
             val result = productService.updateProduct(
                 sellerId = sellerId,
                 productId = productId,
-                updateProductRequest = updateProductRequest
+                updateProductRequest = updateProductRequest,
+                file = null
             )
 
             Then("업데이트된 상품 정보를 반환한다") {
                 result.name shouldBe updateProductRequest.name
-                result.productImage shouldBe updateProductRequest.productImage
                 result.isSoldOut shouldBe updateProductRequest.isSoldOut
 
                 verify(exactly = 1) { productRepository.findByIdOrNull(productId) }

@@ -189,21 +189,25 @@ class OrderDetailsServiceTest : BehaviorSpec() {
     fun `getSellerOrderDetailsAll 메서드 실행 시 Seller 가 주문 정보를 모두 조회`() {
 
         every { orderDetailsRepository.findAllByShopId(1L) } returns listOf(orderDetails, orderDetails2)
+        every { orderMasterRepository.findByIdInOrderByIdDesc(any()) } returns listOf(orderMaster)
 
-        val result = orderDetailsService.getSellerOrderDetailsAll(1L, 1L)
+        val result = orderDetailsService.getSellerOrderDetailsAll(1L)
 
-        result.size shouldBe 2
+        result.size shouldBe 1
     }
 
     @Test
     fun `getSellerOrderDetailsBuyer 메서드 실행 시 Seller 가 buyer의 주문 정보를 모두 조회`() {
 
-        every { orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any(), any()) } returns listOf(
+        every { orderDetailsRepository.findAllByShopIdAndOrderMasterId(any(), any()) } returns listOf(
             orderDetails,
             orderDetails2
         )
+        every { orderMasterRepository.findByIdOrNull(any()) } returns orderMaster
 
         val result = orderDetailsService.getSellerOrderDetailsBuyer(1L, 1L)
+
+        result.orderMasterId shouldBe 1L
 
     }
 
