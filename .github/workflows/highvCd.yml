@@ -11,23 +11,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: setting env
+        run: |
+          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
+          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> .env
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
+          echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env
+          echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env
+          echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
+          echo "AUTH_ISSUER=${{ secrets.AUTH_ISSUER }}" >> .env
+          echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env
+          echo "AWS_BUCKET=${{ secrets.AWS_BUCKET }}" >> .env
+          echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
+          echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" >> .env
+          echo "MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}" >> .env
+          echo "MYSQL_URL=${{ secrets.MYSQL_URL }}" >> .env
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
+          cat .env
+
       - name: Set JDK 22
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
-
-      - name: set docker compose
-        run: |
-          mkdir -p ./
-          echo "${{ secrets.DOCKER_COMPOSE_YML }}" | base64 --decode > ./docker-compose.yml
-          find ./
-
-      - name: set yml
-        run: |
-          mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
-          find src
 
       - name: Build with Gradle
         run: ./gradlew build
