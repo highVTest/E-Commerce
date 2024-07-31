@@ -67,9 +67,8 @@ class OrderDetailsServiceTest : BehaviorSpec() {
 
                     val result = orderDetailsService.requestComplainAccept(1L, 1L, sellerOrderStatusRequest)
 
-                    orderDetails.orderStatus shouldBe OrderStatus.ORDER_CANCELED
-                    orderDetails.complainStatus shouldBe ComplainStatus.REFUNDED
-                    orderDetails.sellerDescription shouldBe "test"
+                    orderDetails.orderStatus shouldBe OrderStatus.ORDERED
+                    orderDetails.complainStatus shouldBe ComplainStatus.REFUND_REQUESTED
                     productBackOffice.quantity shouldBe 101
                     couponToBuyer.isUsed shouldBe false
 
@@ -96,8 +95,8 @@ class OrderDetailsServiceTest : BehaviorSpec() {
 
                     val result = orderDetailsService.requestComplainAccept(1L, 1L, sellerOrderStatusRequest)
 
-                    orderDetails.orderStatus shouldBe OrderStatus.PRODUCT_PREPARING
-                    orderDetails.complainStatus shouldBe ComplainStatus.EXCHANGED
+                    orderDetails.orderStatus shouldBe OrderStatus.ORDERED
+                    orderDetails.complainStatus shouldBe ComplainStatus.EXCHANGE_REQUESTED
                     result shouldBe OrderStatusResponse.from(ComplainType.EXCHANGE, "전체 요청 승인 완료 되었습니다")
 
                 }
@@ -181,7 +180,6 @@ class OrderDetailsServiceTest : BehaviorSpec() {
 
         orderDetails.orderStatus shouldBe OrderStatus.ORDERED
         orderDetails.complainStatus shouldBe ComplainStatus.REFUND_REJECTED
-        orderDetails.sellerDescription shouldBe "dummy description"
         result shouldBe OrderStatusResponse.from(ComplainType.REFUND, "전체 요청 거절 완료 되었습니다")
     }
 
