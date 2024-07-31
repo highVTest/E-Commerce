@@ -17,6 +17,11 @@ jobs:
           java-version: '21'
           distribution: 'openjdk'
 
+      - name: set docker compose
+        run: mkdir -p ./
+          echo "${{ secrets.DOCKER_COMPOSE_YML }}" | base64 --decode > ./
+          find ./
+
       - name: set yml
         run: mkdir -p src/main/resources
           echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
