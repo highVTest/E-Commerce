@@ -29,18 +29,17 @@ class CouponController(
     fun createCoupon(
         @Valid @RequestBody couponRequest: CreateCouponRequest,
         bindingResult: BindingResult,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<DefaultResponse> {
 
         if (bindingResult.hasErrors()) throw InvalidCouponRequestException(
             400,
             bindingResult.fieldError?.defaultMessage.toString()
         )
-        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(couponService.createCoupon(couponRequest, userPrincipal))
+            .body(couponService.createCoupon(couponRequest, userPrincipal.id))
     }
 
     @PreAuthorize("hasRole('SELLER')")
@@ -49,102 +48,78 @@ class CouponController(
         @PathVariable("couponId") couponId: Long,
         @Valid @RequestBody updateCouponRequest: UpdateCouponRequest,
         bindingResult: BindingResult,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<DefaultResponse> {
 
         if (bindingResult.hasErrors()) throw InvalidCouponRequestException(
             400,
             bindingResult.fieldError?.defaultMessage.toString()
         )
-        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
-
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.updateCoupon(couponId, updateCouponRequest, userPrincipal))
+            .body(couponService.updateCoupon(couponId, updateCouponRequest, userPrincipal.id))
     }
 
     @PreAuthorize("hasRole('SELLER')")
     @DeleteMapping("/seller/coupon/{couponId}")
     fun deleteCoupon(
         @PathVariable couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<DefaultResponse> {
-
-        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(couponService.deleteCoupon(couponId, userPrincipal))
+            .body(couponService.deleteCoupon(couponId, userPrincipal.id))
     }
 
     @PreAuthorize("hasRole('SELLER')")
     @GetMapping("/seller/coupon/{couponId}")
     fun getSellerCouponById(
         @PathVariable("couponId") couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
-    ): ResponseEntity<CouponResponse> {
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<CouponResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(couponService.getSellerCouponById(couponId, userPrincipal.id))
 
-        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(couponService.getSellerCouponById(couponId, userPrincipal))
-    }
 
     @PreAuthorize("hasRole('SELLER')")
     @GetMapping("/seller/coupon")
     fun getSellerCouponList(
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
-    ): ResponseEntity<List<CouponResponse>> {
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<List<CouponResponse>> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(couponService.getSellerCouponList(userPrincipal.id))
 
-        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(couponService.getSellerCouponList(userPrincipal))
-    }
 
     @PreAuthorize("hasRole('BUYER')")
     @GetMapping("/buyer/coupon/{couponId}")
     fun getBuyerCouponById(
         @PathVariable("couponId") couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
-    ): ResponseEntity<CouponResponse> {
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<CouponResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(couponService.getBuyerCouponById(couponId, userPrincipal.id))
 
-        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(couponService.getBuyerCouponById(couponId, userPrincipal))
-    }
 
     @PreAuthorize("hasRole('BUYER')")
     @GetMapping("/buyer/coupon")
     fun getBuyerCouponList(
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
-    ): ResponseEntity<List<CouponResponse>> {
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<List<CouponResponse>> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(couponService.getBuyerCouponList(userPrincipal.id))
 
-        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(couponService.getBuyerCouponList(userPrincipal))
-    }
 
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/buyer/coupon/{couponId}")
     fun issuedCoupon(
         @PathVariable couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
-    ): ResponseEntity<DefaultResponse> {
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(couponService.issuedCoupon(couponId, userPrincipal.id))
 
-        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(couponService.issuedCoupon(couponId, userPrincipal))
-    }
 
     // 최후의 보루
     @PreAuthorize("hasRole('BUYER')")

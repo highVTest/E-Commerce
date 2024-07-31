@@ -41,12 +41,14 @@ class CouponService(
     private val log = LoggerFactory.getLogger("CouponService::class.java")
 
     @Transactional
-    fun createCoupon(couponRequest: CreateCouponRequest, userPrincipal: UserPrincipal): DefaultResponse {
+    fun createCoupon(couponRequest: CreateCouponRequest, sellerId: Long): DefaultResponse {
 
         if (couponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && couponRequest.discount > 40)
             throw InvalidCouponDiscountException(400, "할인율은 40%를 넘길 수 없습니다")
 
         val product = productRepository.findByIdOrNull(couponRequest.productId) ?: throw ProductNotFoundException(404, "상품이 존재하지 않습니다")
+
+        if(product.shop.sellerId != sellerId) throw RuntimeException("다른 사용자는 해당 쿠폰을 생성 할 수 없습니다")
 
         if (couponRepository.existsByProductId(couponRequest.productId)) throw CouponAlreadyExistsException(400, "이미 해당 상품에 쿠폰이 발급되어 있습니다")
 
@@ -58,7 +60,7 @@ class CouponService(
                 expiredAt = couponRequest.expiredAt,
                 createdAt = LocalDateTime.now(),
                 quantity = couponRequest.quantity,
-                sellerId = userPrincipal.id
+                sellerId = sellerId
             )
         )
 
@@ -66,11 +68,11 @@ class CouponService(
     }
 
     @Transactional
-    fun updateCoupon(couponId: Long, updateCouponRequest: UpdateCouponRequest, userPrincipal: UserPrincipal): DefaultResponse {
+    fun updateCoupon(couponId: Long, updateCouponRequest: UpdateCouponRequest, sellerId: Long): DefaultResponse {
 
         val result = couponRepository.findByIdOrNull(couponId) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
 
-        if (result.sellerId != userPrincipal.id) throw UnauthorizedUserException(401, "다른 사용자는 해당 쿠폰을 수정할 수 없습니다")
+        if (result.sellerId != sellerId) throw UnauthorizedUserException(401, "다른 사용자는 해당 쿠폰을 수정할 수 없습니다")
 
         result.update(updateCouponRequest)
 
@@ -78,11 +80,11 @@ class CouponService(
     }
 
     @Transactional
-    fun deleteCoupon(couponId: Long, userPrincipal: UserPrincipal): DefaultResponse {
+    fun deleteCoupon(couponId: Long, sellerId: Long): DefaultResponse {
 
         val result = couponRepository.findByIdOrNull(couponId)  ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
 
-        if (result.sellerId != userPrincipal.id)  throw UnauthorizedUserException(401, "다른 사용자는 해당 쿠폰을 삭제할 수 없습니다")
+        if (result.sellerId != sellerId)  throw UnauthorizedUserException(401, "다른 사용자는 해당 쿠폰을 삭제할 수 없습니다")
 
         couponRepository.delete(result)
 
@@ -90,47 +92,45 @@ class CouponService(
     }
 
 
-    fun getSellerCouponById(couponId: Long, userPrincipal: UserPrincipal): CouponResponse {
+    fun getSellerCouponById(couponId: Long, sellerId: Long): CouponResponse {
 
-        val coupon = couponRepository.findByIdAndSellerId(couponId, userPrincipal.id) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
+        val coupon = couponRepository.findByIdAndSellerId(couponId, sellerId) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
 
         return CouponResponse.from(coupon)
     }
 
-    fun getSellerCouponList(userPrincipal: UserPrincipal): List<CouponResponse> {
-        return couponRepository.findAllBySellerId(userPrincipal.id).map { CouponResponse.from(it) }
+    fun getSellerCouponList(sellerId: Long): List<CouponResponse> {
+        return couponRepository.findAllBySellerId(sellerId).map { CouponResponse.from(it) }
     }
 
-    fun getBuyerCouponById(couponId: Long, userPrincipal: UserPrincipal): CouponResponse {
+    fun getBuyerCouponById(couponId: Long, sellerId: Long): CouponResponse {
 
         val result =
-            couponToBuyerRepository.findByCouponIdAndBuyerId(couponId, userPrincipal.id)   ?: throw CouponNotFoundException(404, "쿠폰을 가지고 있지 않습니다")
+            couponToBuyerRepository.findByCouponIdAndBuyerId(couponId, sellerId)   ?: throw CouponNotFoundException(404, "쿠폰을 가지고 있지 않습니다")
 
         return CouponResponse.from(result.coupon)
     }
 
-    fun getBuyerCouponList(userPrincipal: UserPrincipal): List<CouponResponse>? {
+    fun getBuyerCouponList(sellerId: Long): List<CouponResponse>? {
 
-        return couponToBuyerRepository.findAllProductIdWithBuyerId(userPrincipal.id).let {
+        return couponToBuyerRepository.findAllProductIdWithBuyerId(sellerId).let {
             couponRepository.findAllCouponIdWithBuyer(it).map { i -> CouponResponse.from(i) }
         }
     }
 
     @Transactional
-    fun issuedCoupon(couponId: Long, userPrincipal: UserPrincipal): DefaultResponse {
+    fun issuedCoupon(couponId: Long, sellerId: Long): DefaultResponse {
 
         val getLock = couponRepository.getLock("lock_$couponId", 10) == 1
 
         if (!getLock) throw CustomRuntimeException(400, "락이 걸려있지 않습니다")
 
-        val buyer = buyerRepository.findByEmail(userPrincipal.email) ?: throw BuyerNotFoundException(404, "바이어가 존재하지 않습니다")
+        val buyer = buyerRepository.findByIdOrNull(sellerId) ?: throw BuyerNotFoundException(404, "바이어가 존재하지 않습니다")
 
         kotlin.runCatching {
             val coupon = couponRepository.findByIdOrNull(couponId) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
 
-           // if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw DuplicateCouponException(400, "동일한 쿠폰은 지급 받을 수 없습니다")
-
-
+            if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw DuplicateCouponException(400, "동일한 쿠폰은 지급 받을 수 없습니다")
 
             coupon.validExpiredAt()
 
