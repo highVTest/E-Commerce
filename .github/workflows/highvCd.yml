@@ -18,12 +18,14 @@ jobs:
           distribution: 'temurin'
 
       - name: set docker compose
-        run: mkdir -p ./
+        run: |
+          mkdir -p ./
           echo "${{ secrets.DOCKER_COMPOSE_YML }}" | base64 --decode > ./docker-compose.yml
           find ./
 
       - name: set yml
-        run: mkdir -p src/main/resources
+        run: |
+          mkdir -p src/main/resources
           echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
           find src
 
