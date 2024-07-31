@@ -14,8 +14,8 @@ jobs:
       - name: Set JDK 22
         uses: actions/setup-java@v3
         with:
-          java-version: '22'
-          distribution: 'openjdk'
+          java-version: '21'
+          distribution: 'temurin'
 
       - name: set docker compose
         run: mkdir -p ./

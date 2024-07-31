@@ -17,8 +17,8 @@ jobs:
       - name: java setup
         uses: actions/setup-java@v3
         with:
-          distribution: 'openjdk'
-          java-version: '22'
+          distribution: 'temurin'
+          java-version: '21'
 
       - name: make executable gradlew
         run: chmod +x ./gradlew
