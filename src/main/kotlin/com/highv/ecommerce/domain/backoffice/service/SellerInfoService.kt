@@ -1,6 +1,8 @@
 package com.highv.ecommerce.domain.backoffice.service
 
 import com.highv.ecommerce.common.exception.CustomRuntimeException
+import com.highv.ecommerce.common.exception.OldPasswordNotMatchedException
+import com.highv.ecommerce.common.exception.SellerNotFoundException
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdatePasswordRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateSellerRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateShopRequest
@@ -29,7 +31,8 @@ class SellerInfoService(
     }
 
     fun updateSellerInfo(sellerId: Long, updateSellerRequest: UpdateSellerRequest): SellerResponse {
-        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw CustomRuntimeException(404, "Seller not found")
+        val seller =
+            sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "Seller not found")
         seller.apply {
             address = updateSellerRequest.address
             nickname = updateSellerRequest.nickname
@@ -41,16 +44,27 @@ class SellerInfoService(
     }
 
     fun changePassword(sellerId: Long, updatePasswordRequest: UpdatePasswordRequest): String {
-        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw CustomRuntimeException(404, "Seller not found")
-        if (passwordEncoder.matches(
-                passwordEncoder.encode(updatePasswordRequest.oldPassword),
+        val seller =
+            sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "Seller not found")
+        if (!passwordEncoder.matches(
+                updatePasswordRequest.oldPassword,
                 seller.password
             )
-        ) throw RuntimeException("Old password not matched")
+        ) throw OldPasswordNotMatchedException(message = "Old password not matched")
         seller.apply {
             password = passwordEncoder.encode(updatePasswordRequest.newPassword)
         }
         sellerRepository.save(seller)
         return "Password 변경 완료"
+    }
+
+    fun getSellerInfo(sellerId: Long): SellerResponse {
+        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw CustomRuntimeException(404, "Seller not found")
+        return SellerResponse.from(seller)
+    }
+
+    fun getShopInfo(sellerId: Long): ShopResponse {
+        val shop = shopRepository.findShopBySellerId(sellerId)
+        return ShopResponse.from(shop)
     }
 }
