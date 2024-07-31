@@ -199,6 +199,8 @@ class OrderDetailsServiceTest : BehaviorSpec() {
     @Test
     fun `getSellerOrderDetailsBuyer 메서드 실행 시 Seller 가 buyer의 주문 정보를 모두 조회`() {
 
+        every { orderMasterRepository.findByIdOrNull(any()) } returns orderMaster
+      
         every { orderDetailsRepository.findAllByShopIdAndOrderMasterId(any(), any()) } returns listOf(
             orderDetails,
             orderDetails2
