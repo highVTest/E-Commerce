@@ -15,10 +15,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: java setup
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: 'openjdk'
-          java-version: '21'
+          java-version: '22'
 
       - name: make executable gradlew
         run: chmod +x ./gradlew
