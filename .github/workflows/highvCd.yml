@@ -54,7 +54,6 @@ jobs:
       - name: Deploy to aws
         run: |
           mv build/libs/E-Commerce-0.0.1-SNAPSHOT.jar ./api/E-Commerce.jar
-          cd spring
           sudo git clone https://github.com/highVTest/E-Commerce.git
           cd E-Commerce
           sudo git init
