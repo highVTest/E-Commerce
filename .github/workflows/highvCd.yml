@@ -47,19 +47,17 @@ jobs:
         run: ./gradlew build
 
       - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo ${{ secrets.EC2_SSH_KEY }}> ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ec2-52-79-161-1.ap-northeast-2.compute.amazonaws.com >> ~/.ssh/known_hosts
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
       - name: Deploy to aws
         run: |
           mv build/libs/E-Commerce-0.0.1-SNAPSHOT.jar ./api/E-Commerce.jar
-          sudo ssh -o StrictHostKeyChecking=no ubuntu@ec2-52-79-161-1.ap-northeast-2.compute.amazonaws.com 'bash -s' << 'EOF'
-          cd /spring
+          ssh -i ${{ secret.EC2_SSH_KEY }} ubuntu@ec2-52-79-161-1.ap-northeast-2.compute.amazonaws.com 'bash -s' << 'EOF'
+          cd spring
           sudo git clone https://github.com/highVTest/E-Commerce.git
-          cd /E-Commerce
+          cd E-Commerce
           sudo git init
           sudo git remote add origin https://github.com/highVTest/E-Commerce
           sudo git pull origin dev
