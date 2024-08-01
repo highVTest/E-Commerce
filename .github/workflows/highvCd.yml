@@ -53,7 +53,9 @@ jobs:
           username : ubuntu
           key : ${{ secrets.EC2_SSH_KEY }}
           port : 22
-          source: "./build/libs/*.jar, docker-compose.yml"
+          source: |
+            ./build/libs/*.jar
+            docker-compose.yml
           target: "~"
           strip_components: 2
 
