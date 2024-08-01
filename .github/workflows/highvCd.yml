@@ -20,7 +20,6 @@ jobs:
 
       - name: setting env
         run: |
-          rm -rf /home/runner/work/E-Commerce
           echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
           echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> .env
           echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
