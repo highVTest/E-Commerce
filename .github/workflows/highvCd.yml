@@ -48,11 +48,13 @@ jobs:
 
       - name: Deploy to aws
         run: |
-          run: |
           mv build/libs/E-Commerce-0.0.1-SNAPSHOT.jar ./api/E-Commerce.jar
           ssh -o StrictHostKeyChecking=no ubuntu@ec2-3-39-224-3.ap-northeast-2.compute.amazonaws.com 'bash -s' << 'EOF'
           cd /spring
-          git pull origin main
+          git clone https://github.com/highVTest/E-Commerce.git
           cd /E-Commerce
+          git init
+          git remote add origin https://github.com/highVTest/E-Commerce
+          git pull origin dev
           docker-compose up --build
           EOF
