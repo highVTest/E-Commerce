@@ -53,8 +53,8 @@ jobs:
           username : ubuntu
           key : ${{ secrets.EC2_SSH_KEY }}
           port : 22
-          source: "./build/libs/E-Commerce-0.0.1-SNAPSHOT.jar,docker-compose.yml"
-          target: "~"
+          source: "./build/libs/E-Commerce-0.0.1-SNAPSHOT.jar,./docker-compose.yml"
+          target: "/libs"
           strip_components: 2
 
       - name: ssh-command
