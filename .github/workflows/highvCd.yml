@@ -46,6 +46,11 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}  
+
       - name: Deploy to aws
         run: |
           mv build/libs/E-Commerce-0.0.1-SNAPSHOT.jar ./api/E-Commerce.jar
