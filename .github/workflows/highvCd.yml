@@ -48,5 +48,11 @@ jobs:
 
       - name: Deploy to aws
         run: |
+          run: |
           mv build/libs/E-Commerce-0.0.1-SNAPSHOT.jar ./api/E-Commerce.jar
-          java -jar ./api/E-Commerce.jar
+          ssh -o StrictHostKeyChecking=no ubuntu@EC2_IP_ADDRESS 'bash -s' << 'EOF'
+          cd /spring
+          git pull origin main
+          cd /E-Commerce
+          docker-compose up --build
+          EOF
