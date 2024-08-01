@@ -18,24 +18,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: setting env
+      - name: Setting application.yml
         run: |
-          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
-          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> .env
-          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
-          echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env
-          echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env
-          echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
-          echo "AUTH_ISSUER=${{ secrets.AUTH_ISSUER }}" >> .env
-          echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env
-          echo "AWS_BUCKET=${{ secrets.AWS_BUCKET }}" >> .env
-          echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
-          echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" >> .env
-          echo "MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}" >> .env
-          echo "MYSQL_URL=${{ secrets.MYSQL_URL }}" >> .env
-          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
-          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
-          cat .env
+          sed -i 's/${MYSQL_USERNAME}/${{ secrets.MYSQL_USERNAME }}/g' src/main/resources/application.yml
+          sed -i 's/${MYSQL_URL}/${{ secrets.MYSQL_URL }}/g' src/main/resources/application.yml
+          sed -i 's/${MYSQL_PASSWORD}/${{ secrets.MYSQL_PASSWORD }}/g' src/main/resources/application.yml
+          sed -i 's/${REDIS_HOST}/${{ secrets.REDIS_HOST }}/g' src/main/resources/application.yml
+          sed -i 's/${MAIL_USERNAME}/${{ secrets.MAIL_USERNAME }}/g' src/main/resources/application.yml
+          sed -i 's/${MAIL_PASSWORD}/${{ secrets.MAIL_PASSWORD }}/g' src/main/resources/application.yml
+          sed -i 's/${MAIL_PASSWORD}/${{ secrets.KAKAO_CLIENT_ID }}/g' src/main/resources/application.yml
+          sed -i 's/${MAIL_PASSWORD}/${{ secrets.NAVER_CLIENT_ID }}/g' src/main/resources/application.yml
+          sed -i 's/${MAIL_PASSWORD}/${{ secrets.NAVER_CLIENT_SECRET }}/g' src/main/resources/application.yml
+          sed -i 's/${MAIL_PASSWORD}/${{ secrets.AUTH_ISSUER }}/g' src/main/resources/application.yml
+          sed -i 's/${MAIL_PASSWORD}/${{ secrets.AUTH_SECRET }}/g' src/main/resources/application.yml
+          sed -i 's/${MAIL_PASSWORD}/${{ secrets.AWS_BUCKET }}/g' src/main/resources/application.yml
+          sed -i 's/${MAIL_PASSWORD}/${{ secrets.AWS_ACCESS_KEY }}/g' src/main/resources/application.yml
+          sed -i 's/${MAIL_PASSWORD}/${{ secrets.AWS_SECRET_KEY }}/g' src/main/resources/application.yml
+
+      - name: Setting docker-compose.yml
+        run: |
+          sed -i 's/${MYSQL_USERNAME}/${{ secrets.MYSQL_ROOT_PASSWORD }}/g' docker-compose.yml
+          sed -i 's/${MYSQL_URL}/${{ secrets.MYSQL_USERNAME }}/g' docker-compose.ymll
+          sed -i 's/${MYSQL_PASSWORD}/${{ secrets.MYSQL_PASSWORD }}/g' docker-compose.yml
+          sed -i 's/${REDIS_HOST}/${{ secrets.MYSQL_URL }}/g' docker-compose.yml
 
       - name: Set JDK 22
         uses: actions/setup-java@v3
@@ -49,7 +54,7 @@ jobs:
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}  
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
       - name: Deploy to aws
         run: |
