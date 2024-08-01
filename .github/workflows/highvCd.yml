@@ -54,7 +54,6 @@ jobs:
       - name: Deploy to aws
         run: |
           mv build/libs/E-Commerce-0.0.1-SNAPSHOT.jar ./api/E-Commerce.jar
-          ssh -i ${{ secret.EC2_SSH_KEY }} ubuntu@ec2-52-79-161-1.ap-northeast-2.compute.amazonaws.com 'bash -s' << 'EOF'
           cd spring
           sudo git clone https://github.com/highVTest/E-Commerce.git
           cd E-Commerce
