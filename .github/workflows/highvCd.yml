@@ -57,6 +57,18 @@ jobs:
           target: "~"
           strip_components: 2
 
+      - name: ssh-command
+        uses: appleboy/scp-action@v0.1.6
+        with:
+          host: ec2-43-201-108-93.ap-northeast-2.compute.amazonaws.com
+          username: ubuntu
+          key : ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            kill -9 $(ps -ef | grep java | head -n 1 | awk '{print $2}')
+            nohup java -jar *.jar 1> /dev/null 2>&1 &
+
             
 
 
