@@ -47,7 +47,7 @@ jobs:
         run: ./gradlew build
 
       - name: Set up SSH
-        uses: appleboy/scp-action@vmaster
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_SSH_ADDR }} # 서버 주소
           username : ubuntu
