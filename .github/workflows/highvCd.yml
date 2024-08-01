@@ -47,12 +47,11 @@ jobs:
         run: ./gradlew build
 
       - name: Set up SSH
-        with:
-          ssh-private-key: |
-            mkdir -p ~/.ssh
-            echo ${{ secrets.EC2_SSH_KEY }}> ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
-            ssh-keyscan -H ec2-52-79-161-1.ap-northeast-2.compute.amazonaws.com >> ~/.ssh/known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo ${{ secrets.EC2_SSH_KEY }}> ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ec2-52-79-161-1.ap-northeast-2.compute.amazonaws.com >> ~/.ssh/known_hosts
 
       - name: Deploy to aws
         run: |
