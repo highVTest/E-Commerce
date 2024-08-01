@@ -54,7 +54,7 @@ jobs:
       - name: Deploy to aws
         run: |
           mv build/libs/E-Commerce-0.0.1-SNAPSHOT.jar ./api/E-Commerce.jar
-          ssh -o StrictHostKeyChecking=no ubuntu@ec2-3-39-224-3.ap-northeast-2.compute.amazonaws.com 'bash -s' << 'EOF'
+          ssh -o StrictHostKeyChecking=no ubuntu@ec2-43-203-208-115.ap-northeast-2.compute.amazonaws.com 'bash -s' << 'EOF'
           cd /spring
           git clone https://github.com/highVTest/E-Commerce.git
           cd /E-Commerce
