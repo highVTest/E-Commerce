@@ -19,6 +19,8 @@ services:
       timeout: 20s # 20초 동안 헬스 체크 진행
       retries: 10 # 헬스 체크 진행 시간
   backend:
+    env_file:
+      - .env
     image: openjdk:21
     ports:
       - '28080:8080'
@@ -49,6 +51,8 @@ services:
     depends_on:
       - backend
   mysql:
+    env_file:
+      - .env
     image: mysql:latest
     ports:
       - '23306:3306'
@@ -63,6 +67,5 @@ services:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       timeout: 20s
       retries: 10
-
 
 
