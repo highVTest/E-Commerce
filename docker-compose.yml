@@ -19,6 +19,8 @@ services:
       timeout: 20s # 20초 동안 헬스 체크 진행
       retries: 10 # 헬스 체크 진행 시간
   backend:
+    env_file:
+      - .env
     image: openjdk:21
     ports:
       - '28080:8080'
@@ -31,10 +33,16 @@ services:
         condition: service_healthy
     command: ["java", "-jar", "/app/E-Commerce.jar"]
     environment:
-      - SPRING_DATASOURCE_URL=${MYSQL_URL}
-      - SPRING_DATASOURCE_USERNAME=${MYSQL_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
-      - SPRING_REDIS_HOST=redis
+      SPRING_DATASOURCE_URL: ${MYSQL_URL}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SPRING_REDIS_HOST: redis
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 20s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
 
   frontend:
     image: nginx
@@ -43,16 +51,18 @@ services:
     depends_on:
       - backend
   mysql:
+    env_file:
+      - .env
     image: mysql:latest
     ports:
       - '23306:3306'
     volumes:
       - ./mysql:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=highv
-      - MYSQL_USER=${MYSQL_USERNAME}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: highv
+      MYSQL_USER: ${MYSQL_USERNAME}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       timeout: 20s
