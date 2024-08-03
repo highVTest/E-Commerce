@@ -10,11 +10,9 @@ import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
-import com.highv.ecommerce.infra.s3.S3Manager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 
 @Service
@@ -23,16 +21,14 @@ class ProductService(
     private val shopRepository: ShopRepository,
     private val productBackOfficeRepository: ProductBackOfficeRepository,
     private val favoriteService: FavoriteService,
-    private val s3Manager: S3Manager,
+    /*private val s3Manager: S3Manager,*/
 ) {
 
     fun createProduct(
         sellerId: Long,
         productRequest: CreateProductRequest,
         productBackOfficeRequest: ProductBackOfficeRequest,
-        file: MultipartFile?
     ): ProductResponse {
-
         val shop = shopRepository.findShopBySellerId(sellerId)
         val product = Product(
             name = productRequest.name,
@@ -47,24 +43,20 @@ class ProductService(
             categoryId = productRequest.categoryId,
             productBackOffice = null
         )
-
-        if (file != null) {
-            s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
-            product.productImage = s3Manager.getFile(file.originalFilename)
-        }
+        // if (file != null) {
+        //     s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
+        //     product.productImage = s3Manager.getFile(file.originalFilename)
+        // }
 
         val savedProduct = productRepository.save(product)
-
         val productBackOffice = ProductBackOffice(
             quantity = productBackOfficeRequest.quantity,
             price = productBackOfficeRequest.price,
             soldQuantity = 0,
             product = savedProduct
         )
-
         savedProduct.productBackOffice = productBackOffice
         productBackOfficeRepository.save(productBackOffice)
-
         productRepository.save(savedProduct)
         return ProductResponse.from(savedProduct)
     }
@@ -73,13 +65,9 @@ class ProductService(
         sellerId: Long,
         productId: Long,
         updateProductRequest: UpdateProductRequest,
-        file: MultipartFile?
     ): ProductResponse {
-
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
-
         if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")
-
         product.apply {
             name = updateProductRequest.name
             description = updateProductRequest.description
@@ -89,10 +77,10 @@ class ProductService(
             categoryId = updateProductRequest.categoryId
         }
 
-        if (file != null) {
-            s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
-            product.productImage = s3Manager.getFile(file.originalFilename)
-        }
+        // if (file != null) {
+        //     s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
+        //     product.productImage = s3Manager.getFile(file.originalFilename)
+        // }
 
         val updatedProduct = productRepository.save(product)
         return ProductResponse.from(updatedProduct, favoriteService.countFavorite(productId))
