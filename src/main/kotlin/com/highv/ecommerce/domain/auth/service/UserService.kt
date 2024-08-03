@@ -3,9 +3,11 @@ package com.highv.ecommerce.domain.auth.service
 import com.highv.ecommerce.common.dto.AccessTokenResponse
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.BuyerLoginFailedException
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.EmailAlreadyExistsException
 import com.highv.ecommerce.common.exception.SellerLoginFailedException
 import com.highv.ecommerce.domain.auth.dto.EmailAuthResponse
+import com.highv.ecommerce.domain.auth.dto.ImageUrlResponse
 import com.highv.ecommerce.domain.auth.dto.LoginRequest
 import com.highv.ecommerce.domain.auth.dto.UserRole
 import com.highv.ecommerce.domain.buyer.entity.Buyer
@@ -14,10 +16,12 @@ import com.highv.ecommerce.domain.seller.entity.Seller
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.infra.email.EmailUtils
 import com.highv.ecommerce.infra.redis.RedisUtils
+import com.highv.ecommerce.infra.s3.S3Manager
 import com.highv.ecommerce.infra.security.jwt.JwtPlugin
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class UserService(
@@ -27,6 +31,7 @@ class UserService(
     private val jwtPlugin: JwtPlugin,
     private val redisUtils: RedisUtils,
     private val mailUtils: EmailUtils,
+    private val s3Manager: S3Manager,
 
     @Value("\${spring.mail.auth-code-expiration-millis}")
     private val expirationMillis: Long
@@ -149,6 +154,31 @@ class UserService(
         }
 
         return false
+    }
+
+    fun uploadImage(file: MultipartFile, id: Long): ImageUrlResponse {
+        s3Manager.uploadFile(file)
+        val imageUrl = s3Manager.getFile(file.originalFilename)
+        return ImageUrlResponse(imageUrl = imageUrl)
+    }
+
+    fun uploadImages(files: List<MultipartFile>, id: Long): List<ImageUrlResponse> {
+
+        if (files.size > 9) {
+            throw CustomRuntimeException(409, "이미지는 최대 9장만 등록 가능합니다.")
+        } else if (files.isEmpty()) {
+            throw CustomRuntimeException(409, "이미지를 등록해주세요")
+        }
+
+        val imageUrls: MutableList<ImageUrlResponse> = mutableListOf()
+
+        files.forEach {
+            s3Manager.uploadFile(it)
+            val imageUrl = s3Manager.getFile(it.originalFilename)
+            imageUrls.add(ImageUrlResponse(imageUrl = imageUrl))
+        }
+
+        return imageUrls
     }
 
     companion object {
