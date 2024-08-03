@@ -17,6 +17,8 @@ interface ProductRepository : JpaRepository<Product, Long>, ProductQueryDslRepos
 
     // @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productBackOffice WHERE p.id = :productId")
     // fun findProductWithBackOfficeById(productId: Long): Product?
+
+    fun findProductByShopId(shopId: Long): List<Product>
 }
 
 @Repository
@@ -38,12 +40,14 @@ class ProductQueryDslRepositoryImpl(
             .select(product.count())
             .from(product)
             .leftJoin(product.productBackOffice(), productBackOffice)
+            .where(product.isDeleted.eq(false))
             .fetchOne() ?: 0L
 
         val query = jpaQueryFactory
             .selectFrom(product)
             .leftJoin(product.productBackOffice(), productBackOffice).fetchJoin()
             .leftJoin(product.shop()).fetchJoin()
+            .where(product.isDeleted.eq(false))
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .orderBy(*pageable.sort.map { it.toOrderSpecifier() }.toList().toTypedArray())

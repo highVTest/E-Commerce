@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -21,15 +22,11 @@ import org.springframework.web.bind.annotation.RestController
 class SellerInfoController(
     private val sellerInfoService: SellerInfoService
 ) {
-    /*
-    * 가게 정보 및 사용자 정보 수정
-    * */
-
     @PatchMapping("/myShopInfo")
     @PreAuthorize("hasRole('SELLER')")
     fun updateShopInfo(
         @AuthenticationPrincipal seller: UserPrincipal,
-        updateShopRequest: UpdateShopRequest,
+        @RequestBody updateShopRequest: UpdateShopRequest,
     ): ResponseEntity<ShopResponse> = ResponseEntity
         .status(HttpStatus.CREATED)
         .body(sellerInfoService.updateShopInfo(seller.id, updateShopRequest))
@@ -38,7 +35,7 @@ class SellerInfoController(
     @PreAuthorize("hasRole('SELLER')")
     fun updateSellerInfo(
         @AuthenticationPrincipal seller: UserPrincipal,
-        updateSellerRequest: UpdateSellerRequest
+        @RequestBody updateSellerRequest: UpdateSellerRequest
     ): ResponseEntity<SellerResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(sellerInfoService.updateSellerInfo(seller.id, updateSellerRequest))
@@ -47,12 +44,11 @@ class SellerInfoController(
     @PreAuthorize("hasRole('SELLER')")
     fun changePassword(
         @AuthenticationPrincipal seller: UserPrincipal,
-        updatePasswordRequest: UpdatePasswordRequest
+        @RequestBody updatePasswordRequest: UpdatePasswordRequest
     ): ResponseEntity<String> = ResponseEntity
         .status(HttpStatus.OK)
         .body(sellerInfoService.changePassword(seller.id, updatePasswordRequest))
 
-    //get seller info
     @GetMapping("/myInfo")
     fun getSellerInfo(
         @AuthenticationPrincipal seller: UserPrincipal
@@ -60,7 +56,6 @@ class SellerInfoController(
         .status(HttpStatus.OK)
         .body(sellerInfoService.getSellerInfo(seller.id))
 
-    //get shop info
     @GetMapping("/myShopInfo")
     fun getShopInfo(
         @AuthenticationPrincipal seller: UserPrincipal
