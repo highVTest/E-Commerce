@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController
 class SalesStatisticsController(
     private val salesStatisticsService: SalesStatisticsService
 ) {
-    //총 판매량 조회
     @GetMapping("/total-sales-quantity")
     @PreAuthorize("hasRole('SELLER')")
     fun getTotalSales(
@@ -29,7 +28,6 @@ class SalesStatisticsController(
         .status(HttpStatus.OK)
         .body(salesStatisticsService.getTotalSalesQuantity(seller.id))
 
-    //총 매출액 조회
     @GetMapping("/total-sales-amount")
     @PreAuthorize("hasRole('SELLER')")
     fun getTotalSalesAmount(
@@ -38,7 +36,6 @@ class SalesStatisticsController(
         .status(HttpStatus.OK)
         .body(salesStatisticsService.getTotalSalesAmount(seller.id))
 
-    //상품별 판매량 조회
     @GetMapping("/{productId}/sales-quantity")
     @PreAuthorize("hasRole('SELLER')")
     fun getProductSales(
@@ -48,7 +45,6 @@ class SalesStatisticsController(
         .status(HttpStatus.OK)
         .body(salesStatisticsService.getProductSalesQuantity(seller.id, productId))
 
-    //상품별 매출액 조회
     @GetMapping("/{productId}/sales-amount")
     @PreAuthorize("hasRole('SELLER')")
     fun getProductSalesAmount(
