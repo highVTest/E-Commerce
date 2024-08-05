@@ -12,7 +12,7 @@ jobs:
       redis:
         image: redis:latest
         ports:
-          - 6379:6379
+          - 6380:6379
 
     steps:
       - name: Checkout
@@ -47,18 +47,28 @@ jobs:
         run: ./gradlew build
 
       - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
+        uses: appleboy/scp-action@master
         with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+          host: ec2-13-125-92-168.ap-northeast-2.compute.amazonaws.com # 서버 주소
+          username : ubuntu
+          key : ${{ secrets.EC2_SSH_KEY }}
+          port : 22
+          source: "./build/libs/E-Commerce-0.0.1-SNAPSHOT.jar,docker-compose.yml"
+          target: "~"
+          strip_components: 2
 
-      - name: Deploy to aws
-        run: |
-          mv build/libs/E-Commerce-0.0.1-SNAPSHOT.jar ./api/E-Commerce.jar
-          cd /spring
-          sudo git clone https://github.com/highVTest/E-Commerce.git
-          cd /E-Commerce
-          sudo git init
-          sudo git remote add origin https://github.com/highVTest/E-Commerce
-          sudo git pull origin dev
-          sudo docker-compose up --build
-          EOF
+      - name: ssh-command
+        uses: appleboy/scp-action@v0.1.6
+        with:
+          host: ec2-43-201-108-93.ap-northeast-2.compute.amazonaws.com
+          username: ubuntu
+          key : ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            kill -9 $(ps -ef | grep java | head -n 1 | awk '{print $2}')
+            nohup java -jar *.jar 1> /dev/null 2>&1 &
+
+            
+
+
