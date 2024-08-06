@@ -15,8 +15,8 @@ data class CreateBuyerRequest(
     @field: NotBlank(message = "이메일은 공백일 수 없습니다.")
     @field:Email(message = "이메일 형식이 아닙니다.")
     val email: String,
-    
-    // val profileImage: String,
+
+    val profileImage: String,
     val phoneNumber: String,
     val address: String,
 )

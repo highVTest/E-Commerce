@@ -9,6 +9,7 @@ import com.highv.ecommerce.common.exception.SocialLoginException
 import com.highv.ecommerce.common.exception.UnauthorizedEmailException
 import com.highv.ecommerce.domain.auth.oauth.naver.dto.OAuthLoginUserInfo
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
+import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerResponse
@@ -19,7 +20,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.multipart.MultipartFile
 
 @Service
 class BuyerService(
@@ -29,7 +29,7 @@ class BuyerService(
 ) {
 
     @Transactional
-    fun signUp(request: CreateBuyerRequest, file: MultipartFile?): BuyerResponse {
+    fun signUp(request: CreateBuyerRequest): BuyerResponse {
         val buyer: Buyer =
             buyerRepository.findByIdOrNull(request.id) ?: throw EmailNotVerifiedException(404, "이메일 인증된 회원 정보가 없습니다.")
 
@@ -40,14 +40,11 @@ class BuyerService(
         buyer.apply {
             nickname = request.nickname
             password = passwordEncoder.encode(request.password)
+            profileImage = request.profileImage
             phoneNumber = request.phoneNumber
             address = request.address
         }
 
-        if (file != null) {
-            s3Manager.uploadFile(file) // S3Manager를 통해 파일 업로드
-            buyer.profileImage = s3Manager.getFile(file.originalFilename) // Buyer 객체에 프로필 이미지 URL 저장
-        }
         val savedBuyer = buyerRepository.save(buyer)
 
         return BuyerResponse.from(savedBuyer)
@@ -84,17 +81,13 @@ class BuyerService(
     }
 
     @Transactional
-    fun changeProfileImage(userId: Long, file: MultipartFile?): DefaultResponse {
+    fun changeProfileImage(request: UpdateBuyerImageRequest, userId: Long): DefaultResponse {
         val buyer = buyerRepository.findByIdOrNull(userId) ?: throw BuyerNotFoundException(404, "구매자 회원 정보가 존재하지 않습니다.")
 
-        if (file != null) {
-            s3Manager.uploadFile(file)
-            buyer.profileImage = s3Manager.getFile(file.originalFilename)
-        } else {
-            buyer.profileImage = ""
-        }
+        buyer.profileImage = request.imageUrl
 
         buyerRepository.save(buyer)
+
         return DefaultResponse("프로필 이미지가 변경되었습니다.")
     }
 
