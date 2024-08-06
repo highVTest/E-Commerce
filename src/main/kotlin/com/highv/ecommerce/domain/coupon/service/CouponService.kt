@@ -35,10 +35,8 @@ class CouponService(
     private val productRepository: ProductRepository,
     private val couponToBuyerRepository: CouponToBuyerRepository,
     private val buyerRepository: BuyerRepository,
-    private val itemCartRepository: ItemCartRepository
 ) {
 
-    private val log = LoggerFactory.getLogger("CouponService::class.java")
 
     @Transactional
     fun createCoupon(couponRequest: CreateCouponRequest, sellerId: Long): DefaultResponse {
@@ -144,7 +142,6 @@ class CouponService(
 
             coupon.spendCoupon()
 
-            couponRepository.save(coupon)
         }.onFailure {
             throw CouponDistributionException(500, "쿠폰 지급 중 오류가 발생했습니다")
         }.also {
@@ -155,15 +152,15 @@ class CouponService(
         return DefaultResponse.from("쿠폰이 지급 되었습니다")
     }
 
-    fun applyCoupon(couponId: Long, buyerId: Long): DefaultResponse {
-
-        val coupon = couponToBuyerRepository.findByCouponIdAndBuyerIdAndIsUsedFalse(couponId, buyerId)
-            ?: throw CouponNotFoundException(404, "쿠폰 정보가 존재하지 않습니다")
-
-        val itemCart = itemCartRepository.findByProductIdAndBuyerId(coupon.coupon.product.id!!, buyerId)
-            ?: throw ItemNotFoundException(404, "장바구니에 아이템이 존재하지 않습니다")
-
-        return DefaultResponse.from("쿠폰 적용이 완료 되었습니다")
-    }
+//    fun applyCoupon(couponId: Long, buyerId: Long): DefaultResponse {
+//
+//        val coupon = couponToBuyerRepository.findByCouponIdAndBuyerIdAndIsUsedFalse(couponId, buyerId)
+//            ?: throw CouponNotFoundException(404, "쿠폰 정보가 존재하지 않습니다")
+//
+//        val itemCart = itemCartRepository.findByProductIdAndBuyerId(coupon.coupon.product.id!!, buyerId)
+//            ?: throw ItemNotFoundException(404, "장바구니에 아이템이 존재하지 않습니다")
+//
+//        return DefaultResponse.from("쿠폰 적용이 완료 되었습니다")
+//    }
 
 }
