@@ -23,15 +23,15 @@ import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import java.time.LocalDateTime
 
-class OrderDetailMethodTest: BehaviorSpec({
+class OrderDetailMethodTest : BehaviorSpec({
 
     afterEach {
         clearAllMocks()
     }
 
-    Given("buyerUpdate 메서드가 실행될 경우"){
-        When("complainType 이 EXCHANGE 이고 orderStatus 가 DELIVERED 이 아닐 경우"){
-            Then("물건 수령 전에는 교환 요청이 어렵습니다 를 반환 한다"){
+    Given("buyerUpdate 메서드가 실행될 경우") {
+        When("complainType 이 EXCHANGE 이고 orderStatus 가 DELIVERED 이 아닐 경우") {
+            Then("물건 수령 전에는 교환 요청이 어렵습니다 를 반환 한다") {
 
                 orderDetails.orderStatus = OrderStatus.ORDERED
 
@@ -40,15 +40,15 @@ class OrderDetailMethodTest: BehaviorSpec({
                     description = "test"
                 )
 
-               shouldThrow<InvalidRequestException> {
-                   orderDetails.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
-               }.let {
-                   it.message shouldBe "물건 수령 전에는 교환 요청이 어렵습니다"
-               }
+                shouldThrow<InvalidRequestException> {
+                    orderDetails.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
+                }.let {
+                    it.message shouldBe "물건 수령 전에는 교환 요청이 어렵습니다"
+                }
             }
         }
-        When("complainType 이 REFUND 이고 orderStatus 가 DELIVERY_PREPARING 일 경우"){
-            Then("배송 준비 중에는 환불 요청이 어렵습니다 를 반환"){
+        When("complainType 이 REFUND 이고 orderStatus 가 DELIVERY_PREPARING 일 경우") {
+            Then("배송 준비 중에는 환불 요청이 어렵습니다 를 반환") {
                 orderDetails.orderStatus = OrderStatus.DELIVERY_PREPARING
 
                 val buyerOrderStatusRequest = BuyerOrderStatusRequest(
@@ -63,8 +63,8 @@ class OrderDetailMethodTest: BehaviorSpec({
                 }
             }
         }
-        When("complainType 이 REFUND 이고 orderStatus 가 SHIPPING 일 경우"){
-            Then("배송 중에는 환불 요청이 어렵습니다 를 반환"){
+        When("complainType 이 REFUND 이고 orderStatus 가 SHIPPING 일 경우") {
+            Then("배송 중에는 환불 요청이 어렵습니다 를 반환") {
                 orderDetails.orderStatus = OrderStatus.SHIPPING
 
                 val buyerOrderStatusRequest = BuyerOrderStatusRequest(
@@ -79,8 +79,8 @@ class OrderDetailMethodTest: BehaviorSpec({
                 }
             }
         }
-        When("complainType 이 REFUND 이고 orderStatus 가 PENDING 일 경우"){
-            Then("이미 환불 및 교환 요청이 접수 되었습니다 를 반환"){
+        When("complainType 이 REFUND 이고 orderStatus 가 PENDING 일 경우") {
+            Then("이미 환불 및 교환 요청이 접수 되었습니다 를 반환") {
                 orderDetails.orderStatus = OrderStatus.PENDING
 
                 val buyerOrderStatusRequest = BuyerOrderStatusRequest(
@@ -95,8 +95,8 @@ class OrderDetailMethodTest: BehaviorSpec({
                 }
             }
         }
-        When("정상적으로 실행 될 경우"){
-            Then("교환일 경우 EXCHANGE_REQUESTED 환불 일 경우 REFUND_REQUESTED 및 정상 메세지 반환"){
+        When("정상적으로 실행 될 경우") {
+            Then("교환일 경우 EXCHANGE_REQUESTED 환불 일 경우 REFUND_REQUESTED 및 정상 메세지 반환") {
                 orderDetails.orderStatus = OrderStatus.ORDERED
                 val buyerOrderStatusRequest = BuyerOrderStatusRequest(
                     complainType = ComplainType.REFUND,
@@ -124,9 +124,9 @@ class OrderDetailMethodTest: BehaviorSpec({
         }
     }
 
-    Given("sellerUpdate 메서드가 실행이 될 경우"){
-        When("EXCHANGE_REQUESTED, REFUND_REQUESTED 일 경우"){
-            Then("EXCHANGE_REJECTED, REFUND_REJECTED 를 반환"){
+    Given("sellerUpdate 메서드가 실행이 될 경우") {
+        When("EXCHANGE_REQUESTED, REFUND_REQUESTED 일 경우") {
+            Then("EXCHANGE_REJECTED, REFUND_REJECTED 를 반환") {
                 val sellerOrderStatusRequest = SellerOrderStatusRequest(
                     buyerId = 1L,
                     description = "test"
@@ -152,9 +152,8 @@ class OrderDetailMethodTest: BehaviorSpec({
         }
     }
 
-
 }) {
-    companion object{
+    companion object {
         private fun defaultResponse(msg: String) = DefaultResponse(msg)
         private val orderMaster = OrderMaster(
             id = 1L,
@@ -206,7 +205,7 @@ class OrderDetailMethodTest: BehaviorSpec({
             product = product1,
             orderMasterId = 1L,
             productQuantity = 1,
-            shopId = 1L,
+            shop = shop,
             totalPrice = 10000
         )
 
@@ -218,7 +217,7 @@ class OrderDetailMethodTest: BehaviorSpec({
             product = product1,
             orderMasterId = 1L,
             productQuantity = 1,
-            shopId = 1L,
+            shop = shop,
             totalPrice = 10000
         )
 
@@ -244,7 +243,7 @@ class OrderDetailMethodTest: BehaviorSpec({
             product = product1,
             quantity = 1,
             buyerId = 1L,
-            shopId = 1L
+            shop = shop
         ).apply { id = 1L }
     }
 }
