@@ -22,15 +22,6 @@ import org.springframework.web.bind.annotation.RestController
 class InventoryManagementController(
     private val inventoryManagementService: InventoryManagementService
 ) {
-    @GetMapping("/{productId}/left-quantity")
-    @PreAuthorize("hasRole('SELLER')")
-    fun getProductsQuantity(
-        @AuthenticationPrincipal seller: UserPrincipal,
-        @PathVariable productId: Long
-    ): ResponseEntity<ProductBackOfficeResponse> = ResponseEntity
-        .status(HttpStatus.OK)
-        .body(inventoryManagementService.getProductsQuantity(seller.id, productId))
-
     @PatchMapping("/{productId}/quantity")
     @PreAuthorize("hasRole('SELLER')")
     fun changeQuantity(

@@ -16,11 +16,6 @@ class InventoryManagementService(
     private val productRepository: ProductRepository,
     private val shopRepository: ShopRepository
 ) {
-    fun getProductsQuantity(sellerId: Long, productId: Long): ProductBackOfficeResponse {
-        val product = validateProduct(sellerId, productId)
-        return ProductBackOfficeResponse(product.quantity, product.price)
-    }
-
     fun changeQuantity(sellerId: Long, productId: Long, quantity: QuantityRequest): ProductBackOfficeResponse {
         val product = validateProduct(sellerId, productId)
         product.quantity = quantity.quantity
