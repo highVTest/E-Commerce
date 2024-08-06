@@ -33,11 +33,13 @@ class OrderMasterService(
     @Transactional
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
 
-        if (paymentRequest.cartIdList.isEmpty()) throw CartEmptyException(400, "장바구니에서 아이템 목록을 선택해 주세요")
-
         val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw BuyerNotFoundException(404, "구매자 정보가 존재하지 않습니다")
 
+        if (paymentRequest.cartIdList.isEmpty()) throw CartEmptyException(400, "장바구니 에서 아이템 목록을 선택해 주세요")
+
         val cart = itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
+
+        if(cart.isEmpty()) throw CartEmptyException(400, "장바구니에 아이템이 존재 하지 않습니다")
 
         val couponToBuyer =
             couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(paymentRequest.couponIdList, buyerId)
@@ -68,8 +70,9 @@ class OrderMasterService(
         couponToBuyer.forEach { it.useCoupon() }
 
         cart.forEach {
-            if (it.product.productBackOffice!!.quantity < it.quantity) throw InsufficientStockException(400, "재고가 부족합니다")
+            if (it.product.productBackOffice!!.quantity < it.quantity) throw InsufficientStockException(400, "재고가 부족 합니다")
             it.product.productBackOffice!!.quantity -= it.quantity
+            it.product.productBackOffice!!.soldQuantity += it.quantity
         }
 
         itemCartRepository.deleteAll(cart)

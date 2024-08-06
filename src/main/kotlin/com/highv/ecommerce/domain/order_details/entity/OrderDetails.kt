@@ -82,7 +82,7 @@ class OrderDetails(
                     OrderStatus.DELIVERY_PREPARING -> throw InvalidRequestException(400, "배송 준비 중에는 환불 요청이 어렵습니다")
                     OrderStatus.SHIPPING -> throw InvalidRequestException(400, "배송 중에는 환불 요청이 어렵습니다")
                     OrderStatus.PENDING -> throw InvalidRequestException(400, "이미 환불 및 교환 요청이 접수 되었습니다")
-                    else -> this.orderStatus = orderStatus
+                    else -> this.orderStatus = OrderStatus.PENDING
                 }
                 this.complainStatus = ComplainStatus.REFUND_REQUESTED
             }
@@ -117,11 +117,19 @@ class OrderDetails(
                 when (complainStatus) {
                     ComplainStatus.EXCHANGE_REQUESTED -> this.complainStatus = ComplainStatus.EXCHANGE_REJECTED
                     ComplainStatus.REFUND_REQUESTED -> this.complainStatus = ComplainStatus.REFUND_REJECTED
-                    ComplainStatus.REFUNDED -> this.complainStatus = ComplainStatus.REFUNDED
-                    ComplainStatus.EXCHANGED -> this.complainStatus = ComplainStatus.EXCHANGED
-                    else -> throw InvalidRequestException(400, "잘못된 접근 입니다")
+                    ComplainStatus.REFUNDED -> {
+                        this.complainStatus = ComplainStatus.REFUNDED
+                        this.orderStatus = OrderStatus.ORDER_CANCELED
+                    }
+                    ComplainStatus.EXCHANGED -> {
+                        this.complainStatus = ComplainStatus.EXCHANGED
+                        this.orderStatus = OrderStatus.PRODUCT_PREPARING
+                    }
+                    else -> throw InvalidRequestException(400, "이미 작업을 처리 하였거나 존재 하지 않는 작업 입니다")
                 }
             }
         }
+        this.sellerDateTime = LocalDateTime.now()
+        this.sellerDescription = sellerOrderStatusRequest.description
     }
 }
