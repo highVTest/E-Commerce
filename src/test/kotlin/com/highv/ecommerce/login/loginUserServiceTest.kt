@@ -96,7 +96,7 @@ class LoginUserServiceTest : BehaviorSpec({
         every { passwordEncoder.matches(loginRequest.password, any()) } returns false
 
         When("구매자가 로그인을 시도할 때") {
-            Then("예외를 발생시킨다") {
+            Then("BuyerLoginFailedException를 발생시킨다") {
                 val exception = shouldThrow<BuyerLoginFailedException> { userService.loginBuyer(loginRequest) }
                 exception.message shouldBe "구매자 로그인 실패"
             }

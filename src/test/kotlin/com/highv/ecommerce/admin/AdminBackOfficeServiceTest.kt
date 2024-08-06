@@ -244,7 +244,7 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
         every { blackListRepository.findByIdOrNull(blackListId) } returns null
 
         When("관리자가 특정 블랙리스트를 조회할 때") {
-            Then("예외를 발생시킨다") {
+            Then("BlackListNotFoundException를 발생시킨다") {
                 val exception = shouldThrow<BlackListNotFoundException> {
                     adminService.getBlackList(blackListId)
                 }
@@ -282,7 +282,7 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
         every { blackListRepository.findByIdOrNull(blackListId) } returns null
 
         When("관리자가 블랙리스트 항목을 삭제할 때") {
-            Then("예외를 발생시킨다") {
+            Then("BlackListNotFoundException를 발생시킨다") {
                 val exception = shouldThrow<BlackListNotFoundException> {
                     adminService.deleteBlackList(blackListId)
                 }
