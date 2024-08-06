@@ -7,10 +7,14 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
@@ -18,7 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val authenticationEntrypoint: AuthenticationEntryPoint,
-    private val accessDeniedHandler: AccessDeniedHandler
+    private val accessDeniedHandler: AccessDeniedHandler,
 ) {
     @Bean
     fun filterChain(
@@ -29,6 +33,7 @@ class SecurityConfig(
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
             .csrf { it.disable() }
+            .cors {  }
             .authorizeHttpRequests {
                 it.requestMatchers(
                     "/api/v1/login",
@@ -49,4 +54,22 @@ class SecurityConfig(
             }
             .build()
     }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+
+        configuration.allowedOrigins = listOf("http://test.highvecommerce.com")   // 허용할 URL
+
+        configuration.allowedMethods = listOf("POST", "GET", "DELETE", "PUT", "PATCH")  // 허용할 Method
+
+        configuration.allowedHeaders = listOf("*") // 허용할 Header
+
+        configuration.allowCredentials = true // 세션 쿠키를 유지할 지 여부
+
+        val source = UrlBasedCorsConfigurationSource() // cors 적용
+        source.registerCorsConfiguration("/**", configuration)
+        return source
+    }
+
 }

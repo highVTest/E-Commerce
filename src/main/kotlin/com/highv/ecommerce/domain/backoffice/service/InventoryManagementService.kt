@@ -1,33 +1,44 @@
 package com.highv.ecommerce.domain.backoffice.service
 
+import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.PriceRequest
 import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.ProductBackOfficeResponse
+import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.QuantityRequest
+import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.SellersProductResponse
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
+import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
 import org.springframework.stereotype.Service
 
 @Service
 class InventoryManagementService(
     private val productBackOfficeRepository: ProductBackOfficeRepository,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val shopRepository: ShopRepository
 ) {
     fun getProductsQuantity(sellerId: Long, productId: Long): ProductBackOfficeResponse {
         val product = validateProduct(sellerId, productId)
         return ProductBackOfficeResponse(product.quantity, product.price)
     }
 
-    fun changeQuantity(sellerId: Long, productId: Long, quantity: Int): ProductBackOfficeResponse {
+    fun changeQuantity(sellerId: Long, productId: Long, quantity: QuantityRequest): ProductBackOfficeResponse {
         val product = validateProduct(sellerId, productId)
-        product.quantity = quantity
+        product.quantity = quantity.quantity
         val changedProduct = productBackOfficeRepository.save(product)
         return ProductBackOfficeResponse.from(changedProduct)
     }
 
-    fun changePrice(sellerId: Long, productId: Long, price: Int): ProductBackOfficeResponse {
+    fun changePrice(sellerId: Long, productId: Long, price: PriceRequest): ProductBackOfficeResponse {
         val product = validateProduct(sellerId, productId)
-        product.price = price
+        product.price = price.price
         val changedProduct = productBackOfficeRepository.save(product)
         return ProductBackOfficeResponse.from(changedProduct)
+    }
+
+    fun getSellerProducts(sellerId: Long): List<SellersProductResponse> {
+        val shop = shopRepository.findShopBySellerId(sellerId)
+        val products = productRepository.findProductByShopId(shop.id!!)
+        return products.map { SellersProductResponse.from(it, it.productBackOffice!!) }
     }
 
     private fun validateProduct(sellerId: Long, productId: Long): ProductBackOffice {

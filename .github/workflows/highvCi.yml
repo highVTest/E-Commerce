@@ -1,0 +1,28 @@
+name: HighV CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: [ ubuntu-latest ]
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: java setup
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: make executable gradlew
+        run: chmod +x ./gradlew
+
+      - name: run unittest
+        run: |
+          ./gradlew clean test

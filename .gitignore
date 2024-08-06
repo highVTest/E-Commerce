@@ -38,6 +38,9 @@ out/
 
 ### Kotlin ###
 .kotlin
-application.yml
 
 highv_ddl.sql
+
+*.env
+
+.env

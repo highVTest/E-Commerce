@@ -98,16 +98,30 @@ class OrderDetails(
         complainStatus: ComplainStatus
     ) {
         // order_cancelled 일 경우 로직 작성 필요
-        this.orderStatus = orderStatus
 
-        when (complainStatus) {
-            ComplainStatus.EXCHANGE_REQUESTED -> this.complainStatus = ComplainStatus.EXCHANGE_REJECTED
-            ComplainStatus.REFUND_REQUESTED -> this.complainStatus = ComplainStatus.REFUND_REJECTED
-            ComplainStatus.REFUNDED -> this.complainStatus = ComplainStatus.REFUNDED
-            ComplainStatus.EXCHANGED -> this.complainStatus = ComplainStatus.EXCHANGED
-            else -> throw InvalidRequestException(400, "잘못된 접근 입니다")
+
+        when(orderStatus) {
+            OrderStatus.ORDER_CANCELED -> if (this.complainStatus == ComplainStatus.REFUNDED) throw InvalidRequestException(
+                404,
+                "이미 환불 처리된 상황 입니다"
+            )
+
+            OrderStatus.PRODUCT_PREPARING -> if (this.complainStatus == ComplainStatus.EXCHANGED) throw InvalidRequestException(
+                404,
+                "이미 교환 완료 된 상태 입니다"
+            )
+
+            else -> {
+                this.orderStatus = orderStatus
+
+                when (complainStatus) {
+                    ComplainStatus.EXCHANGE_REQUESTED -> this.complainStatus = ComplainStatus.EXCHANGE_REJECTED
+                    ComplainStatus.REFUND_REQUESTED -> this.complainStatus = ComplainStatus.REFUND_REJECTED
+                    ComplainStatus.REFUNDED -> this.complainStatus = ComplainStatus.REFUNDED
+                    ComplainStatus.EXCHANGED -> this.complainStatus = ComplainStatus.EXCHANGED
+                    else -> throw InvalidRequestException(400, "잘못된 접근 입니다")
+                }
+            }
         }
-        this.sellerDateTime = LocalDateTime.now()
-        this.sellerDescription = sellerOrderStatusRequest.description
     }
 }

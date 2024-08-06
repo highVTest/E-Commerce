@@ -24,7 +24,6 @@ class SellerInfoService(
         val shop = shopRepository.findShopBySellerId(sellerId)
         shop.apply {
             description = updateShopRequest.description
-            shopImage = updateShopRequest.shopImage
         }
         val updatedShop = shopRepository.save(shop)
         return ShopResponse.from(updatedShop)
@@ -37,7 +36,6 @@ class SellerInfoService(
             address = updateSellerRequest.address
             nickname = updateSellerRequest.nickname
             phoneNumber = updateSellerRequest.phoneNumber
-            profileImage = updateSellerRequest.profileImage
         }
         val updateSellerInfo = sellerRepository.save(seller)
         return SellerResponse.from(updateSellerInfo)
