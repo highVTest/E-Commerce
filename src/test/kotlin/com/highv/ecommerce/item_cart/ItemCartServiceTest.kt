@@ -183,7 +183,9 @@ class ItemCartServiceTest : BehaviorSpec() {
                 Then("수량이 변경된다.") {
                     every { itemCartRepository.save(any()) } returns itemCart.apply { quantity = request.quantity }
 
-                    itemCartService.updateItemIntoCart(product.id!!, request, buyerId)
+                    val response = itemCartService.updateItemIntoCart(product.id!!, request, buyerId)
+
+                    response.msg shouldBe "수량이 변경됐습니다."
                 }
 
             }
