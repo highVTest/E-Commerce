@@ -8,6 +8,8 @@ import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 @Service
@@ -30,9 +32,9 @@ class InventoryManagementService(
         return ProductBackOfficeResponse.from(changedProduct)
     }
 
-    fun getSellerProducts(sellerId: Long): List<SellersProductResponse> {
+    fun getSellerProducts(sellerId: Long, pageable: Pageable): Page<SellersProductResponse> {
         val shop = shopRepository.findShopBySellerId(sellerId)
-        val products = productRepository.findAllByShopId(shop.id!!)
+        val products = productRepository.findPaginatedByShopId(shop.id!!, pageable)
         return products.map { SellersProductResponse.from(it, it.productBackOffice!!) }
     }
 
