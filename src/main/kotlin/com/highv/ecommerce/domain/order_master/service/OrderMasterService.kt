@@ -4,7 +4,6 @@ import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.BuyerNotFoundException
 import com.highv.ecommerce.common.exception.CartEmptyException
 import com.highv.ecommerce.common.exception.CouponExpiredException
-import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.InsufficientStockException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
@@ -59,7 +58,7 @@ class OrderMasterService(
                     product = it.product,
                     orderMasterId = orderMaster.id!!,
                     productQuantity = it.quantity,
-                    shopId = it.shopId,
+                    shop = it.shop,
                     totalPrice = productPrice[it.id]!!,
                 )
             }
@@ -68,7 +67,10 @@ class OrderMasterService(
         couponToBuyer.forEach { it.useCoupon() }
 
         cart.forEach {
-            if (it.product.productBackOffice!!.quantity < it.quantity) throw InsufficientStockException(400, "재고가 부족합니다")
+            if (it.product.productBackOffice!!.quantity < it.quantity) throw InsufficientStockException(
+                400,
+                "재고가 부족합니다"
+            )
             it.product.productBackOffice!!.quantity -= it.quantity
         }
 

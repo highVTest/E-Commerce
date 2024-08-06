@@ -11,6 +11,7 @@ import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
+import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -41,7 +42,7 @@ class ItemCartService(
                 product = product,
                 quantity = request.quantity,
                 buyerId = buyerId,
-                shopId = product.shop.id!!
+                shop = product.shop
             )
 
             itemCartRepository.save(item)
@@ -52,16 +53,16 @@ class ItemCartService(
     @Transactional(readOnly = true)
     fun getMyCart(buyerId: Long): List<CartResponse> {
         val cart: List<ItemCart> = itemCartRepository.findByBuyerId(buyerId)
-        val shopGroupItem: MutableMap<Long, MutableList<ItemResponse>> = mutableMapOf()
+        val shopGroupItem: MutableMap<Shop, MutableList<ItemResponse>> = mutableMapOf()
 
         cart.forEach {
-            if (!shopGroupItem.containsKey(it.shopId)) {
-                shopGroupItem[it.shopId] = mutableListOf()
+            if (!shopGroupItem.containsKey(it.shop)) {
+                shopGroupItem[it.shop] = mutableListOf()
             }
-            shopGroupItem[it.shopId]!!.add(ItemResponse.from(it))
+            shopGroupItem[it.shop]!!.add(ItemResponse.from(it))
         }
 
-        return shopGroupItem.map { (key, value) -> CartResponse(key, value) }
+        return shopGroupItem.map { (key, value) -> CartResponse(key.id!!, key.name, value) }
     }
 
     @Transactional

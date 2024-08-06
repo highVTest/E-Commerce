@@ -98,7 +98,7 @@ class OrderDetailsRepositoryImpl(
             .innerJoin(orderDetails.buyer()).fetchJoin()
             // .where(orderDetails.buyer().id.eq(buyerId))
             .where(orderDetails.orderMasterId.eq(orderId))
-            .where(orderDetails.shopId.eq(shopId))
+            .where(orderDetails.shop().id.eq(shopId))
             .fetch()
 
         return query

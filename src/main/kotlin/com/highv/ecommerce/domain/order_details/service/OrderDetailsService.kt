@@ -18,6 +18,7 @@ import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
+import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -59,16 +60,17 @@ class OrderDetailsService(
         val orderMasters: List<OrderMaster> =
             orderMasterRepository.findByIdInOrderByIdDesc(orderDetails.map { it.orderMasterId }.toSet<Long>())
 
-        val orderMasterGroup: MutableMap<Long, MutableMap<Long, BuyerOrderShopResponse>> = mutableMapOf()
+        val orderMasterGroup: MutableMap<Long, MutableMap<Shop, BuyerOrderShopResponse>> = mutableMapOf()
 
         orderDetails.forEach {
             if (!orderMasterGroup.containsKey(it.orderMasterId)) {
                 orderMasterGroup[it.orderMasterId] = mutableMapOf()
             }
-            if (!orderMasterGroup[it.orderMasterId]!!.contains(it.shopId)) {
-                orderMasterGroup[it.orderMasterId]!![it.shopId] = BuyerOrderShopResponse(it.shopId, mutableListOf())
+            if (!orderMasterGroup[it.orderMasterId]!!.contains(it.shop)) {
+                orderMasterGroup[it.orderMasterId]!![it.shop] =
+                    BuyerOrderShopResponse(it.shop.id!!, it.shop.name, mutableListOf())
             }
-            orderMasterGroup[it.orderMasterId]!![it.shopId]!!.productsOrders.add(BuyerOrderDetailProductResponse.from(it))
+            orderMasterGroup[it.orderMasterId]!![it.shop]!!.productsOrders.add(BuyerOrderDetailProductResponse.from(it))
         }
 
         val orderMasterAndShopGroup: MutableMap<Long, MutableList<BuyerOrderShopResponse>> = mutableMapOf()
@@ -104,13 +106,13 @@ class OrderDetailsService(
             throw CustomRuntimeException(404, "주문 내역이 없습니다.")
         }
 
-        val shopGroup: MutableMap<Long, MutableList<BuyerOrderDetailProductResponse>> = mutableMapOf()
+        val shopGroup: MutableMap<Shop, MutableList<BuyerOrderDetailProductResponse>> = mutableMapOf()
 
         orderDetails.forEach {
-            if (!shopGroup.containsKey(it.shopId)) {
-                shopGroup[it.shopId] = mutableListOf()
+            if (!shopGroup.containsKey(it.shop)) {
+                shopGroup[it.shop] = mutableListOf()
             }
-            shopGroup[it.shopId]?.add(BuyerOrderDetailProductResponse.from(it))
+            shopGroup[it.shop]?.add(BuyerOrderDetailProductResponse.from(it))
         }
 
         val orderShopDetails: MutableList<BuyerOrderShopResponse> = mutableListOf()
