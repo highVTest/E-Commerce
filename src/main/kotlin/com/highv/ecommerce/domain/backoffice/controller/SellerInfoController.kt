@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.backoffice.controller
 
+import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdatePasswordRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateSellerRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateShopRequest
@@ -45,7 +46,7 @@ class SellerInfoController(
     fun changePassword(
         @AuthenticationPrincipal seller: UserPrincipal,
         @RequestBody updatePasswordRequest: UpdatePasswordRequest
-    ): ResponseEntity<String> = ResponseEntity
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(sellerInfoService.changePassword(seller.id, updatePasswordRequest))
 
