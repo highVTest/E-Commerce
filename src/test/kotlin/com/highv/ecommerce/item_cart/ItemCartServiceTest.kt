@@ -18,7 +18,6 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDateTime
 
 class ItemCartServiceTest : BehaviorSpec() {
@@ -67,20 +66,24 @@ class ItemCartServiceTest : BehaviorSpec() {
                     product = product,
                     quantity = request.quantity,
                     buyerId = buyerId,
-                    shopId = shop.id!!
+                    shop = shop
                 )
 
-                every { productRepository.findByIdOrNull(any()) } returns product
+                every { productRepository.findByIdOrNull(product.id!!) } returns product
 
-                every { itemCartRepository.findByProductIdAndBuyerId(any(), any()) } returns null
+                every { itemCartRepository.findByProductIdAndBuyerId(product.id!!, buyerId) } returns null
 
                 every { itemCartRepository.save(any()) } returns itemCart.apply { id = 1L }
 
 
                 Then("장바구니에 추가된다.") {
-                    itemCartService.addItemIntoCart(product.id!!, request, buyerId)
+                    val response = itemCartService.addItemIntoCart(product.id!!, request, buyerId)
 
-                    verify(exactly = 1) { productRepository.findByIdOrNull(any()) }
+                    response.msg shouldBe "장바구니에 상품이 추가됐습니다."
+
+                    verify(exactly = 1) { productRepository.findByIdOrNull(product.id!!) }
+                    verify(exactly = 1) { itemCartRepository.findByProductIdAndBuyerId(product.id!!, buyerId) }
+                    verify(exactly = 1) { itemCartRepository.save(any()) }
                 }
 
             }
@@ -93,7 +96,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                     shouldThrow<InvalidQuantityException> {
                         itemCartService.addItemIntoCart(product.id!!, request, buyerId)
                     }.let {
-                        it.message shouldBe "상품의 개수가 1개보다 적을 수 없습니다."
+                        it.message shouldBe "상품의 수량이 1개보다 적을 수 없습니다."
                     }
                 }
             }
@@ -107,7 +110,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                 Then("상품이 없다는 예외가 발생한다.") {
                     shouldThrow<ProductNotFoundException> { itemCartService.addItemIntoCart(1L, request, buyerId) }
                         .let {
-                            it.message shouldBe "Product not found"
+                            it.message shouldBe "해당 상품이 존재하지 않습니다."
                         }
                 }
             }
@@ -120,7 +123,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                     product = product,
                     quantity = 10,
                     buyerId = buyerId,
-                    shopId = shop.id!!
+                    shop = product.shop
                 )
 
                 every { productRepository.findByIdOrNull(any()) } returns product
@@ -166,7 +169,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                 product = product,
                 quantity = 5,
                 buyerId = buyerId,
-                shopId = 1L
+                shop = product.shop
             ).apply { id = 1L }
 
 
@@ -195,7 +198,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                     shouldThrow<ItemNotFoundException> {
                         itemCartService.updateItemIntoCart(product.id!!, request, buyerId)
                     }.let {
-                        it.message shouldBe "Item not found"
+                        it.message shouldBe "장바구니에 해당 상품이 존재하지 않습니다."
                     }
                 }
             }
@@ -230,7 +233,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                 product = product,
                 quantity = 5,
                 buyerId = buyerId,
-                shopId = 1L
+                shop = product.shop
             ).apply { id = 1L }
 
             When("상품이 존재하면") {
@@ -248,7 +251,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                     val error = shouldThrow<ItemNotFoundException> {
                         itemCartService.deleteItemIntoCart(product.id!!, buyerId)
                     }
-                    error.message shouldBe "Item not found"
+                    error.message shouldBe "장바구니에 해당 상품이 존재하지 않습니다."
                 }
             }
         }
@@ -355,7 +358,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                     product = it,
                     quantity = 5,
                     buyerId = buyerId,
-                    shopId = it.shop.id!!
+                    shop = it.shop
                 ).apply { id = it.id }
             })
 
@@ -364,7 +367,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                     product = it,
                     quantity = 5,
                     buyerId = buyerId,
-                    shopId = it.shop.id!!
+                    shop = it.shop
                 ).apply { id = it.id }
             })
 
@@ -373,7 +376,7 @@ class ItemCartServiceTest : BehaviorSpec() {
                     product = product3,
                     quantity = 5,
                     buyerId = buyerId,
-                    shopId = product3.shop.id!!
+                    shop = product3.shop
                 ).apply { id = product3.id }
             )
 
