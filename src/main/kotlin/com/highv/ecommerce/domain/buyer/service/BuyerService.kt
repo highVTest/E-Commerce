@@ -1,7 +1,12 @@
 package com.highv.ecommerce.domain.buyer.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.common.exception.*
+import com.highv.ecommerce.common.exception.BuyerNotFoundException
+import com.highv.ecommerce.common.exception.DuplicatePasswordException
+import com.highv.ecommerce.common.exception.EmailNotVerifiedException
+import com.highv.ecommerce.common.exception.PasswordMismatchException
+import com.highv.ecommerce.common.exception.SocialLoginException
+import com.highv.ecommerce.common.exception.UnauthorizedEmailException
 import com.highv.ecommerce.domain.auth.oauth.naver.dto.OAuthLoginUserInfo
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
@@ -56,14 +61,14 @@ class BuyerService(
 
     @Transactional
     fun changePassword(request: UpdateBuyerPasswordRequest, userId: Long): DefaultResponse {
-        val buyer = buyerRepository.findByIdOrNull(userId) ?: throw BuyerNotFoundException(404, "사용자가 존재하지 않습니다.")
+        val buyer = buyerRepository.findByIdOrNull(userId) ?: throw BuyerNotFoundException(404, "구매자 회원 정보가 존재하지 않습니다.")
 
         if (buyer.providerName != null) {
             throw SocialLoginException(400, "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.")
         }
 
         if (!passwordEncoder.matches(request.currentPassword, buyer.password)) {
-            throw PasswordMismatchException(400, "비밀번호가 일치하지 않습니다.")
+            throw PasswordMismatchException(400, "현재 비밀번호가 일치하지 않습니다.")
         }
 
         if (request.newPassword != request.confirmNewPassword) {
@@ -80,7 +85,7 @@ class BuyerService(
 
     @Transactional
     fun changeProfileImage(userId: Long, file: MultipartFile?): DefaultResponse {
-        val buyer = buyerRepository.findByIdOrNull(userId) ?: throw BuyerNotFoundException(404, "사용자가 존재하지 않습니다.")
+        val buyer = buyerRepository.findByIdOrNull(userId) ?: throw BuyerNotFoundException(404, "구매자 회원 정보가 존재하지 않습니다.")
 
         if (file != null) {
             s3Manager.uploadFile(file)
