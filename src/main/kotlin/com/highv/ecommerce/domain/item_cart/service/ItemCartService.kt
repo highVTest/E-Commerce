@@ -47,7 +47,7 @@ class ItemCartService(
 
             itemCartRepository.save(item)
         }
-        return DefaultResponse("장바구니 상품이 추가됐습니다.")
+        return DefaultResponse("장바구니에 상품이 추가됐습니다.")
     }
 
     @Transactional(readOnly = true)
