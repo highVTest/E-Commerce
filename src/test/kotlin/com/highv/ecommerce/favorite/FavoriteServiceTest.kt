@@ -1,6 +1,8 @@
-/*
 package com.highv.ecommerce.favorite
 
+import com.highv.ecommerce.common.exception.BuyerNotFoundException
+import com.highv.ecommerce.common.exception.ProductNotFoundException
+import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.favorite.entity.Favorite
 import com.highv.ecommerce.domain.favorite.repository.FavoriteRepository
@@ -65,14 +67,14 @@ class FavoriteServiceTest : BehaviorSpec() {
                 }
             }
 
-            When("상품이 없으면") {
+            When("해당 상품이 없으면") {
                 every { productRepository.existsById(any()) } returns false
 
                 Then("상품이 존재하지 않는다고 예외가 발생한다.") {
                     shouldThrow<ProductNotFoundException> {
                         favoriteService.management(productId, buyerId)
                     }.let {
-                        it.message shouldBe "Product with ID ${productId} not found"
+                        it.message shouldBe "해당 상품이 존재하지 않습니다."
                     }
 
                 }
@@ -87,7 +89,7 @@ class FavoriteServiceTest : BehaviorSpec() {
                     shouldThrow<BuyerNotFoundException> {
                         favoriteService.management(productId, buyerId)
                     }.let {
-                        it.message shouldBe "Buyer with ID ${buyerId} not found"
+                        it.message shouldBe "구매자 정보가 존재하지 않습니다."
                     }
                 }
             }
@@ -112,7 +114,7 @@ class FavoriteServiceTest : BehaviorSpec() {
             }
 
             for (i in 1..10) {
-                Product(
+                val product = Product(
                     name = "상품${i}",
                     description = "설명${i}",
                     productImage = "이미지${i}",
@@ -123,27 +125,44 @@ class FavoriteServiceTest : BehaviorSpec() {
                     isDeleted = false,
                     shop = shop,
                     categoryId = 1L
-                )
+                ).also {
+                    it.id = i.toLong()
+                }
+                products.add(product)
+            }
+
+            val productBackOffices: List<ProductBackOffice> = products.map {
+                ProductBackOffice(
+                    quantity = it.id!!.toInt() * 15,
+                    price = it.id!!.toInt() * 1000,
+                    soldQuantity = 0,
+                    product = it
+                ).apply { id = it.id }
+            }
+
+            for (i in 0 until products.size) {
+                products[i].productBackOffice = productBackOffices[i]
             }
 
             products.forEach {
-                Favorite(
+                val favorite = Favorite(
                     productId = it.id!!,
                     buyerId = buyerId
                 ).apply { id = it.id!! }
 
-                When("구매자가 찜 목록을 조회하면") {
-                    every { favoriteRepository.findAllByBuyerId(buyerId) } returns favorites
-                    every { productRepository.findAllById(any()) } returns products
+                favorites.add(favorite)
+            }
 
-                    val response = favoriteService.getFavorites(buyerId)
+            When("구매자가 찜 목록을 조회하면") {
+                every { favoriteRepository.findAllByBuyerId(buyerId) } returns favorites
+                every { productRepository.findAllById(any()) } returns products
 
-                    Then("목록을 반환한다.") {
-                        response.size shouldBe 10
-                    }
+                val response = favoriteService.getFavorites(buyerId)
+
+                Then("목록을 반환한다.") {
+                    response.size shouldBe 10
                 }
-
             }
         }
     }
-}*/
+}

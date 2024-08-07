@@ -198,7 +198,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
     fun `getSellerOrderDetailsBuyer 메서드 실행 시 Seller 가 buyer의 주문 정보를 모두 조회`() {
 
         every { orderMasterRepository.findByIdOrNull(any()) } returns orderMaster
-      
+
         every { orderDetailsRepository.findAllByShopIdAndOrderMasterId(any(), any()) } returns listOf(
             orderDetails,
             orderDetails2
@@ -208,7 +208,6 @@ class OrderDetailsServiceTest : BehaviorSpec() {
         val result = orderDetailsService.getSellerOrderDetailsBuyer(1L, 1L)
 
         result.orderMasterId shouldBe 1L
-
     }
 
     companion object {
@@ -262,7 +261,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
             product = product1,
             orderMasterId = 1L,
             productQuantity = 1,
-            shopId = 1L,
+            shop = shop,
             totalPrice = 10000
         )
 
@@ -274,7 +273,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
             product = product1,
             orderMasterId = 1L,
             productQuantity = 1,
-            shopId = 1L,
+            shop = shop,
             totalPrice = 10000
         )
 
@@ -300,7 +299,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
             product = product1,
             quantity = 1,
             buyerId = 1L,
-            shopId = 1L
+            shop = shop,
         ).apply { id = 1L }
     }
 }

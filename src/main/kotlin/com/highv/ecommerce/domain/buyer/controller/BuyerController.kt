@@ -1,10 +1,10 @@
 package com.highv.ecommerce.domain.buyer.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.InvalidRequestException
 import com.highv.ecommerce.common.exception.LoginException
 import com.highv.ecommerce.domain.buyer.dto.request.CreateBuyerRequest
+import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
 import com.highv.ecommerce.domain.buyer.dto.response.BuyerResponse
@@ -16,8 +16,12 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
-import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/buyer")
@@ -25,9 +29,8 @@ class BuyerController(private val buyerService: BuyerService) {
 
     @PostMapping("/user_signup")
     fun signUp(
-        @RequestPart @Valid request: CreateBuyerRequest,
-        bindingResult: BindingResult,
-        @RequestPart(value = "file", required = false) file: MultipartFile?
+        @RequestBody @Valid request: CreateBuyerRequest,
+        bindingResult: BindingResult
     ): ResponseEntity<BuyerResponse> {
 
         if (bindingResult.hasErrors()) {
@@ -36,7 +39,7 @@ class BuyerController(private val buyerService: BuyerService) {
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(buyerService.signUp(request, file))
+            .body(buyerService.signUp(request))
     }
 
     @PreAuthorize("hasRole('BUYER')")
@@ -67,11 +70,11 @@ class BuyerController(private val buyerService: BuyerService) {
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/profile/image")
     fun changeImage(
+        @RequestBody request: UpdateBuyerImageRequest,
         @AuthenticationPrincipal user: UserPrincipal,
-        @RequestPart(value = "file", required = false) file: MultipartFile?
     ): ResponseEntity<DefaultResponse> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(buyerService.changeProfileImage(user.id, file))
+        .body(buyerService.changeProfileImage(request, user.id))
 
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/profile")

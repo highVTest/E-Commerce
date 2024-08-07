@@ -83,8 +83,6 @@ class OrderDetailsRepositoryImpl(
         return orderDetailsJpaRepository.findByIdAndBuyerId(shopId, orderStatusId)
     }
 
-    // ---------------------------- 판매자 가게 주문 단건 조회
-
     override fun findAllByShopIdAndOrderMasterId(shopId: Long, orderMasterId: Long): List<OrderDetails> {
         val query = queryFactory
             .select(orderDetails)
@@ -99,7 +97,6 @@ class OrderDetailsRepositoryImpl(
 
         return query
     }
-    // --------------------
 
     override fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderDetails> {
         return orderDetailsJpaRepository.findAllByShopIdAndBuyerId(shopId, buyerId)

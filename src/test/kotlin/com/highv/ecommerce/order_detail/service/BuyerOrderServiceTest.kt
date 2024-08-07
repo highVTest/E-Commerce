@@ -1,5 +1,6 @@
 package com.highv.ecommerce.order_detail.service
 
+import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
@@ -14,6 +15,7 @@ import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.seller.shop.entity.Shop
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -173,7 +175,7 @@ class BuyerOrderServiceTest : BehaviorSpec() {
                             product = it,
                             orderMasterId = orderMasters[0].id!!,
                             productQuantity = 10,
-                            shopId = it.shop.id!!,
+                            shop = it.shop,
                             totalPrice = 5000
                         )
                     )
@@ -193,7 +195,7 @@ class BuyerOrderServiceTest : BehaviorSpec() {
                             product = it,
                             orderMasterId = orderMasters[0].id!!,
                             productQuantity = 10,
-                            shopId = it.shop.id!!,
+                            shop = it.shop,
                             totalPrice = 5000
                         )
                     )
@@ -215,7 +217,7 @@ class BuyerOrderServiceTest : BehaviorSpec() {
                             product = it,
                             orderMasterId = orderMasters[1].id!!,
                             productQuantity = 10,
-                            shopId = it.shop.id!!,
+                            shop = it.shop,
                             totalPrice = 5000
                         )
                     )
@@ -234,7 +236,7 @@ class BuyerOrderServiceTest : BehaviorSpec() {
                         product = product3,
                         orderMasterId = orderMasters[1].id!!,
                         productQuantity = 10,
-                        shopId = product3.shop.id!!,
+                        shop = product3.shop,
                         totalPrice = 5000
                     )
                 )
@@ -287,7 +289,7 @@ class BuyerOrderServiceTest : BehaviorSpec() {
                             product = it,
                             orderMasterId = orderMaster.id!!,
                             productQuantity = 10,
-                            shopId = it.shop.id!!,
+                            shop = it.shop,
                             totalPrice = 5000
                         )
                     )
@@ -307,7 +309,7 @@ class BuyerOrderServiceTest : BehaviorSpec() {
                             product = it,
                             orderMasterId = orderMaster.id!!,
                             productQuantity = 10,
-                            shopId = it.shop.id!!,
+                            shop = it.shop,
                             totalPrice = 5000
                         )
                     )
@@ -326,7 +328,7 @@ class BuyerOrderServiceTest : BehaviorSpec() {
                         product = product3,
                         orderMasterId = orderMaster.id!!,
                         productQuantity = 10,
-                        shopId = product3.shop.id!!,
+                        shop = product3.shop,
                         totalPrice = 5000
                     )
                 )
@@ -360,6 +362,46 @@ class BuyerOrderServiceTest : BehaviorSpec() {
 
                 }
 
+            }
+        }
+
+        Given("주문 내역이 존재하지 않으면") {
+            val buyerId = 1L
+            val orderMasterId = 99L
+
+            When("단 건 조회 시") {
+                every { orderMasterRepository.findByIdOrNull(orderMasterId) } returns null
+
+                Then("예외가 발생한다.") {
+                    shouldThrow<CustomRuntimeException> {
+                        orderDetailsService.getBuyerOrderDetails(
+                            buyerId,
+                            orderMasterId
+                        )
+                    }
+                        .also {
+                            it.message shouldBe "주문 내역이 없습니다."
+                        }
+                }
+
+                every {
+                    orderDetailsRepository.findAllByBuyerIdAndOrderMasterId(
+                        buyerId,
+                        orderMasterId
+                    )
+                } returns emptyList()
+
+                Then("예외가 발생한다.") {
+                    shouldThrow<CustomRuntimeException> {
+                        orderDetailsService.getBuyerOrderDetails(
+                            buyerId,
+                            orderMasterId
+                        )
+                    }
+                        .also {
+                            it.message shouldBe "주문 내역이 없습니다."
+                        }
+                }
             }
         }
     }

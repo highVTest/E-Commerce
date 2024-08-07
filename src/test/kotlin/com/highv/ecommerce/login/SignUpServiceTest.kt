@@ -29,7 +29,7 @@ class SignUpServiceTest {
     private val buyerRepository: BuyerRepository = mockk<BuyerRepository>()
     private val passwordEncoder: PasswordEncoder = mockk<PasswordEncoder>()
     private val s3Manager: S3Manager = mockk<S3Manager>()
-    private val buyerService: BuyerService = BuyerService(buyerRepository, passwordEncoder, s3Manager)
+    private val buyerService: BuyerService = BuyerService(buyerRepository, passwordEncoder)
     private val shopRepository = mockk<ShopRepository>()
 
     @Test
@@ -53,18 +53,16 @@ class SignUpServiceTest {
             password = "테스트 비밀번호",
             email = "test@email.com",
             phoneNumber = "테스트 폰 번호",
-            address = "테스트 주소"
+            address = "테스트 주소",
+            profileImage = "테스트 이미지"
         )
-
-        // 이미지 없음
-        val file: MultipartFile? = null
 
         // When
         every { buyerRepository.findByIdOrNull(buyerId) } returns buyer
         every { buyerRepository.save(buyer) } returns buyer
         every { passwordEncoder.encode(request.password) } returns "123456"
 
-        val response = buyerService.signUp(request, file)
+        val response = buyerService.signUp(request)
 
         // then
         response.id shouldBe buyerId
@@ -72,7 +70,7 @@ class SignUpServiceTest {
         response.email shouldBe request.email
         response.address shouldBe request.address
         response.phoneNumber shouldBe request.phoneNumber
-        response.profileImage shouldBe ""
+        response.profileImage shouldBe "테스트 이미지"
     }
 
     @Test
@@ -96,22 +94,22 @@ class SignUpServiceTest {
             password = "테스트 비밀번호",
             email = "test2@email.com",
             phoneNumber = "테스트 폰 번호",
-            address = "테스트 주소"
+            address = "테스트 주소",
+            profileImage = ""
         )
 
-        // 이미지 없음
-        val file: MultipartFile? = null
-
         // when & then
+        // 회원 정보가 있으나 내가 인증한 이메일이 아닌 경우
         every { buyerRepository.findByIdOrNull(buyerId) } returns buyer
         shouldThrow<UnauthorizedEmailException> {
-            buyerService.signUp(request, file)
+            buyerService.signUp(request)
         }.message shouldBe "인증되지 않은 이메일입니다."
 
         // When & then
+        // 이메일 인증을 안 한 경우
         every { buyerRepository.findByIdOrNull(buyerId) } returns null
         shouldThrow<EmailNotVerifiedException> {
-            buyerService.signUp(request, file)
+            buyerService.signUp(request)
         }.message shouldBe "이메일 인증된 회원 정보가 없습니다."
     }
 

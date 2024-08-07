@@ -200,7 +200,7 @@ class OrderMasterServiceService {
             product = product1,
             orderMasterId = 1L,
             productQuantity = 1,
-            shopId = 1L,
+            shop = shop,
             totalPrice = 10000
         )
 
@@ -226,7 +226,7 @@ class OrderMasterServiceService {
             product = product1,
             quantity = 1,
             buyerId = 1L,
-            shopId = 1L
+            shop = shop,
         ).apply { id = 1L }
     }
 }

@@ -1,38 +1,36 @@
-/*
 package com.highv.ecommerce.buyer
 
+import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.DuplicatePasswordException
-import com.highv.ecommerce.common.exception.InvalidRequestException
-import com.highv.ecommerce.common.exception.OldPasswordNotMatchedException
+import com.highv.ecommerce.common.exception.PasswordMismatchException
 import com.highv.ecommerce.common.exception.SocialLoginException
+import com.highv.ecommerce.common.exception.ValidationException
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerImageRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerPasswordRequest
 import com.highv.ecommerce.domain.buyer.dto.request.UpdateBuyerProfileRequest
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.buyer.service.BuyerService
-import com.highv.ecommerce.infra.s3.S3Manager
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.mock.web.MockMultipartFile
 import org.springframework.security.crypto.password.PasswordEncoder
-import java.nio.charset.StandardCharsets
 
 class BuyerServiceTest : DescribeSpec({
     val buyerRepository: BuyerRepository = mockk<BuyerRepository>()
     val passwordEncoder: PasswordEncoder = mockk<PasswordEncoder>()
-    val s3Manager: S3Manager = mockk<S3Manager>()
-    val buyerService: BuyerService = BuyerService(buyerRepository, passwordEncoder, s3Manager)
+    val buyerService: BuyerService = BuyerService(buyerRepository, passwordEncoder)
 
     afterEach {
         clearAllMocks()
     }
+
+
 
     describe("일반 회원이 비밀번호를 바꿀 때") {
         val buyerId = 1L
@@ -56,13 +54,13 @@ class BuyerServiceTest : DescribeSpec({
                 confirmNewPassword = "NewPassword"
             )
             every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
-            every { passwordEncoder.matches(any(), any()) } returns false
+            every { passwordEncoder.matches(request.currentPassword, buyer.password) } returns false
 
             it("예외가 발생한다.") {
-                shouldThrow<OldPasswordNotMatchedException> {
+                shouldThrow<PasswordMismatchException> {
                     buyerService.changePassword(request, buyerId)
                 }.run {
-                    message shouldBe "비밀번호가 일치하지 않습니다."
+                    message shouldBe "현재 비밀번호가 일치하지 않습니다."
                 }
             }
         }
@@ -76,10 +74,10 @@ class BuyerServiceTest : DescribeSpec({
             )
 
             every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
-            every { passwordEncoder.matches(any(), any()) } returns true
+            every { passwordEncoder.matches(request.currentPassword, buyer.password) } returns true
 
             it("예외가 발생한다.") {
-                shouldThrow<InvalidRequestException> {
+                shouldThrow<PasswordMismatchException> {
                     buyerService.changePassword(request, buyerId)
                 }.run {
                     message shouldBe "변경할 비밀번호와 확인 비밀번호가 다릅니다."
@@ -110,17 +108,21 @@ class BuyerServiceTest : DescribeSpec({
         context("모든 조건이 만족될 경우") {
             val request = UpdateBuyerPasswordRequest(
                 currentPassword = "testPassword",
-                newPassword = "testPassword1",
-                confirmNewPassword = "testPassword1"
+                newPassword = "new password",
+                confirmNewPassword = "new password",
             )
-
+            val buyerSlot = slot<Buyer>()
             every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
             every { passwordEncoder.matches(request.currentPassword, buyer.password) } returns true
             every { passwordEncoder.matches(request.newPassword, buyer.password) } returns false
-            every { passwordEncoder.encode(any()) } returns "testPassword1"
+            every { passwordEncoder.encode(any()) } returns "new password"
+            every { buyerRepository.save(capture(buyerSlot)) } returns buyer
 
             it("비밀번호가 변경된다.") {
-                buyerService.changePassword(request, buyerId)
+                val response = buyerService.changePassword(request, buyerId)
+                response.msg shouldBe "비밀번호가 변경되었습니다."
+
+                buyerSlot.captured.password shouldBe "new password"
             }
         }
 
@@ -162,6 +164,7 @@ class BuyerServiceTest : DescribeSpec({
 
     describe("회원이 프로필 이미지를 변경하면") {
         val buyerId = 1L
+        val request = UpdateBuyerImageRequest(imageUrl = "change Image")
 
         context("소셜 회원이면") {
             val buyer = Buyer(
@@ -175,19 +178,20 @@ class BuyerServiceTest : DescribeSpec({
                 providerName = "naver"
             )
 
-            val file = MockMultipartFile(
-                "file", "test.txt", "text/plain", "hello file".byteInputStream(
-                    StandardCharsets.UTF_8
-                )
-            )
+            val buyerSlot = slot<Buyer>()
+
 
             every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
-            every { s3Manager.uploadFile(any()) } returns Unit
-            every { s3Manager.getFile(any()) } returns "lemon.jpg"
-            every { buyerRepository.save(any()) } returns buyer
+            every { buyerRepository.save(capture(buyerSlot)) } returns buyer
+
+
 
             it("이미지가 변경된다.") {
-                buyerService.changeProfileImage(buyerId, file)
+                val response = buyerService.changeProfileImage(request, buyerId)
+
+                response.msg shouldBe "프로필 이미지가 변경되었습니다."
+
+                buyerSlot.captured.profileImage shouldBe "change Image"
             }
         }
 
@@ -203,19 +207,17 @@ class BuyerServiceTest : DescribeSpec({
                 providerName = null
             )
 
-            val file = MockMultipartFile(
-                "file", "test.txt", "text/plain", "hello file".byteInputStream(
-                    StandardCharsets.UTF_8
-                )
-            )
+            val buyerSlot = slot<Buyer>()
 
             every { buyerRepository.findByIdOrNull(any()) } returns buyer.apply { id = buyerId }
-            every { s3Manager.uploadFile(any()) } returns Unit
-            every { s3Manager.getFile(any()) } returns "lemon.jpg"
-            every { buyerRepository.save(any()) } returns buyer
+            every { buyerRepository.save(capture(buyerSlot)) } returns buyer
 
             it("이미지가 변경된다.") {
-                buyerService.changeProfileImage(buyerId, file)
+                val response: DefaultResponse = buyerService.changeProfileImage(request, buyerId)
+
+                response.msg shouldBe "프로필 이미지가 변경되었습니다."
+
+                buyerSlot.captured.profileImage shouldBe "change Image"
             }
         }
 
@@ -247,6 +249,7 @@ class BuyerServiceTest : DescribeSpec({
             every { buyerRepository.save(any()) } returns buyer
 
             it("닉네임, 핸드폰 번호, 주소가 수정된다.") {
+
                 val result = buyerService.changeProfile(request, buyerId)
 
                 result.nickname shouldBe "수정한 닉네임"
@@ -255,6 +258,36 @@ class BuyerServiceTest : DescribeSpec({
 
             }
 
+        }
+
+        context("일반 회원이고 변경 닉네임이 공백이면") {
+            val buyer = Buyer(
+                nickname = "TestName",
+                email = "test@test.com",
+                profileImage = "testImage",
+                phoneNumber = "010-1234-5678",
+                address = "서울시-용산구-용산로-용산2길 19",
+                password = "testPassword",
+                providerId = null,
+                providerName = null
+            ).apply { id = buyerId }
+
+            val request: UpdateBuyerProfileRequest = UpdateBuyerProfileRequest(
+                nickname = "",
+                phoneNumber = "수정한 번호",
+                address = "수정한 주소"
+            )
+
+            every { buyerRepository.findByIdOrNull(any()) } returns buyer
+            every { buyerRepository.save(any()) } returns buyer
+
+            it("예외가 발생한다.") {
+                shouldThrow<ValidationException> {
+                    buyerService.changeProfile(request, buyerId)
+                }.run {
+                    message shouldBe "닉네임이 공백일 수 없습니다."
+                }
+            }
         }
 
         context("소셜 로그인 유저면") {
@@ -290,5 +323,60 @@ class BuyerServiceTest : DescribeSpec({
         }
     }
 
+    describe("회원 정보 조회 시") {
+        val buyerId = 1L
+
+        context("일반 회원이면") {
+            val buyer = Buyer(
+                nickname = "TestName",
+                email = "test@test.com",
+                profileImage = "testImage",
+                phoneNumber = "010-1234-5678",
+                address = "서울시-용산구-용산로-용산2길 19",
+                password = "testPassword",
+                providerId = null,
+                providerName = null
+            ).apply { id = buyerId }
+
+            every { buyerRepository.findByIdOrNull(buyerId) } returns buyer
+
+            it("회원 정보가 반환된다.") {
+                val response = buyerService.getMyProfile(buyerId)
+
+                response.id shouldBe buyerId
+                response.nickname shouldBe "TestName"
+                response.email shouldBe "test@test.com"
+                response.phoneNumber shouldBe "010-1234-5678"
+                response.address shouldBe "서울시-용산구-용산로-용산2길 19"
+
+            }
+        }
+
+        context("소셜 회원이면") {
+            val buyer = Buyer(
+                nickname = "TestName",
+                email = "null",
+                profileImage = "testImage",
+                phoneNumber = "010-1234-5678",
+                address = "서울시-용산구-용산로-용산2길 19",
+                password = "testPassword",
+                providerId = "123321",
+                providerName = "kakao"
+            ).apply { id = buyerId }
+
+            every { buyerRepository.findByIdOrNull(buyerId) } returns buyer
+
+            it("회원정보가 반환된다.") {
+                val response = buyerService.getMyProfile(buyerId)
+
+                response.id shouldBe buyerId
+                response.nickname shouldBe "TestName"
+                response.email shouldBe "null"
+                response.phoneNumber shouldBe "010-1234-5678"
+                response.address shouldBe "서울시-용산구-용산로-용산2길 19"
+            }
+        }
+
+    }
 })
-*/
+

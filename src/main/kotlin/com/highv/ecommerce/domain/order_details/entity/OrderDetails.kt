@@ -8,6 +8,7 @@ import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import com.highv.ecommerce.domain.product.entity.Product
+import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -62,8 +63,9 @@ class OrderDetails(
     @Column(name = "product_quantity", nullable = false)
     var productQuantity: Int,
 
-    @Column(name = "shop_id", nullable = false)
-    val shopId: Long,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id")
+    val shop: Shop,
 
     @Column(name = "total_price", nullable = false)
     val totalPrice: Int
@@ -72,7 +74,10 @@ class OrderDetails(
 
         when (buyerOrderStatusRequest.complainType.name) {
             "EXCHANGE" -> {
-                if (this.orderStatus != OrderStatus.DELIVERED) throw InvalidRequestException(400, "물건 수령 전에는 교환 요청이 어렵습니다")
+                if (this.orderStatus != OrderStatus.DELIVERED) throw InvalidRequestException(
+                    400,
+                    "물건 수령 전에는 교환 요청이 어렵습니다"
+                )
                 this.complainStatus = ComplainStatus.EXCHANGE_REQUESTED
                 this.orderStatus = OrderStatus.PENDING
             }
@@ -99,8 +104,7 @@ class OrderDetails(
     ) {
         // order_cancelled 일 경우 로직 작성 필요
 
-
-        when(orderStatus) {
+        when (orderStatus) {
             OrderStatus.ORDER_CANCELED -> if (this.complainStatus == ComplainStatus.REFUNDED) throw InvalidRequestException(
                 404,
                 "이미 환불 처리된 상황 입니다"
