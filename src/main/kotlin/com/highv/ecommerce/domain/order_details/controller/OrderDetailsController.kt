@@ -97,4 +97,9 @@ class OrderDetailsController(
         @RequestBody request: UpdateDeliveryStatusRequest
     ): ResponseEntity<DefaultResponse> = ResponseEntity.status(HttpStatus.OK)
         .body(orderDetailsService.updateProductsDelivery(orderMasterId, shopId, request))
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("delivery-status")
+    fun updateDeliveryStatus(): ResponseEntity<DefaultResponse> =
+        ResponseEntity.status(HttpStatus.OK).body(orderDetailsService.updateDelivery())
 }
