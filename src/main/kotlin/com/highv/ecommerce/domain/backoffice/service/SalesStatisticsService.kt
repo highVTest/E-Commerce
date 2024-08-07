@@ -1,8 +1,6 @@
 package com.highv.ecommerce.domain.backoffice.service
 
-import com.highv.ecommerce.domain.backoffice.dto.salesstatics.ProductSalesQuantityResponse
 import com.highv.ecommerce.domain.backoffice.dto.salesstatics.ProductSalesResponse
-import com.highv.ecommerce.domain.backoffice.dto.salesstatics.TotalSalesQuantityResponse
 import com.highv.ecommerce.domain.backoffice.dto.salesstatics.TotalSalesResponse
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
 import com.highv.ecommerce.domain.product.entity.Product
@@ -14,52 +12,32 @@ class SalesStatisticsService(
     private val productBackOfficeRepository: ProductBackOfficeRepository,
     private val productRepository: ProductRepository
 ) {
-
-    fun getTotalSalesQuantity(sellerId: Long): TotalSalesQuantityResponse {
+    fun getTotalSales(sellerId: Long): TotalSalesResponse {
         val products = productRepository.findAllByShopId(sellerId)
         val productIds = products.mapNotNull { it.id }
-        val totalSalesQuantity =
-            if (productIds.isEmpty()) 0 else productBackOfficeRepository.findTotalSoldQuantitiesByProductIds(productIds)
-
-        return TotalSalesQuantityResponse(totalSalesQuantity)
+        val totalSales = productBackOfficeRepository.findTotalSalesStatisticsByProductIds(productIds)
+        return TotalSalesResponse(totalSales.totalQuantity, totalSales.totalPrice)
     }
 
-    fun getTotalSalesAmount(sellerId: Long): TotalSalesResponse {
-        val products = productRepository.findAllByShopId(sellerId)
-        val productIds = products.mapNotNull { it.id }
-        val totalSalesAmount =
-            if (productIds.isEmpty()) 0 else productBackOfficeRepository.findTotalSalesAmountByProductIds(productIds)
-        return TotalSalesResponse(totalSalesAmount)
-    }
-
-    fun getProductSalesQuantity(sellerId: Long, productId: Long): ProductSalesQuantityResponse {
-        val product = validateProductWithBackOffice(sellerId, productId)
-        val productBackOffice = product.productBackOffice
-            ?: throw IllegalArgumentException("ProductBackOffice not found for product with ID $productId")
-        return ProductSalesQuantityResponse(product.name, productBackOffice.soldQuantity.toInt())
+    fun getMonthsProductSales(sellerId: Long): List<TotalSalesResponse> {
+        TODO("최근 1년의 판매를 기준으로 월별 표기. 1월부터 ~ 12월까지 표기")
     }
 
     fun getProductSales(sellerId: Long, productId: Long): ProductSalesResponse {
-        val product = validateProductWithBackOffice(sellerId, productId)
+        val product = validateProduct(sellerId, productId)
         val productBackOffice = product.productBackOffice
             ?: throw IllegalArgumentException("ProductBackOffice not found for product with ID $productId")
-        return ProductSalesResponse(product.name, (productBackOffice.soldQuantity * productBackOffice.price).toInt())
+        return ProductSalesResponse(
+            product.name,
+            productBackOffice.soldQuantity,
+            (productBackOffice.soldQuantity * productBackOffice.price)
+        )
     }
 
-    private fun validateProductWithBackOffice(sellerId: Long, productId: Long): Product {
-        // val product = productRepository.findProductWithBackOfficeById(productId)
-        //     ?: throw IllegalArgumentException("Product with ID $productId not found")
-        // if (product.shop.sellerId != sellerId) {
-        //     throw IllegalArgumentException("No Authority")
-        // }
-
+    private fun validateProduct(sellerId: Long, productId: Long): Product {
         val product = productRepository.findByIdOrNull(productId)
             ?: throw IllegalArgumentException("Product with ID $productId not found")
-
-        if (product.shop.sellerId != sellerId) {
-            throw IllegalArgumentException("No Authority")
-        }
-        
+        if (product.shop.sellerId != sellerId) throw IllegalArgumentException("No Authority")
         return product
     }
 }
