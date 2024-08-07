@@ -53,7 +53,7 @@ class OrderDetailsController(
         @RequestBody sellerOrderStatusRequest: SellerOrderStatusRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<OrderStatusResponse> = ResponseEntity.status(HttpStatus.OK)
-        .body(orderDetailsService.requestComplainReject(sellerOrderStatusRequest, shopId, orderId))
+        .body(orderDetailsService.requestComplainReject(sellerOrderStatusRequest, shopId, orderId, userPrincipal.id))
 
     @PreAuthorize("hasRole('SELLER')")
     @GetMapping("/shop/order-details/{shopId}")
@@ -61,7 +61,7 @@ class OrderDetailsController(
         @PathVariable("shopId") shopId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<List<SellerOrderResponse>> = ResponseEntity.status(HttpStatus.OK)
-        .body(orderDetailsService.getSellerOrderDetailsAll(shopId))
+        .body(orderDetailsService.getSellerOrderDetailsAll(shopId, userPrincipal.id))
 
     @PreAuthorize("hasRole('SELLER')")
     @GetMapping("/shop/order-details/{shopId}/{orderId}")
@@ -80,5 +80,5 @@ class OrderDetailsController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
         @RequestBody sellerOrderStatusRequest: SellerOrderStatusRequest
     ): ResponseEntity<OrderStatusResponse> = ResponseEntity.status(HttpStatus.OK)
-        .body(orderDetailsService.requestComplainAccept(shopId, orderId, sellerOrderStatusRequest))
+        .body(orderDetailsService.requestComplainAccept(shopId, orderId, sellerOrderStatusRequest, userPrincipal.id))
 }

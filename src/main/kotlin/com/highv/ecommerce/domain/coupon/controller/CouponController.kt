@@ -122,15 +122,15 @@ class CouponController(
 
 
     // 최후의 보루
-    @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/apply/{couponId}")
-    fun applyCoupon(
-        @PathVariable couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<DefaultResponse> {
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(couponService.applyCoupon(couponId, userPrincipal.id))
-    }
+//    @PreAuthorize("hasRole('BUYER')")
+//    @PatchMapping("/apply/{couponId}")
+//    fun applyCoupon(
+//        @PathVariable couponId: Long,
+//        @AuthenticationPrincipal userPrincipal: UserPrincipal
+//    ): ResponseEntity<DefaultResponse> {
+//
+//        return ResponseEntity
+//            .status(HttpStatus.OK)
+//            .body(couponService.applyCoupon(couponId, userPrincipal.id))
+//    }
 }

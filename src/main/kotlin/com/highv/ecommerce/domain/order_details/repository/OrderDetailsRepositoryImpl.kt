@@ -83,29 +83,6 @@ class OrderDetailsRepositoryImpl(
         return orderDetailsJpaRepository.findByIdAndBuyerId(shopId, orderStatusId)
     }
 
-    // ---------------------------- 판매자 가게 주문 단건 조회
-    override fun findAllByShopIdAndOrderMasterIdAndBuyerId(
-        shopId: Long,
-        orderId: Long,
-        buyerId: Long
-    ): List<OrderDetails> {
-        val query = queryFactory
-            .select(orderDetails)
-            .from(orderDetails)
-            .innerJoin(orderDetails.product()).fetchJoin()
-            .innerJoin(orderDetails.product().productBackOffice()).fetchJoin()
-            .innerJoin(orderDetails.product().shop()).fetchJoin()
-            .innerJoin(orderDetails.buyer()).fetchJoin()
-            // .where(orderDetails.buyer().id.eq(buyerId))
-            .where(orderDetails.orderMasterId.eq(orderId))
-            .where(orderDetails.shop().id.eq(shopId))
-            .fetch()
-
-        return query
-
-        // return orderDetailsJpaRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(shopId, orderId, buyerId)
-    }
-
     override fun findAllByShopIdAndOrderMasterId(shopId: Long, orderMasterId: Long): List<OrderDetails> {
         val query = queryFactory
             .select(orderDetails)
@@ -115,12 +92,11 @@ class OrderDetailsRepositoryImpl(
             .innerJoin(orderDetails.product().shop()).fetchJoin()
             .innerJoin(orderDetails.buyer()).fetchJoin()
             .where(orderDetails.orderMasterId.eq(orderMasterId))
-            .where(orderDetails.product().shop().id.eq(shopId))
+            .where(orderDetails.shopId.eq(shopId))
             .fetch()
 
         return query
     }
-    // --------------------
 
     override fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderDetails> {
         return orderDetailsJpaRepository.findAllByShopIdAndBuyerId(shopId, buyerId)

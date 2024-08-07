@@ -1,7 +1,9 @@
 package com.highv.ecommerce.domain.backoffice.service
 
+import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.CustomRuntimeException
-import com.highv.ecommerce.common.exception.OldPasswordNotMatchedException
+import com.highv.ecommerce.common.exception.DuplicatePasswordException
+import com.highv.ecommerce.common.exception.PasswordMismatchException
 import com.highv.ecommerce.common.exception.SellerNotFoundException
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdatePasswordRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateSellerRequest
@@ -41,19 +43,20 @@ class SellerInfoService(
         return SellerResponse.from(updateSellerInfo)
     }
 
-    fun changePassword(sellerId: Long, updatePasswordRequest: UpdatePasswordRequest): String {
+    fun changePassword(sellerId: Long, request: UpdatePasswordRequest): DefaultResponse {
         val seller =
             sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "Seller not found")
-        if (!passwordEncoder.matches(
-                updatePasswordRequest.oldPassword,
-                seller.password
-            )
-        ) throw OldPasswordNotMatchedException(message = "Old password not matched")
-        seller.apply {
-            password = passwordEncoder.encode(updatePasswordRequest.newPassword)
+
+        if (!passwordEncoder.matches(request.currentPassword, seller.password)) {
+            throw PasswordMismatchException(400, "비밀번호가 일치하지 않습니다.")
+        } else if (passwordEncoder.matches(request.newPassword, seller.password)) {
+            throw DuplicatePasswordException(400, "현재 비밀번호와 수정할 비밀번호가 같습니다.")
+        } else if (request.newPassword != request.confirmNewPassword) {
+            throw PasswordMismatchException(400, "변경할 비밀번호와 확인 비밀번호가 다릅니다.")
         }
-        sellerRepository.save(seller)
-        return "Password 변경 완료"
+
+        seller.password = passwordEncoder.encode(request.newPassword)
+        return DefaultResponse("비밀번호가 변경되었습니다.")
     }
 
     fun getSellerInfo(sellerId: Long): SellerResponse {

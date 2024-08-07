@@ -41,8 +41,8 @@ spring:
         writetimeout: 5000
     auth-code-expiration-millis: 300000 # 5 * 60 * 1000 = 5분
 
-    cache:
-      type: redis
+  cache:
+    type: redis
 
 
 
@@ -88,3 +88,6 @@ cloud:
       static: "ap-northeast-2"
     stack:
       auto: false
+
+server:
+  port: 80
