@@ -57,7 +57,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
                     orderDetails.complainStatus = ComplainStatus.REFUND_REQUESTED
 
                     every {
-                        orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any(), any())
+                        orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any())
                     } returns listOf(orderDetails)
                     every { couponRepository.findAllByProductId(any()) } returns listOf(coupon.id!!)
                     every {
@@ -85,7 +85,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
                     orderDetails.complainStatus = ComplainStatus.EXCHANGE_REQUESTED
 
                     every {
-                        orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any(), any())
+                        orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any())
                     } returns listOf(orderDetails)
                     every { couponRepository.findAllByProductId(any()) } returns listOf(coupon.id!!)
                     every {
@@ -110,7 +110,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
                     orderDetails.complainStatus = ComplainStatus.NONE
 
                     every {
-                        orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any(), any())
+                        orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any())
                     } returns listOf(orderDetails)
                     every { couponRepository.findAllByProductId(any()) } returns listOf(coupon.id!!)
                     every {
@@ -141,7 +141,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
         )
 
         every {
-            orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any(), any())
+            orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any())
         } returns listOf(orderDetails, orderDetails2)
 
         every {
@@ -169,7 +169,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
         )
 
         every {
-            orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any(), any())
+            orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any())
         } returns listOf(orderDetails)
 
         every {

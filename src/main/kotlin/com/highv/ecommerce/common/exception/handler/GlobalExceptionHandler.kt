@@ -261,4 +261,9 @@ class GlobalExceptionHandler {
     fun shopAlreadyExistsExceptionHandler(e: ShopAlreadyExistsException): ResponseEntity<ErrorResponse> {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponse(e.errorCode, e.message))
     }
+
+    @ExceptionHandler(ModelNotFoundException::class)
+    fun modelNotFoundException(e: ModelNotFoundException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponse(e.errorCode, e.message))
+    }
 }
