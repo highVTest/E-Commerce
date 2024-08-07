@@ -18,19 +18,6 @@ import org.springframework.web.bind.annotation.RestController
 class CouponControllerVn(
     private val couponService: CouponServiceVn
 ) {
-    @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/v2/buyer/coupon/{couponId}")
-    fun issuedCouponV2(
-        @PathVariable couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal?
-    ): ResponseEntity<DefaultResponse> {
-
-        if (userPrincipal == null) throw UnauthorizedUserException(401, "인증되지 않은 사용자입니다.")
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(couponService.issuedCouponV2(couponId, userPrincipal))
-    }
 
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/v3/buyer/coupon/{couponId}")
