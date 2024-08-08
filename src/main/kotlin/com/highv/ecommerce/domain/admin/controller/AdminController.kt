@@ -76,7 +76,6 @@ class AdminController(
             .body(adminService.approveSellerResignation(sellerId))
 
     // 판매자 승인 대기 회원 승격
-    //Seller Entity에 status가 없어서 주석처리
     @PatchMapping("/seller/approval/{sellerId}")
     @PreAuthorize("hasRole('ADMIN')")
     fun promotePendingSeller(@PathVariable sellerId: Long): ResponseEntity<DefaultResponse> =
