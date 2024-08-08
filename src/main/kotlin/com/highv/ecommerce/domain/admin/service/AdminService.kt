@@ -6,6 +6,7 @@ import com.highv.ecommerce.domain.admin.dto.BlackListResponse
 import com.highv.ecommerce.domain.admin.entity.BlackList
 import com.highv.ecommerce.domain.admin.repository.BlackListRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
+import com.highv.ecommerce.domain.seller.entity.Seller
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -101,5 +102,31 @@ class AdminService(
             ?: throw BlackListNotFoundException(message = "블랙리스트 id $blackListId 존재하지 않습니다.")
         blackListRepository.delete(blackList)
         return DefaultResponse("블랙리스트 삭제 완료")
+    }
+
+    // 판매자 탈퇴 대기 회원 승인 로직 구현
+    @Transactional
+    fun approveSellerResignation(sellerId: Long): DefaultResponse {
+        val seller = sellerRepository.findByIdOrNull(sellerId)
+            ?: throw SellerNotFoundException(message = "Seller id $sellerId not found")
+
+        // 판매자 상태를 탈퇴 승인으로 변경합니다.
+        seller.status = Seller.Status.RESIGNED
+        sellerRepository.save(seller)
+
+        return DefaultResponse("판매자 탈퇴 승인 완료")
+    }
+
+    // 판매자 승인 대기 회원 승격 로직 구현
+    @Transactional
+    fun promotePendingSeller(sellerId: Long): DefaultResponse {
+        val seller = sellerRepository.findByIdOrNull(sellerId)
+            ?: throw SellerNotFoundException(message = "Seller id $sellerId not found")
+
+        // 판매자 상태를 승인 완료로 변경합니다.
+        seller.status = Seller.Status.APPROVED
+        sellerRepository.save(seller)
+
+        return DefaultResponse("판매자 승인 완료")
     }
 }
