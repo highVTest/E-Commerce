@@ -6,6 +6,7 @@ import com.highv.ecommerce.common.exception.CustomRuntimeException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
+import java.util.*
 
 @Component
 class S3Manager(
@@ -19,7 +20,9 @@ class S3Manager(
         if (type.isNullOrEmpty()) {
             throw CustomRuntimeException(400, "이미지 파일만 업로드 해주세요")
         }
-        val fileName = file.originalFilename
+        val uuid = UUID.randomUUID()
+        val fileName = "${uuid}-${file.originalFilename}"
+
 
         val metadata = ObjectMetadata().apply { // 파일의 컨텐츠 타입과 크기를 설정
             contentType = type
