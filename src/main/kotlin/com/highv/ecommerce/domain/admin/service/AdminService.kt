@@ -1,7 +1,9 @@
 package com.highv.ecommerce.domain.admin.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.common.exception.*
+import com.highv.ecommerce.common.exception.BlackListNotFoundException
+import com.highv.ecommerce.common.exception.ProductNotFoundException
+import com.highv.ecommerce.common.exception.SellerNotFoundException
 import com.highv.ecommerce.domain.admin.dto.BlackListResponse
 import com.highv.ecommerce.domain.admin.entity.BlackList
 import com.highv.ecommerce.domain.admin.repository.BlackListRepository
@@ -55,7 +57,7 @@ class AdminService(
 
         // 상품에서 판매자 정보를 가져옵니다.
         val seller = product.shop.sellerId
-            ?.let { sellerRepository.findByIdOrNull(it) }
+            .let { sellerRepository.findByIdOrNull(it) }
             ?: throw SellerNotFoundException(message = "Seller not found for product id $productId")
 
         // 판매자의 이메일로 블랙리스트에서 검색합니다.
@@ -111,7 +113,7 @@ class AdminService(
             ?: throw SellerNotFoundException(message = "Seller id $sellerId not found")
 
         // 판매자 상태를 탈퇴 승인으로 변경합니다.
-        seller.status = Seller.Status.RESIGNED
+        seller.activeStatus = Seller.ActiveStatus.RESIGNED
         sellerRepository.save(seller)
 
         return DefaultResponse("판매자 탈퇴 승인 완료")
@@ -124,7 +126,7 @@ class AdminService(
             ?: throw SellerNotFoundException(message = "Seller id $sellerId not found")
 
         // 판매자 상태를 승인 완료로 변경합니다.
-        seller.status = Seller.Status.APPROVED
+        seller.activeStatus = Seller.ActiveStatus.APPROVED
         sellerRepository.save(seller)
 
         return DefaultResponse("판매자 승인 완료")
