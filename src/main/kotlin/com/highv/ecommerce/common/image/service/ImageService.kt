@@ -12,9 +12,10 @@ class ImageService(
 ) {
 
     fun uploadImage(file: MultipartFile, id: Long): ImageUrlResponse {
-        s3Manager.uploadFile(file)
-        val imageUrl = s3Manager.getFile(file.originalFilename)
-        return ImageUrlResponse(imageUrl = imageUrl)
+        val imageUrl = s3Manager.uploadFile(listOf(file))
+        // val imageUrl = s3Manager.getFile(file.originalFilename)
+
+        return ImageUrlResponse(imageUrl = imageUrl[0])
     }
 
     fun uploadImages(files: List<MultipartFile>, id: Long): List<ImageUrlResponse> {
@@ -25,12 +26,8 @@ class ImageService(
             throw CustomRuntimeException(409, "이미지를 등록해주세요")
         }
 
-        val imageUrls: MutableList<ImageUrlResponse> = mutableListOf()
-
-        files.forEach {
-            s3Manager.uploadFile(it)
-            val imageUrl = s3Manager.getFile(it.originalFilename)
-            imageUrls.add(ImageUrlResponse(imageUrl = imageUrl))
+        val imageUrls: List<ImageUrlResponse> = s3Manager.uploadFile(files).map {
+            ImageUrlResponse(it)
         }
 
         return imageUrls
