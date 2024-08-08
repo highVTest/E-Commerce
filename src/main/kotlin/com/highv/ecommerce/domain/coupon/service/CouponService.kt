@@ -58,7 +58,8 @@ class CouponService(
                 expiredAt = couponRequest.expiredAt,
                 createdAt = LocalDateTime.now(),
                 quantity = couponRequest.quantity,
-                sellerId = sellerId
+                sellerId = sellerId,
+                couponName = couponRequest.couponName,
             )
         )
 

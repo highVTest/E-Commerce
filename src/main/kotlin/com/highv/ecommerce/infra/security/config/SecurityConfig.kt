@@ -59,7 +59,7 @@ class SecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
 
-        configuration.allowedOrigins = listOf("http://test.highvecommerce.com")   // 허용할 URL
+        configuration.allowedOrigins = listOf("http://test.highvecommerce.com", "http://localhost:5173")   // 허용할 URL
 
         configuration.allowedMethods = listOf("POST", "GET", "DELETE", "PUT", "PATCH")  // 허용할 Method
 

@@ -43,6 +43,9 @@ class Coupon(
     @Column(name = "seller_id", nullable = false)
     val sellerId: Long,
 
+    @Column(name = "coupon_name", nullable = false)
+    val couponName: String
+
     ) {
 
     fun update(updateCouponRequest: UpdateCouponRequest) {

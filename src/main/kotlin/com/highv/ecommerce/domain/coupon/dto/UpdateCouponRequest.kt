@@ -15,5 +15,7 @@ data class UpdateCouponRequest(
     @field:Min(value = 1, message = "최소 1이어야 합니다")
     @field:Max(value = 50000, message = "최대 50000을 넘길 수 없습니다")
     val discount : Int,
-    val quantity : Int = 0,
+
+    @field:Min(value = 1, message = "최소 1이어야 합니다")
+    val quantity : Int,
 )

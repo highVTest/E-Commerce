@@ -27,40 +27,6 @@ class CouponServiceVn(
     //리엔트리 락
     private val reentrantLock = ReentrantLock()
 
-    @Transactional
-    fun issuedCouponV2(couponId: Long, userPrincipal: UserPrincipal): DefaultResponse {
-
-        synchronized(lock) {
-            val buyer = buyerRepository.findByEmail(userPrincipal.email) ?: throw BuyerNotFoundException(404, "바이어가 존재하지 않습니다")
-
-            kotlin.runCatching {
-
-                val coupon = couponRepository.findByIdOrNull(couponId) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
-
-                if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw DuplicateCouponException(400, "동일한 쿠폰은 지급 받을 수 없습니다")
-
-
-
-                coupon.validExpiredAt()
-
-                couponToBuyerRepository.save(
-                    CouponToBuyer(
-                        buyer = buyer,
-                        coupon = coupon,
-                        isUsed = false,
-                    )
-                )
-
-                coupon.spendCoupon()
-
-                couponRepository.save(coupon)
-            }.onFailure {
-                throw CouponDistributionException(500, "다시 시도 해주세요 ${it.message}")
-            }
-        }
-
-        return DefaultResponse.from("쿠폰이 지급 되었습니다")
-    }
 
     @Transactional
     fun issuedCouponV3(couponId: Long, userPrincipal: UserPrincipal): DefaultResponse {
