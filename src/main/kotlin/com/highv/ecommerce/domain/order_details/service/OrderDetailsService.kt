@@ -3,6 +3,7 @@ package com.highv.ecommerce.domain.order_details.service
 import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.InvalidRequestException
 import com.highv.ecommerce.common.exception.ModelNotFoundException
+import com.highv.ecommerce.common.lock.service.LockService
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderDetailProductResponse
@@ -28,7 +29,8 @@ class OrderDetailsService(
     private val orderDetailsRepository: OrderDetailsRepository,
     private val couponToBuyerRepository: CouponToBuyerRepository,
     private val couponRepository: CouponRepository,
-    private val orderMasterRepository: OrderMasterRepository
+    private val orderMasterRepository: OrderMasterRepository,
+    private val lockService: LockService
 ) {
 
     @Transactional
@@ -208,6 +210,11 @@ class OrderDetailsService(
             else ComplainType.EXCHANGE
         when (orderDetails[0].complainStatus) {
             ComplainStatus.REFUND_REQUESTED -> {
+
+                val lock = createLockKey(shopId,orderId,sellerId).let{
+                    lockService.mySqlLock(it)
+                }
+
                 orderDetails.map {
 
                     it.sellerUpdate(OrderStatus.ORDER_CANCELED, sellerOrderStatusRequest, ComplainStatus.REFUNDED)
@@ -222,6 +229,8 @@ class OrderDetailsService(
 
                     couponToBuyerList.map { couponToBuyer -> couponToBuyer.returnCoupon() }
                 }
+
+                lockService.deleteLock(lock)
             }
 
             ComplainStatus.EXCHANGE_REQUESTED -> {
@@ -238,5 +247,9 @@ class OrderDetailsService(
         orderDetailsRepository.saveAll(orderDetails)
 
         return OrderStatusResponse.from(complainType, "전체 요청 승인 완료 되었습니다")
+    }
+
+    private fun createLockKey(shopId: Long, orderId: Long, sellerId: Long): String{
+        return "${shopId}_${orderId}_${sellerId}"
     }
 }
