@@ -110,7 +110,7 @@ class AdminService(
     @Transactional
     fun approveSellerResignation(sellerId: Long): DefaultResponse {
         val seller = sellerRepository.findByIdOrNull(sellerId)
-            ?: throw SellerNotFoundException(message = "Seller id $sellerId not found")
+            ?: throw SellerNotFoundException(message = "판매자 id $sellerId not found")
 
         // 판매자 상태를 탈퇴 승인으로 변경합니다.
         seller.activeStatus = Seller.ActiveStatus.RESIGNED
@@ -123,7 +123,7 @@ class AdminService(
     @Transactional
     fun promotePendingSeller(sellerId: Long): DefaultResponse {
         val seller = sellerRepository.findByIdOrNull(sellerId)
-            ?: throw SellerNotFoundException(message = "Seller id $sellerId not found")
+            ?: throw SellerNotFoundException(message = "판매자 id $sellerId not found")
 
         // 판매자 상태를 승인 완료로 변경합니다.
         seller.activeStatus = Seller.ActiveStatus.APPROVED
