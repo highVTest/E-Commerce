@@ -3,7 +3,6 @@ package com.highv.ecommerce.domain.auth.service
 import com.highv.ecommerce.common.dto.AccessTokenResponse
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.BuyerLoginFailedException
-import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.EmailAlreadyExistsException
 import com.highv.ecommerce.common.exception.SellerLoginFailedException
 import com.highv.ecommerce.domain.auth.dto.EmailAuthResponse
@@ -20,7 +19,6 @@ import com.highv.ecommerce.infra.security.jwt.JwtPlugin
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 
 @Service
 class UserService(
@@ -119,7 +117,8 @@ class UserService(
                 email = email,
                 profileImage = "",
                 phoneNumber = "",
-                address = ""
+                address = "",
+                activeStatus = Seller.ActiveStatus.PENDING
             )
 
             userId = sellerRepository.saveAndFlush(seller).id!!
