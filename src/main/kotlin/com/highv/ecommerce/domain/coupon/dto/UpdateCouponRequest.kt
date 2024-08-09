@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDateTime
 
 data class UpdateCouponRequest(
+
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     val expiredAt: LocalDateTime,
 
