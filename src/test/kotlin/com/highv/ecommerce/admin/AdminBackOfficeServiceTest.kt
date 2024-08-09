@@ -1,6 +1,7 @@
 package com.highv.ecommerce.admin
 
 import com.highv.ecommerce.common.exception.BlackListNotFoundException
+import com.highv.ecommerce.common.exception.SellerNotFoundException
 import com.highv.ecommerce.domain.admin.entity.BlackList
 import com.highv.ecommerce.domain.admin.repository.BlackListRepository
 import com.highv.ecommerce.domain.admin.service.AdminService
@@ -12,7 +13,11 @@ import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDateTime
 
@@ -42,7 +47,8 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             password = "password",
             profileImage = "profileImage",
             phoneNumber = "010-1234-5678",
-            address = "광주광역시 서구"
+            address = "광주광역시 서구",
+            activeStatus = Seller.ActiveStatus.PENDING
         )
         // BlackList 객체를 캡처하기 위해 슬롯을 사용합니다.
         val blackListSlot = slot<BlackList>()
@@ -103,7 +109,8 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
             password = "password",
             profileImage = "profileImage",
             phoneNumber = "010-1234-5678",
-            address = "광주광역시 서구"
+            address = "광주광역시 서구",
+            activeStatus = Seller.ActiveStatus.PENDING
         )
         // 상품 객체를 생성합니다.
         val specificDate = LocalDateTime.of(1995, 4, 29, 0, 0)
@@ -262,6 +269,87 @@ class AdminBackOfficeServiceTest : BehaviorSpec({
                     adminService.deleteBlackList(blackListId)
                 }
                 exception.message shouldBe "블랙리스트 id $blackListId 존재하지 않습니다."
+            }
+        }
+    }
+    Given("판매자가 존재하면") {
+        val sellerId = 1L
+        val seller = Seller(
+            id = sellerId,
+            email = "seller@test.com",
+            nickname = "TestSeller",
+            password = "password",
+            profileImage = "profileImage",
+            phoneNumber = "010-1234-5678",
+            address = "광주광역시 서구",
+            activeStatus = Seller.ActiveStatus.PENDING
+        )
+
+        When("판매자 탈퇴 대기 회원을 승인할 때") {
+            every { sellerRepository.findByIdOrNull(sellerId) } returns seller
+            every { sellerRepository.save(seller) } returns seller
+
+            Then("판매자의 상태를 RESIGNED로 변경한다") {
+                val response = adminService.approveSellerResignation(sellerId)
+                response.msg shouldBe "판매자 탈퇴 승인 완료"
+                seller.activeStatus shouldBe Seller.ActiveStatus.RESIGNED
+                verify { sellerRepository.save(seller) }
+            }
+        }
+    }
+
+    Given("판매자가 존재하지 않으면") {
+        val sellerId = 1L
+
+        When("판매자 탈퇴 대기 회원을 승인할 때") {
+            every { sellerRepository.findByIdOrNull(sellerId) } returns null
+
+            Then("SellerNotFoundException를 발생시킨다") {
+                val exception = shouldThrow<SellerNotFoundException> {
+                    adminService.approveSellerResignation(sellerId)
+                }
+                exception.message shouldBe "판매자 id $sellerId not found"
+            }
+        }
+    }
+
+    Given("판매자가 존재하면") {
+        val sellerId = 1L
+        val seller = Seller(
+            id = sellerId,
+            email = "seller@test.com",
+            nickname = "TestSeller",
+            password = "password",
+            profileImage = "profileImage",
+            phoneNumber = "010-1234-5678",
+            address = "광주광역시 서구",
+            activeStatus = Seller.ActiveStatus.PENDING
+        )
+
+        When("판매자 승인 대기 회원을 승격할 때") {
+            every { sellerRepository.findByIdOrNull(sellerId) } returns seller
+            every { sellerRepository.save(seller) } returns seller
+
+            Then("판매자의 상태를 APPROVED로 변경한다") {
+                val response = adminService.promotePendingSeller(sellerId)
+                response.msg shouldBe "판매자 승인 완료"
+                seller.activeStatus shouldBe Seller.ActiveStatus.APPROVED
+                verify { sellerRepository.save(seller) }
+            }
+        }
+    }
+
+    Given("판매자가 존재하지 않으면") {
+        val sellerId = 1L
+
+        When("판매자 승인 대기 회원을 승격할 때") {
+            every { sellerRepository.findByIdOrNull(sellerId) } returns null
+
+            Then("SellerNotFoundException를 발생시킨다") {
+                val exception = shouldThrow<SellerNotFoundException> {
+                    adminService.promotePendingSeller(sellerId)
+                }
+                exception.message shouldBe "판매자 id $sellerId not found"
             }
         }
     }

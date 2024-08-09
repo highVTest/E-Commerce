@@ -12,7 +12,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -46,7 +46,6 @@ dependencies {
     implementation("org.redisson:redisson-spring-boot-starter:3.33.0")
 
     implementation("org.apache.tika:tika-core:1.24")
-
 
     // 추가된 부분: JSON 웹 토큰(JWT) 관련 의존성
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
