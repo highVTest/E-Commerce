@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.order_details.repository
 
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
+import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 
 interface OrderDetailsRepository {
 
@@ -14,13 +15,13 @@ interface OrderDetailsRepository {
 
     fun findByIdAndShopId(orderStatusId: Long, shopId: Long): OrderDetails?
 
-    // ----------------------- 판매자 가게 주문 단건 조회
     fun findAllByShopIdAndOrderMasterId(shopId: Long, orderMasterId: Long): List<OrderDetails>
 
-    // --------------------
     fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderDetails>
 
     fun findAllByBuyerId(buyerId: Long): List<OrderDetails>
 
     fun findAllByBuyerIdAndOrderMasterId(buyerId: Long, orderId: Long): List<OrderDetails>
+
+    fun updateDeliveryStatus(changeStatus: OrderStatus, whereStatus: OrderStatus)
 }

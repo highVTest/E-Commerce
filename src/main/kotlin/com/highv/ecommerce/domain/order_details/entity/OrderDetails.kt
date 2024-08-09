@@ -1,6 +1,5 @@
 package com.highv.ecommerce.domain.order_details.entity
 
-import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.InvalidRequestException
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
@@ -125,15 +124,52 @@ class OrderDetails(
                         this.complainStatus = ComplainStatus.REFUNDED
                         this.orderStatus = OrderStatus.ORDER_CANCELED
                     }
+
                     ComplainStatus.EXCHANGED -> {
                         this.complainStatus = ComplainStatus.EXCHANGED
                         this.orderStatus = OrderStatus.PRODUCT_PREPARING
                     }
+
                     else -> throw InvalidRequestException(400, "이미 작업을 처리 하였거나 존재 하지 않는 작업 입니다")
                 }
             }
         }
         this.sellerDateTime = LocalDateTime.now()
         this.sellerDescription = sellerOrderStatusRequest.description
+    }
+
+    fun updateDeliveryStatus(orderStatus: OrderStatus) {
+        when (orderStatus) {
+            OrderStatus.DELIVERY_PREPARING -> {
+                if (this.orderStatus != OrderStatus.PRODUCT_PREPARING) throw InvalidRequestException(
+                    400,
+                    "상품 준비 중일 때만 배송 중으로 변경이 가능합니다."
+                )
+                this.orderStatus = orderStatus
+            }
+
+            OrderStatus.SHIPPING -> {
+                if (this.orderStatus != OrderStatus.DELIVERY_PREPARING) throw InvalidRequestException(
+                    400,
+                    "배송 준비 중일 때만 배송 중으로 변경이 가능합니다."
+                )
+                this.orderStatus = orderStatus
+            }
+
+            OrderStatus.DELIVERED -> {
+                if (this.orderStatus != OrderStatus.SHIPPING) throw InvalidRequestException(
+                    400,
+                    "배송 중일 때만 배송 완료로 변경이 가능합니다."
+                )
+                this.orderStatus = orderStatus
+            }
+
+            else -> {
+                throw InvalidRequestException(
+                    400,
+                    "잘못 요청 보냈습니다."
+                )
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.order_details.service
 
+import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.InvalidRequestException
 import com.highv.ecommerce.common.exception.ModelNotFoundException
@@ -12,6 +13,7 @@ import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
+import com.highv.ecommerce.domain.order_details.dto.UpdateDeliveryStatusRequest
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
@@ -43,7 +45,10 @@ class OrderDetailsService(
 
         if (orderDetails.isEmpty()) throw ModelNotFoundException(409, "주문한 상품이 존재 하지 않습니다")
 
-        if (orderDetails[0].orderStatus == OrderStatus.PENDING) throw CustomRuntimeException(400, "이미 환불이나 교환이 요청된 상품 입니다")
+        if (orderDetails[0].orderStatus == OrderStatus.PENDING) throw CustomRuntimeException(
+            400,
+            "이미 환불이나 교환이 요청된 상품 입니다"
+        )
 
         orderDetails.forEach {
             it.buyerUpdate(OrderStatus.PENDING, buyerOrderStatusRequest)
@@ -139,8 +144,8 @@ class OrderDetailsService(
             orderId,
         )
 
-        if(orderDetails.isEmpty()) throw CustomRuntimeException(400, "주문 정보가 존재 하지 않습니다")
-        if(orderDetails[0].product.shop.sellerId!= sellerId) throw CustomRuntimeException(400, "다른 상점의 정보 입니다")
+        if (orderDetails.isEmpty()) throw CustomRuntimeException(400, "주문 정보가 존재 하지 않습니다")
+        if (orderDetails[0].product.shop.sellerId != sellerId) throw CustomRuntimeException(400, "다른 상점의 정보 입니다")
 
         val complainType =
             if (orderDetails[0].complainStatus == ComplainStatus.REFUND_REQUESTED) ComplainType.REFUND
@@ -153,12 +158,11 @@ class OrderDetailsService(
         return OrderStatusResponse.from(complainType, "전체 요청 거절 완료 되었습니다")
     }
 
-    fun getSellerOrderDetailsAll(shopId: Long, sellerId : Long): List<SellerOrderResponse> {
+    fun getSellerOrderDetailsAll(shopId: Long, sellerId: Long): List<SellerOrderResponse> {
 
         val orderDetails = orderDetailsRepository.findAllByShopId(shopId)
 
-        if(orderDetails.isEmpty()) throw CustomRuntimeException(404, "판매자가 운영 하는 상점이 아닙니다")
-
+        if (orderDetails.isEmpty()) throw CustomRuntimeException(404, "판매자가 운영 하는 상점이 아닙니다")
 
         val orderMasters =
             orderMasterRepository.findByIdInOrderByIdDesc(orderDetails.map { it.orderMasterId }.toSet())
@@ -239,4 +243,50 @@ class OrderDetailsService(
 
         return OrderStatusResponse.from(complainType, "전체 요청 승인 완료 되었습니다")
     }
+
+    @Transactional
+    fun updateProductsDelivery(
+        orderMasterId: Long,
+        shopId: Long,
+        request: UpdateDeliveryStatusRequest
+    ): DefaultResponse {
+        val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(shopId, orderMasterId)
+
+        if (orderDetails.isEmpty()) {
+            throw InvalidRequestException(400, "변경 가능한 상품들이 없습니다.")
+        }
+
+        orderDetails.forEach {
+            it.updateDeliveryStatus(request.deliveryStatus)
+        }
+
+        orderDetailsRepository.saveAll(orderDetails)
+
+        return DefaultResponse("상태 변경이 완료됐습니다. 변경된 상태 : ${request.deliveryStatus}")
+    }
+
+    @Transactional
+    fun updateDelivery(): DefaultResponse {
+
+        // 1. SHIPPING 상태를 DELIVERED 변경
+        orderDetailsRepository.updateDeliveryStatus(
+            changeStatus = OrderStatus.DELIVERED,
+            whereStatus = OrderStatus.SHIPPING
+        )
+
+        // 2. DELIVERY_PREPARING 상태를 SHIPPING 상태로 변경
+        orderDetailsRepository.updateDeliveryStatus(
+            changeStatus = OrderStatus.SHIPPING,
+            whereStatus = OrderStatus.DELIVERY_PREPARING
+        )
+
+        // 3. PRODUCT_PREPARING 상태를 DELIVERY_PREPARING 상태로 변경
+        orderDetailsRepository.updateDeliveryStatus(
+            changeStatus = OrderStatus.DELIVERY_PREPARING,
+            whereStatus = OrderStatus.PRODUCT_PREPARING
+        )
+
+        return DefaultResponse("상태를 성공적으로 변경 했습니다.")
+    }
 }
+
