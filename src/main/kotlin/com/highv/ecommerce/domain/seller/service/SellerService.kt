@@ -29,7 +29,10 @@ class SellerService(
     fun signUp(request: CreateSellerRequest, file: MultipartFile?): SellerResponse {
 
         val seller: Seller =
-            sellerRepository.findByIdOrNull(request.id) ?: throw EmailVerificationNotFoundException(404, "이메일 인증된 회원 정보가 없습니다.")
+            sellerRepository.findByIdOrNull(request.id) ?: throw EmailVerificationNotFoundException(
+                404,
+                "이메일 인증된 회원 정보가 없습니다."
+            )
 
         if (request.email != seller.email) {
             throw UnverifiedEmailException(400, "인증되지 않은 이메일입니다.")
@@ -42,10 +45,10 @@ class SellerService(
             address = request.address
         }
 
-        if (file != null) {
-            s3Manager.uploadFile(file)
-            seller.profileImage = s3Manager.getFile(file.originalFilename)
-        }
+        // if (file != null) {
+        //     s3Manager.uploadFile(file)
+        //     seller.profileImage = s3Manager.getFile(file.originalFilename)
+        // }
 
         val savedSeller = sellerRepository.save(seller)
 
@@ -65,10 +68,10 @@ class SellerService(
             rate = 0.0f
         )
 
-        if (file != null) {
-            s3Manager.uploadFile(file)
-            shop.shopImage = s3Manager.getFile(file.originalFilename)
-        }
+        // if (file != null) {
+        //     s3Manager.uploadFile(file)
+        //     shop.shopImage = s3Manager.getFile(file.originalFilename)
+        // }
         val savedShop = shopRepository.save(shop)
         return ShopResponse.from(savedShop)
     }
