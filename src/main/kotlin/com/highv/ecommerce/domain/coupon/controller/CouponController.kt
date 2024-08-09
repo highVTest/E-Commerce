@@ -32,6 +32,7 @@ class CouponController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<DefaultResponse> {
 
+
         if (bindingResult.hasErrors()) throw InvalidCouponRequestException(
             400,
             bindingResult.fieldError?.defaultMessage.toString()

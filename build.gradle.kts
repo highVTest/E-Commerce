@@ -12,7 +12,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -65,6 +65,7 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.9")
     testImplementation("io.kotest:kotest-runner-junit5:5.7.2")
     testImplementation("io.kotest:kotest-assertions-core:5.7.2")
+    testImplementation("org.testcontainers:testcontainers:1.20.0")
 }
 
 kotlin {

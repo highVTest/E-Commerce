@@ -18,5 +18,6 @@ data class CreateCouponRequest (
 
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     val expiredAt: LocalDateTime,
-    val quantity : Int
+    val quantity : Int,
+    val couponName : String,
 )

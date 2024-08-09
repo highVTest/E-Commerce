@@ -54,6 +54,8 @@ logging:
         orm:
           jdbc:
             bind: trace
+      springframework:
+        transaction: DEBUG
 
 oauth2:
   kakao:
@@ -73,7 +75,7 @@ auth:
   jwt:
     issuer: ${AUTH_ISSUER}
     secret: ${AUTH_SECRET}
-    accessTokenExpirationHour: 24
+    accessTokenExpirationHour: 24000
     refreshTokenExpirationHour: 168
 
 cloud:
