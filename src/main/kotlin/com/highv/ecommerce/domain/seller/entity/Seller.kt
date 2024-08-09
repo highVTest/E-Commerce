@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.seller.entity
 
+import com.highv.ecommerce.domain.seller.dto.ActiveStatus
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -29,10 +30,4 @@ class Seller(
     @Column(name = "active_status")
     @Enumerated(EnumType.STRING)
     var activeStatus: ActiveStatus
-) {
-    enum class ActiveStatus {
-        PENDING,
-        APPROVED,
-        RESIGNED
-    }
-}
+)
