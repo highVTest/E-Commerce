@@ -8,7 +8,7 @@ import com.highv.ecommerce.domain.admin.dto.BlackListResponse
 import com.highv.ecommerce.domain.admin.entity.BlackList
 import com.highv.ecommerce.domain.admin.repository.BlackListRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
-import com.highv.ecommerce.domain.seller.entity.Seller
+import com.highv.ecommerce.domain.seller.dto.ActiveStatus
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -113,8 +113,7 @@ class AdminService(
             ?: throw SellerNotFoundException(message = "판매자 id $sellerId not found")
 
         // 판매자 상태를 탈퇴 승인으로 변경합니다.
-        seller.activeStatus = Seller.ActiveStatus.RESIGNED
-        sellerRepository.save(seller)
+        seller.activeStatus = ActiveStatus.RESIGNED
 
         return DefaultResponse("판매자 탈퇴 승인 완료")
     }
@@ -126,8 +125,7 @@ class AdminService(
             ?: throw SellerNotFoundException(message = "판매자 id $sellerId not found")
 
         // 판매자 상태를 승인 완료로 변경합니다.
-        seller.activeStatus = Seller.ActiveStatus.APPROVED
-        sellerRepository.save(seller)
+        seller.activeStatus = ActiveStatus.APPROVED
 
         return DefaultResponse("판매자 승인 완료")
     }
