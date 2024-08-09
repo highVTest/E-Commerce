@@ -23,6 +23,13 @@ spring:
       host: ${REDIS_HOST}
       port: 6379
 
+    mongodb:
+      search:
+        db: Cluster0807
+        host: cluster0807.e7xiz.mongodb.net
+        password: x-SQAQ7vbUJEe38
+        user: chadkim1021
+
   mail:
     host: smtp.gmail.com
     port: 587
@@ -86,3 +93,5 @@ cloud:
       static: "ap-northeast-2"
     stack:
       auto: false
+
+

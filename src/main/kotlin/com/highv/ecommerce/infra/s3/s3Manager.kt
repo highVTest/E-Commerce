@@ -20,8 +20,8 @@ class S3Manager(
         if (type.isNullOrEmpty()) {
             throw CustomRuntimeException(400, "이미지 파일만 업로드 해주세요")
         }
-        val uuid = UUID.randomUUID()
-        val fileName = "${uuid}-${file.originalFilename}"
+        val uuid = UUID.randomUUID() // UUID 생성
+        val fileName = "${uuid}-${file.originalFilename}" // UUID를 파일 이름 앞에 적용
 
 
         val metadata = ObjectMetadata().apply { // 파일의 컨텐츠 타입과 크기를 설정
