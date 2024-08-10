@@ -35,9 +35,12 @@ class RedisConfig(
         redisTemplate.valueSerializer = StringRedisSerializer()
 
         // // Hash를 사용할 경우 시리얼라이저
-        // redisTemplate.hashKeySerializer = StringRedisSerializer()
-        // redisTemplate.hashValueSerializer = StringRedisSerializer()
-        //
+         redisTemplate.hashKeySerializer = StringRedisSerializer()
+         redisTemplate.hashValueSerializer = StringRedisSerializer()
+
+        // RedisTemplete 에서 Transaction 을 지원하는지 여부
+        redisTemplate.setEnableTransactionSupport(true)
+
         // // 모든 경우
         // redisTemplate.setDefaultSerializer(StringRedisSerializer())
 

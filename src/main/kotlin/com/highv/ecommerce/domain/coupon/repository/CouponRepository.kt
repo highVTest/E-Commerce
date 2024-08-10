@@ -22,9 +22,11 @@ interface CouponRepository {
 
     fun findAllBySellerId(sellerId: Long): List<Coupon>
 
-    fun getLock(name: String, time: Int):Int
-
-    fun releaseLock(name: String): Int
-
     fun findAllByProductId(productIdList : List<Long>): List<Long>
+
+    fun flush()
+
+    fun saveAndFlush(coupon: Coupon)
+
+    fun findByProductId(productId: Long): Coupon?
 }
