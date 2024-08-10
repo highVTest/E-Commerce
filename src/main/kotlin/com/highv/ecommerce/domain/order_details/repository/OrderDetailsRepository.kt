@@ -16,7 +16,6 @@ interface OrderDetailsRepository {
 
     // ----------------------- 판매자 가게 주문 단건 조회
     fun findAllByShopIdAndOrderMasterId(shopId: Long, orderMasterId: Long): List<OrderDetails>
-
     // --------------------
     fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderDetails>
 

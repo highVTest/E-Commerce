@@ -250,6 +250,6 @@ class OrderDetailsService(
     }
 
     private fun createLockKey(shopId: Long, orderId: Long, sellerId: Long): String{
-        return "${shopId}_${orderId}_${sellerId}"
+        return "${shopId}_${orderId}"
     }
 }
