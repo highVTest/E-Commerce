@@ -3,6 +3,7 @@ package com.highv.ecommerce.domain.order_details.repository
 import com.highv.ecommerce.domain.item_cart.entity.QItemCart
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.entity.QOrderDetails
+import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
@@ -92,7 +93,7 @@ class OrderDetailsRepositoryImpl(
             .innerJoin(orderDetails.product().shop()).fetchJoin()
             .innerJoin(orderDetails.buyer()).fetchJoin()
             .where(orderDetails.orderMasterId.eq(orderMasterId))
-            .where(orderDetails.shopId.eq(shopId))
+            .where(orderDetails.shop().id.eq(shopId))
             .fetch()
 
         return query
@@ -100,5 +101,9 @@ class OrderDetailsRepositoryImpl(
 
     override fun findAllByShopIdAndBuyerId(shopId: Long, buyerId: Long): List<OrderDetails> {
         return orderDetailsJpaRepository.findAllByShopIdAndBuyerId(shopId, buyerId)
+    }
+
+    override fun updateDeliveryStatus(changeStatus: OrderStatus, whereStatus: OrderStatus) {
+        orderDetailsJpaRepository.updateDeliveryStatus(changeStatus, whereStatus)
     }
 }
