@@ -27,4 +27,6 @@ interface CouponRepository {
     fun flush()
 
     fun saveAndFlush(coupon: Coupon)
+
+    fun findByProductId(productId: Long): Coupon?
 }

@@ -16,4 +16,6 @@ interface CouponJpaRepository: JpaRepository<Coupon, Long>{
 
     @Query("SELECT c.id FROM Coupon c WHERE c.product.id in :productIdList ")
     fun findAllByProductIdList(productIdList: List<Long>): List<Long>
+
+    fun findByProductId(productId: Long): Coupon?
 }

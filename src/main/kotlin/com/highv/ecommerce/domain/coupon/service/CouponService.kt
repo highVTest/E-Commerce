@@ -107,9 +107,9 @@ class CouponService(
         return CouponResponse.from(result.coupon)
     }
 
-    fun getBuyerCouponList(sellerId: Long): List<CouponResponse>? {
+    fun getBuyerCouponList(buyerId: Long): List<CouponResponse>? {
 
-        return couponToBuyerRepository.findAllProductIdWithBuyerId(sellerId).let {
+        return couponToBuyerRepository.findAllProductIdWithBuyerId(buyerId).let {
             couponRepository.findAllCouponIdWithBuyer(it).map { i -> CouponResponse.from(i) }
         }
     }
@@ -177,5 +177,12 @@ class CouponService(
 
     private fun redisUnLock(key: String): Boolean
             = redisTemplate.delete(key)
+
+    fun getDetailCoupon(productId: Long): CouponResponse {
+
+       return couponRepository.findByProductId(productId)
+           .let { CouponResponse.from(it ?: throw CouponNotFoundException(409, "쿠폰이 존재하지 않습니다")) }
+
+    }
 
 }
