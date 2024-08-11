@@ -10,14 +10,17 @@ import com.highv.ecommerce.domain.admin.repository.BlackListRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.dto.ActiveStatus
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
+import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class AdminService(
     private val sellerRepository: SellerRepository,
     private val productRepository: ProductRepository,
+    private val shopRepository: ShopRepository,
     private val blackListRepository: BlackListRepository
 ) {
     // 판매자 제재 로직 구현
@@ -115,7 +118,18 @@ class AdminService(
         // 판매자 상태를 탈퇴 승인으로 변경합니다.
         seller.activeStatus = ActiveStatus.RESIGNED
 
-        return DefaultResponse("판매자 탈퇴 승인 완료")
+        // 해당 판매자의 Shop을 찾습니다.
+        val shop = shopRepository.findShopBySellerId(sellerId)
+
+        // Shop에 속한 모든 Product를 삭제(소프트 삭제)합니다.
+        val products = productRepository.findAllByShopId(shop.id!!)
+        products.forEach { product ->
+            product.isDeleted = true
+            product.deletedAt = LocalDateTime.now()
+            productRepository.save(product)
+        }
+
+        return DefaultResponse("판매자 탈퇴 승인 및 상품 삭제 완료")
     }
 
     // 판매자 승인 대기 회원 승격 로직 구현
