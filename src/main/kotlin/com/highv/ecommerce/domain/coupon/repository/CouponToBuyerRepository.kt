@@ -10,7 +10,7 @@ interface CouponToBuyerRepository {
 
     fun save(coupon: CouponToBuyer): CouponToBuyer
 
-    fun findByCouponIdAndBuyerId(couponId: Long, buyerId: Long): CouponToBuyer?
+    fun findByProductIdAndBuyerId(productId: Long, buyerId: Long): CouponToBuyer?
 
     fun findAllByCouponIdAndBuyerIdAndIsUsedFalse(couponIdList: List<Long>, buyerId: Long): List<CouponToBuyer>
 

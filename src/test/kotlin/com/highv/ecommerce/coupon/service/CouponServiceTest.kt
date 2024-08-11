@@ -1,10 +1,8 @@
 package com.highv.ecommerce.coupon.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.common.exception.InvalidCouponDiscountException
-import com.highv.ecommerce.common.exception.InvalidDiscountPolicyException
-import com.highv.ecommerce.common.exception.UnauthorizedException
 import com.highv.ecommerce.common.exception.UnauthorizedUserException
+import com.highv.ecommerce.common.innercall.TxAdvice
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
@@ -15,7 +13,6 @@ import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.coupon.service.CouponService
-import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.shop.entity.Shop
@@ -24,20 +21,34 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import org.redisson.api.RLock
+import org.redisson.api.RedissonClient
+import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.core.ValueOperations
 import java.time.LocalDateTime
 import kotlin.test.Test
 
 class CouponServiceTest {
 
+    private val redisTemplate = mockk<RedisTemplate<String, String>>()
     private val couponRepository = mockk<CouponRepository>()
     private val productRepository = mockk<ProductRepository>()
     private val couponToBuyerRepository = mockk<CouponToBuyerRepository>()
     private val buyerRepository = mockk<BuyerRepository>()
-    private val itemCartRepository = mockk<ItemCartRepository>()
-    private val couponService = CouponService(
-        couponRepository, productRepository, couponToBuyerRepository, buyerRepository, itemCartRepository
-    )
+    private val redissonClient = mockk<RedissonClient>()
     private val userPrincipal = mockk<UserPrincipal>()
+    private val txAdvice = mockk<TxAdvice>()
+    private val couponService = CouponService(
+        couponRepository, productRepository, couponToBuyerRepository,
+        buyerRepository, txAdvice, redissonClient, redisTemplate
+    )
+    private val lock = mockk<RLock>()
+    private val valueOperations = mockk<ValueOperations<String, String>>()
+
+    init {
+        every { redisTemplate.opsForValue() } returns valueOperations
+
+    }
 
 //    @Test
 //    fun `쿠폰의 정책이 DISCOUNT_RATE 이고 CreateCouponRequest 의 값이 100 이상일 경우 InvalidDiscountPolicyException을 벌생`() {
@@ -167,7 +178,7 @@ class CouponServiceTest {
         coupon.product.id = 1L
         every { userPrincipal.id } returns 1
         every { couponRepository.findByIdAndSellerId(any(), any()) } returns coupon
-        every { couponToBuyerRepository.findByCouponIdAndBuyerId(any(), any()) } returns couponToBuyer
+        every { couponToBuyerRepository.findByProductIdAndBuyerId(any(), any()) } returns couponToBuyer
         every { couponRepository.findByIdOrNull(any()) } returns coupon
 
         val result = couponService.getSellerCouponById(1L, userPrincipal.id)
@@ -204,67 +215,27 @@ class CouponServiceTest {
     }
 
     //동시성 문제
-//    @Test
-//    fun `쿠폰이 발급될 경우에 동일한 쿠폰은 지급이 안되 는지 확인`(){
-//
-//        every { userPrincipal.email } returns "eeeeee@eee.com"
-//
-//        every { buyerRepository.findByEmail(any()) } returns buyer1
-//
-//        every { couponRepository.findByIdOrNull(any()) } returns coupon
-//
-//        every { couponToBuyerRepository.existsByCouponIdAndBuyerId(any(), any()) } returns true
-//
-//        shouldThrow<RuntimeException> {
-//            couponService.issuedCoupon(1L, userPrincipal)
-//        }.let {
-//            it.message shouldBe "동일한 쿠폰은 지급 받을 수 없습니다"
-//        }
-//    }
-//
-//
-//    //동시성 문제
-//    @Test
-//    fun `쿠폰이 발급될 경우에 정상적 으로 발급이 되는지 확인`(){
-//
-//        val threadCount = 10
-//
-//        val executorService = Executors.newFixedThreadPool(threadCount)
-//        val barrier = CyclicBarrier(threadCount)
-//
-//        every { userPrincipal.email } returns "eeeeee@eee.com"
-//
-//        every { couponRepository.getLock(any(), any()) } returns 1
-//
-//        every { buyerRepository.findByEmail(any()) } returns buyer1
-//
-//
-//        repeat(threadCount){
-//            executorService.execute{
-//                try {
-//                    barrier.await()
-//                    kotlin.runCatching {
-//                        every { couponRepository.findByIdOrNull(1L) } returns coupon
-//                        couponService.issuedCoupon(1L, userPrincipal)
-//                        println("쿠폰 발급")
-//                    }.onFailure {
-//                        println("쿠폰 발급 실패")
-//                    }
-//                }catch(e: Exception){
-//                    e.printStackTrace()
-//                }
-//
-//
-//            }
-//        }
-//        executorService.shutdown()
-//        executorService.awaitTermination(5, TimeUnit.SECONDS)
-//
-//
-//        verify{ couponRepository.findByIdOrNull(1L)!!.quantity shouldBe 90 }
-//        verify(exactly = threadCount) { couponRepository.getLock(any(),any()) }
-//        verify(exactly = threadCount) { couponRepository.releaseLock(any()) }
-//    }
+    @Test
+    fun `쿠폰이 발급될 경우에 동일한 쿠폰은 지급이 안되 는지 확인`(){
+
+        every { userPrincipal.email } returns "eeeeee@eee.com"
+
+        every { buyerRepository.findByEmail(any()) } returns buyer1
+
+        every { couponRepository.findByIdOrNull(any()) } returns coupon
+
+        every { couponToBuyerRepository.existsByCouponIdAndBuyerId(any(), any()) } returns true
+
+        shouldThrow<RuntimeException> {
+            couponService.issuedCoupon(1L, 1L)
+        }.let {
+            it.message shouldBe "동일한 쿠폰은 지급 받을 수 없습니다"
+        }
+    }
+
+    //동시성 문제
+
+
 
     //Given
     companion object {
@@ -293,7 +264,8 @@ class CouponServiceTest {
             discountPolicy = DiscountPolicy.DISCOUNT_PRICE,
             discount = 30000,
             expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
-            quantity = 1
+            quantity = 1,
+            couponName = "test"
         )
 
         private val updateCouponRequest = UpdateCouponRequest(
@@ -308,10 +280,11 @@ class CouponServiceTest {
             product = product,
             discountPolicy = DiscountPolicy.DISCOUNT_PRICE,
             discount = 30000,
-            expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
-            quantity = 100,
+            expiredAt = LocalDateTime.of(2029, 8, 1, 0, 0),
+            quantity = 1000,
             createdAt = LocalDateTime.of(2024, 7, 1, 0, 0),
-            sellerId = 1L
+            sellerId = 1L,
+            couponName = "test"
         )
 
         private val coupon2 = Coupon(
@@ -322,7 +295,8 @@ class CouponServiceTest {
             expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
             quantity = 1,
             createdAt = LocalDateTime.of(2024, 7, 1, 0, 0),
-            sellerId = 1L
+            sellerId = 1L,
+            couponName = "test2"
         )
 
         private val coupon3 = Coupon(
@@ -333,7 +307,8 @@ class CouponServiceTest {
             expiredAt = LocalDateTime.of(2024, 8, 1, 0, 0),
             quantity = 1,
             createdAt = LocalDateTime.of(2024, 7, 1, 0, 0),
-            sellerId = 2L
+            sellerId = 2L,
+            couponName = "test3"
         )
 
         private val buyer1 = Buyer(

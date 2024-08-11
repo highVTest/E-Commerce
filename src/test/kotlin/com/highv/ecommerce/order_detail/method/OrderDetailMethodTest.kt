@@ -128,7 +128,6 @@ class OrderDetailMethodTest : BehaviorSpec({
         When("EXCHANGE_REQUESTED, REFUND_REQUESTED 일 경우") {
             Then("EXCHANGE_REJECTED, REFUND_REJECTED 를 반환") {
                 val sellerOrderStatusRequest = SellerOrderStatusRequest(
-                    buyerId = 1L,
                     description = "test"
                 )
 
@@ -229,7 +228,8 @@ class OrderDetailMethodTest : BehaviorSpec({
             expiredAt = LocalDateTime.of(2129, 1, 1, 1, 0),
             createdAt = LocalDateTime.of(2021, 1, 1, 1, 0),
             product = product1,
-            sellerId = 1L
+            sellerId = 1L,
+            couponName = "test coupon name"
         )
 
         private val couponToBuyer = CouponToBuyer(

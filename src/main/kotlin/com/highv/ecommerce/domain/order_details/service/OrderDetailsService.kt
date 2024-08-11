@@ -256,7 +256,7 @@ class OrderDetailsService(
     private fun createLockKey(shopId: Long, orderId: Long, sellerId: Long): String{
         return "${shopId}_${orderId}"
     }
-}
+
 
     @Transactional
     fun updateProductsDelivery(
@@ -303,4 +303,5 @@ class OrderDetailsService(
         return DefaultResponse("상태를 성공적으로 변경 했습니다.")
     }
 }
+
 

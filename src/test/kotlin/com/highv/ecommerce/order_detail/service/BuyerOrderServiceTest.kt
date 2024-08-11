@@ -1,6 +1,8 @@
 package com.highv.ecommerce.order_detail.service
 
 import com.highv.ecommerce.common.exception.CustomRuntimeException
+import com.highv.ecommerce.common.lock.repository.LockKeyRepository
+import com.highv.ecommerce.common.lock.service.LockService
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
@@ -20,6 +22,8 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import org.redisson.api.RedissonClient
+import org.springframework.data.redis.core.StringRedisTemplate
 import java.time.LocalDateTime
 
 class BuyerOrderServiceTest : BehaviorSpec() {
@@ -29,13 +33,16 @@ class BuyerOrderServiceTest : BehaviorSpec() {
         val couponToBuyerRepository = mockk<CouponToBuyerRepository>()
         val couponRepository = mockk<CouponRepository>()
         val orderMasterRepository = mockk<OrderMasterRepository>()
+        val lockRepository = mockk<LockKeyRepository>()
+        val lockService = LockService(lockRepository)
 
         val orderDetailsService =
             OrderDetailsService(
                 orderDetailsRepository,
                 couponToBuyerRepository,
                 couponRepository,
-                orderMasterRepository
+                orderMasterRepository,
+                lockService
             )
 
         Given("주문 내역이 존재하면") {

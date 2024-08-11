@@ -1,6 +1,8 @@
 package com.highv.ecommerce.order_detail.service
 
 import com.highv.ecommerce.common.exception.InvalidRequestException
+import com.highv.ecommerce.common.lock.repository.LockKeyRepository
+import com.highv.ecommerce.common.lock.service.LockService
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.coupon.entity.Coupon
@@ -28,6 +30,8 @@ import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import org.redisson.api.RedissonClient
+import org.springframework.data.redis.core.StringRedisTemplate
 import java.time.LocalDateTime
 import kotlin.test.Test
 
@@ -36,11 +40,14 @@ class OrderDetailsServiceTest : BehaviorSpec() {
     private val orderDetailsRepository = mockk<OrderDetailsRepository>()
     private val couponToBuyerRepository = mockk<CouponToBuyerRepository>()
     private val couponRepository = mockk<CouponRepository>()
+    private val lockRepository = mockk<LockKeyRepository>()
+    private val lockService = LockService(lockRepository)
     private val orderDetailsService = OrderDetailsService(
         orderDetailsRepository,
         couponToBuyerRepository,
         couponRepository,
-        orderMasterRepository
+        orderMasterRepository,
+        lockService
     )
 
     init {
@@ -51,13 +58,12 @@ class OrderDetailsServiceTest : BehaviorSpec() {
                     product1.productBackOffice = productBackOffice
 
                     val sellerOrderStatusRequest = SellerOrderStatusRequest(
-                        buyerId = 1L,
                         description = "test"
                     )
                     orderDetails.complainStatus = ComplainStatus.REFUND_REQUESTED
 
                     every {
-                        orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any())
+                        orderDetailsRepository.findAllByShopIdAndOrderMasterId(any(), any())
                     } returns listOf(orderDetails)
                     every { couponRepository.findAllByProductId(any()) } returns listOf(coupon.id!!)
                     every {
@@ -65,7 +71,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
                     } returns listOf(couponToBuyer)
                     every { orderDetailsRepository.saveAll(any()) } returns listOf(orderDetails)
 
-                    val result = orderDetailsService.requestComplainAccept(1L, 1L, sellerOrderStatusRequest)
+                    val result = orderDetailsService.requestComplainAccept(1L, 1L, sellerOrderStatusRequest, 1L)
 
                     orderDetails.orderStatus shouldBe OrderStatus.ORDERED
                     orderDetails.complainStatus shouldBe ComplainStatus.REFUND_REQUESTED
@@ -79,13 +85,12 @@ class OrderDetailsServiceTest : BehaviorSpec() {
                 Then("주문 상태가 주문 준비 중으로 변경 된다") {
 
                     val sellerOrderStatusRequest = SellerOrderStatusRequest(
-                        buyerId = 1L,
                         description = "test"
                     )
                     orderDetails.complainStatus = ComplainStatus.EXCHANGE_REQUESTED
 
                     every {
-                        orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any())
+                        orderDetailsRepository.findAllByShopIdAndOrderMasterId(any(), any())
                     } returns listOf(orderDetails)
                     every { couponRepository.findAllByProductId(any()) } returns listOf(coupon.id!!)
                     every {
@@ -93,7 +98,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
                     } returns listOf(couponToBuyer)
                     every { orderDetailsRepository.saveAll(any()) } returns listOf(orderDetails)
 
-                    val result = orderDetailsService.requestComplainAccept(1L, 1L, sellerOrderStatusRequest)
+                    val result = orderDetailsService.requestComplainAccept(1L, 1L, sellerOrderStatusRequest, 1L)
 
                     orderDetails.orderStatus shouldBe OrderStatus.ORDERED
                     orderDetails.complainStatus shouldBe ComplainStatus.EXCHANGE_REQUESTED
@@ -104,13 +109,12 @@ class OrderDetailsServiceTest : BehaviorSpec() {
             When("교환과 환불 모두 하지 않은 경우") {
                 Then("구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다 를 반환") {
                     val sellerOrderStatusRequest = SellerOrderStatusRequest(
-                        buyerId = 1L,
                         description = "test"
                     )
                     orderDetails.complainStatus = ComplainStatus.NONE
 
                     every {
-                        orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any())
+                        orderDetailsRepository.findAllByShopIdAndOrderMasterId(any(), any())
                     } returns listOf(orderDetails)
                     every { couponRepository.findAllByProductId(any()) } returns listOf(coupon.id!!)
                     every {
@@ -119,7 +123,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
                     every { orderDetailsRepository.saveAll(any()) } returns listOf(orderDetails)
 
                     shouldThrow<InvalidRequestException> {
-                        orderDetailsService.requestComplainAccept(1L, 1L, sellerOrderStatusRequest)
+                        orderDetailsService.requestComplainAccept(1L, 1L, sellerOrderStatusRequest, 1L)
                     }.let {
                         it.message shouldBe "구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다"
                     }
@@ -141,7 +145,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
         )
 
         every {
-            orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any())
+            orderDetailsRepository.findAllByShopIdAndOrderMasterId(any(), any())
         } returns listOf(orderDetails, orderDetails2)
 
         every {
@@ -164,19 +168,18 @@ class OrderDetailsServiceTest : BehaviorSpec() {
         orderDetails.complainStatus = ComplainStatus.REFUND_REQUESTED
 
         val sellerOrderStatusRequest = SellerOrderStatusRequest(
-            buyerId = 1L,
             description = "dummy description",
         )
 
         every {
-            orderDetailsRepository.findAllByShopIdAndOrderMasterIdAndBuyerId(any(), any())
+            orderDetailsRepository.findAllByShopIdAndOrderMasterId(any(), any())
         } returns listOf(orderDetails)
 
         every {
             orderDetailsRepository.saveAll(any())
         } returns listOf(orderDetails)
 
-        val result = orderDetailsService.requestComplainReject(sellerOrderStatusRequest, 1L, 1L)
+        val result = orderDetailsService.requestComplainReject(sellerOrderStatusRequest, 1L, 1L, 1L)
 
         orderDetails.orderStatus shouldBe OrderStatus.ORDERED
         orderDetails.complainStatus shouldBe ComplainStatus.REFUND_REJECTED
@@ -189,7 +192,7 @@ class OrderDetailsServiceTest : BehaviorSpec() {
         every { orderDetailsRepository.findAllByShopId(1L) } returns listOf(orderDetails, orderDetails2)
         every { orderMasterRepository.findByIdInOrderByIdDesc(any()) } returns listOf(orderMaster)
 
-        val result = orderDetailsService.getSellerOrderDetailsAll(1L)
+        val result = orderDetailsService.getSellerOrderDetailsAll(1L, 1L)
 
         result.size shouldBe 1
     }
@@ -285,7 +288,8 @@ class OrderDetailsServiceTest : BehaviorSpec() {
             expiredAt = LocalDateTime.of(2129, 1, 1, 1, 0),
             createdAt = LocalDateTime.of(2021, 1, 1, 1, 0),
             product = product1,
-            sellerId = 1L
+            sellerId = 1L,
+            couponName = "coupon",
         )
 
         private val couponToBuyer = CouponToBuyer(
