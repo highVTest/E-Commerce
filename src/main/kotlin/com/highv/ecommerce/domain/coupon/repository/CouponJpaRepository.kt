@@ -14,12 +14,8 @@ interface CouponJpaRepository: JpaRepository<Coupon, Long>{
 
     fun findAllBySellerId(sellerId: Long): List<Coupon>
 
-    @Query("select GET_LOCK(:name, :time)", nativeQuery = true)
-    fun getLock(@Param("name")name: String, @Param("time")time: Int):Int
-
-    @Query("SELECT RELEASE_LOCK(:name)", nativeQuery = true)
-    fun releaseLock(@Param("name") name: String): Int
-
     @Query("SELECT c.id FROM Coupon c WHERE c.product.id in :productIdList ")
     fun findAllByProductIdList(productIdList: List<Long>): List<Long>
+
+    fun findByProductId(productId: Long): Coupon?
 }

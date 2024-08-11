@@ -5,10 +5,10 @@ import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.ProductNotFoundException
 import com.highv.ecommerce.common.exception.ReviewNotFoundException
 import com.highv.ecommerce.common.exception.ShopNotFoundException
+import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.review.dto.ReviewRequest
 import com.highv.ecommerce.domain.review.dto.ReviewResponse
 import com.highv.ecommerce.domain.review.entity.Review
-import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.review.repository.ReviewRepository
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -42,7 +42,14 @@ class ReviewService(
         reviewRequest: ReviewRequest,
         buyerId: Long
     ): ReviewResponse {
-        val review = reviewRepository.findByIdOrNull(reviewId)?: throw ReviewNotFoundException(404, "Review id $reviewId not found")
+        val review = reviewRepository.findByIdOrNull(reviewId) ?: throw ReviewNotFoundException(
+            404,
+            "Review id $reviewId not found"
+        )
+
+        if (review.buyerId != buyerId) {
+            throw CustomRuntimeException(400, "자기 리뷰가 아닙니다.")
+        }
 
         review.apply {
             rate = reviewRequest.rate
@@ -53,9 +60,16 @@ class ReviewService(
         return ReviewResponse.from(savedReview)
     }
 
-    fun deleteReview(productId: Long, reviewId:Long, buyerId: Long): DefaultResponse {
-        val review = reviewRepository.findByIdOrNull(reviewId)?: throw ReviewNotFoundException(404, "Review id $reviewId not found")
+    fun deleteReview(productId: Long, reviewId: Long, buyerId: Long): DefaultResponse {
+        val review = reviewRepository.findByIdOrNull(reviewId) ?: throw ReviewNotFoundException(
+            404,
+            "Review id $reviewId not found"
+        )
 
+        if (review.buyerId != buyerId) {
+            throw CustomRuntimeException(400, "자기 리뷰가 아닙니다.")
+        }
+        
         reviewRepository.delete(review)
         updateShopAverageRate(productId)
         return DefaultResponse("Review deleted successfully")
@@ -72,8 +86,14 @@ class ReviewService(
 
     fun updateShopAverageRate(productId: Long) {
         val reviews = reviewRepository.findAllByProductId(productId)
-        val shopId = productRepository.findByIdOrNull(productId)?.shop?.id ?: throw ProductNotFoundException(404, "Product id $productId not found")
-        val shop = shopRepository.findByIdOrNull(shopId)?: throw ShopNotFoundException(404, "Shop not found for this product and shop")
+        val shopId = productRepository.findByIdOrNull(productId)?.shop?.id ?: throw ProductNotFoundException(
+            404,
+            "Product id $productId not found"
+        )
+        val shop = shopRepository.findByIdOrNull(shopId) ?: throw ShopNotFoundException(
+            404,
+            "Shop not found for this product and shop"
+        )
 
         val avgRate = if (reviews.isNotEmpty()) {
             reviews.map { it.rate }.average().toFloat()
