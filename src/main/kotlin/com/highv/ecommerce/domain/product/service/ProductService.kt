@@ -9,9 +9,12 @@ import com.highv.ecommerce.domain.product.dto.ProductResponse
 import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
+import com.highv.ecommerce.domain.seller.dto.ActiveStatus
+import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -19,6 +22,7 @@ import java.time.LocalDateTime
 class ProductService(
     private val productRepository: ProductRepository,
     private val shopRepository: ShopRepository,
+    private val sellerRepository: SellerRepository,
     private val productBackOfficeRepository: ProductBackOfficeRepository,
     private val favoriteService: FavoriteService,
     /*private val s3Manager: S3Manager,*/
@@ -29,6 +33,16 @@ class ProductService(
         productRequest: CreateProductRequest,
         productBackOfficeRequest: ProductBackOfficeRequest,
     ): ProductResponse {
+
+        // Seller의 상태를 확인합니다.
+        val seller = sellerRepository.findByIdOrNull(sellerId)
+            ?: throw RuntimeException("Seller not found")
+
+        // Seller 상태가 PENDING 또는 RESIGNED일 경우 예외를 발생시킵니다.
+        if (seller.activeStatus == ActiveStatus.PENDING || seller.activeStatus == ActiveStatus.RESIGNED) {
+            throw RuntimeException("Seller is not authorized to create a product")
+        }
+
         val shop = shopRepository.findShopBySellerId(sellerId)
         val product = Product(
             name = productRequest.name,
