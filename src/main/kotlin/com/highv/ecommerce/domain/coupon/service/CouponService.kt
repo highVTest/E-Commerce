@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
-
 @Service
 class CouponService(
     private val couponRepository: CouponRepository,
@@ -136,7 +135,10 @@ class CouponService(
 
                 coupon.validExpiredAt()
 
-                txAdvice.run { saveCoupon(coupon, buyer) }
+                txAdvice.run {
+                    saveCoupon(coupon, buyer)
+                }
+
             }
             else throw CustomRuntimeException(400, "락 획득 시에 애러가 발생 하였습니다")
         }

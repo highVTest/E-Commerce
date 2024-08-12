@@ -39,6 +39,7 @@ class LockService(
         lockKeyRepository.delete(lockKey)
     }
 
+
     fun <T> runExclusiveWithRedissonLock(lockKey: String, waitTime: Long, func: () -> T): T {
         val lock: RLock = redissonClient.getFairLock(lockKey)
         return try {

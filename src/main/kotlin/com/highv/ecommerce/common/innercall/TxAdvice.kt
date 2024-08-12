@@ -6,7 +6,8 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 class TxAdvice {
 
-    @Transactional()
+
+    @Transactional
     fun <T> run(function: () -> T): T {
         return function()
     }

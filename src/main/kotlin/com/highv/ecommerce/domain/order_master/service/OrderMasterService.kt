@@ -6,7 +6,7 @@ import com.highv.ecommerce.common.exception.CartEmptyException
 import com.highv.ecommerce.common.exception.CouponExpiredException
 import com.highv.ecommerce.common.exception.InsufficientStockException
 import com.highv.ecommerce.common.innercall.TxAdvice
-import com.highv.ecommerce.common.lock.service.LockService
+import com.highv.ecommerce.common.lock.service.RedisLockService
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
@@ -32,25 +32,10 @@ class OrderMasterService(
     private val itemCartRepository: ItemCartRepository,
     private val buyerRepository: BuyerRepository,
     private val couponToBuyerRepository: CouponToBuyerRepository,
-    private val redisLockService: LockService,
+    private val redisLockService: RedisLockService,
     private val txAdvice: TxAdvice,
     private val productBackOfficeRepository: ProductBackOfficeRepository
 ) {
-
-    val log = LoggerFactory.getLogger("동시성 이슈")
-
-    // fun paymentLock(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
-    //     var result = DefaultResponse.from("")
-    //     val key = "$buyerId"
-    //
-    //     kotlin.runCatching {
-    //         redisLockService.runExclusiveWithRedissonLock(key) {
-    //             result = txAdvice.run { requestPayment(buyerId, paymentRequest) }
-    //
-    //         }
-    //     }
-    //     return result
-    // }
 
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
 
@@ -92,7 +77,6 @@ class OrderMasterService(
     }
 
     fun orderSave(buyer: Buyer, cart: List<ItemCart>, productPrice: Map<Long, Int>): OrderMaster {
-        log.info("수량 변경 시도")
         cart.forEach {
             if (it.product.productBackOffice!!.quantity < it.quantity)
                 throw InsufficientStockException(400, "재고가 부족 합니다")
@@ -100,9 +84,7 @@ class OrderMasterService(
             it.product.productBackOffice!!.soldQuantity += it.quantity
             productBackOfficeRepository.saveAndFlush(it.product.productBackOffice!!)
         }
-        log.info("마스터 저장")
         val orderMaster = orderMasterRepository.saveAndFlush(OrderMaster())
-        log.info("디테일 저장")
         orderDetailsRepository.saveAll(
             cart.map {
                 OrderDetails(
@@ -119,6 +101,6 @@ class OrderMasterService(
         )
         return orderMaster
     }
-}
 
+}
 
