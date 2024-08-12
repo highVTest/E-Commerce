@@ -204,10 +204,7 @@ class OrderDetailsService(
         sellerId: Long
     ): OrderStatusResponse {
 
-        var orderStatusResponse = OrderStatusResponse("요청에 실패 했습니다")
-
-        lockService.runExclusiveWithRedissonLock("${shopId}_${orderId}", 1){
-            val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(
+         val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(
                 shopId,
                 orderId
             )
@@ -252,14 +249,7 @@ class OrderDetailsService(
 
             orderDetailsRepository.saveAll(orderDetails)
 
-            orderStatusResponse = OrderStatusResponse.from(complainType, "전체 요청 승인 완료 되었습니다")
-        }
-
-        return orderStatusResponse
-    }
-
-    private fun createLockKey(shopId: Long, orderId: Long, sellerId: Long): String{
-        return "${shopId}_${orderId}"
+        return OrderStatusResponse.from(complainType, "전체 요청 승인 완료 되었습니다")
     }
 
 
