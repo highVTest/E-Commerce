@@ -32,6 +32,7 @@ class CouponController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<DefaultResponse> {
 
+
         if (bindingResult.hasErrors()) throw InvalidCouponRequestException(
             400,
             bindingResult.fieldError?.defaultMessage.toString()
@@ -91,15 +92,22 @@ class CouponController(
         .status(HttpStatus.OK)
         .body(couponService.getSellerCouponList(userPrincipal.id))
 
+    @GetMapping("/coupon/{productId}")
+    fun getDetailCoupon(
+        @PathVariable("productId") productId: Long,
+    ): ResponseEntity<CouponResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(couponService.getDetailCoupon(productId))
+
 
     @PreAuthorize("hasRole('BUYER')")
-    @GetMapping("/buyer/coupon/{couponId}")
+    @GetMapping("/buyer/coupon/{productId}")
     fun getBuyerCouponById(
-        @PathVariable("couponId") couponId: Long,
+        @PathVariable("productId") productId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<CouponResponse> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(couponService.getBuyerCouponById(couponId, userPrincipal.id))
+        .body(couponService.getBuyerCouponById(productId, userPrincipal.id))
 
 
     @PreAuthorize("hasRole('BUYER')")
@@ -120,17 +128,11 @@ class CouponController(
         .status(HttpStatus.OK)
         .body(couponService.issuedCoupon(couponId, userPrincipal.id))
 
-
-    // 최후의 보루
     @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/apply/{couponId}")
-    fun applyCoupon(
+    @DeleteMapping("/buyer/coupon/{couponId}")
+    fun deleteBuyerCoupon(
         @PathVariable couponId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<DefaultResponse> {
+    ) : ResponseEntity<DefaultResponse> = ResponseEntity.status(HttpStatus.OK).body(couponService.deleteBuyerCoupon(couponId, userPrincipal.id))
 
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(couponService.applyCoupon(couponId, userPrincipal.id))
-    }
 }

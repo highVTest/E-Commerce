@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size
 
 data class CreateBuyerRequest(
     val id: Long,
+    @field:NotBlank(message = "닉네임은 공백일 수 없습니다.")
     val nickname: String,
 
     @field : NotBlank(message = "비밀번호는 공백일 수 없습니다.")
@@ -15,8 +16,8 @@ data class CreateBuyerRequest(
     @field: NotBlank(message = "이메일은 공백일 수 없습니다.")
     @field:Email(message = "이메일 형식이 아닙니다.")
     val email: String,
-    
-    // val profileImage: String,
+
+    val profileImage: String,
     val phoneNumber: String,
     val address: String,
 )

@@ -38,6 +38,8 @@ dependencies {
     implementation("com.mysql:mysql-connector-j")
     implementation("org.springframework.boot:spring-boot-starter-security") //security 사용 가능
 
+    implementation("org.redisson:redisson-spring-boot-starter:3.18.0")
+
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
     //s3
     implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
@@ -46,7 +48,6 @@ dependencies {
     implementation("org.redisson:redisson-spring-boot-starter:3.33.0")
 
     implementation("org.apache.tika:tika-core:1.24")
-
 
     // 추가된 부분: JSON 웹 토큰(JWT) 관련 의존성
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
@@ -73,6 +74,10 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.9")
     testImplementation("io.kotest:kotest-runner-junit5:5.7.2")
     testImplementation("io.kotest:kotest-assertions-core:5.7.2")
+    testImplementation("org.testcontainers:testcontainers:1.20.0")
+    testImplementation("com.h2database:h2")
+    testImplementation("org.redisson:redisson-spring-boot-starter:3.33.0")
+
 }
 
 kotlin {

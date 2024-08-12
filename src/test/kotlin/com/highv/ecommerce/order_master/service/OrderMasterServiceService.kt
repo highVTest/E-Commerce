@@ -200,7 +200,7 @@ class OrderMasterServiceService {
             product = product1,
             orderMasterId = 1L,
             productQuantity = 1,
-            shopId = 1L,
+            shop = shop,
             totalPrice = 10000
         )
 
@@ -212,7 +212,8 @@ class OrderMasterServiceService {
             expiredAt = LocalDateTime.of(2129, 1, 1, 1, 0),
             createdAt = LocalDateTime.of(2021, 1, 1, 1, 0),
             product = product1,
-            sellerId = 1L
+            sellerId = 1L,
+            couponName = "coupon",
         )
 
         private val couponToBuyer = CouponToBuyer(
@@ -226,7 +227,7 @@ class OrderMasterServiceService {
             product = product1,
             quantity = 1,
             buyerId = 1L,
-            shopId = 1L
+            shop = shop,
         ).apply { id = 1L }
     }
 }

@@ -1,12 +1,13 @@
 package com.highv.ecommerce.domain.seller.entity
 
-import com.highv.ecommerce.domain.seller.shop.entity.Shop
+import com.highv.ecommerce.domain.seller.dto.ActiveStatus
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 
 @Entity
@@ -26,6 +27,7 @@ class Seller(
     var phoneNumber: String,
     @Column(name = "address")
     var address: String,
-/*    @Column(name = "status")
-    var status: String,*/
+    @Column(name = "active_status")
+    @Enumerated(EnumType.STRING)
+    var activeStatus: ActiveStatus
 )

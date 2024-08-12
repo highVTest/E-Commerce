@@ -1,8 +1,6 @@
 package com.highv.ecommerce.domain.backoffice.controller
 
-import com.highv.ecommerce.domain.backoffice.dto.salesstatics.ProductSalesQuantityResponse
 import com.highv.ecommerce.domain.backoffice.dto.salesstatics.ProductSalesResponse
-import com.highv.ecommerce.domain.backoffice.dto.salesstatics.TotalSalesQuantityResponse
 import com.highv.ecommerce.domain.backoffice.dto.salesstatics.TotalSalesResponse
 import com.highv.ecommerce.domain.backoffice.service.SalesStatisticsService
 import com.highv.ecommerce.infra.security.UserPrincipal
@@ -20,37 +18,30 @@ import org.springframework.web.bind.annotation.RestController
 class SalesStatisticsController(
     private val salesStatisticsService: SalesStatisticsService
 ) {
-    @GetMapping("/total-sales-quantity")
+    //전체 상품 판매량 + 금액
+    @GetMapping("/total-sales")
     @PreAuthorize("hasRole('SELLER')")
     fun getTotalSales(
         @AuthenticationPrincipal seller: UserPrincipal,
-    ): ResponseEntity<TotalSalesQuantityResponse> = ResponseEntity
-        .status(HttpStatus.OK)
-        .body(salesStatisticsService.getTotalSalesQuantity(seller.id))
-
-    @GetMapping("/total-sales-amount")
-    @PreAuthorize("hasRole('SELLER')")
-    fun getTotalSalesAmount(
-        @AuthenticationPrincipal seller: UserPrincipal,
     ): ResponseEntity<TotalSalesResponse> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(salesStatisticsService.getTotalSalesAmount(seller.id))
+        .body(salesStatisticsService.getTotalSales(seller.id))
 
-    @GetMapping("/{productId}/sales-quantity")
+    //월별 상품 전체 판매량
+    @GetMapping("/product")
+    @PreAuthorize("hasRole('SELLER')")
+    fun getMonthsProductSales(
+        @AuthenticationPrincipal seller: UserPrincipal,
+    ): ResponseEntity<List<TotalSalesResponse>> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(salesStatisticsService.getMonthsProductSales(seller.id))
+
+    //상품 판매 수량 및 금액
+    @GetMapping("/sales")
     @PreAuthorize("hasRole('SELLER')")
     fun getProductSales(
         @AuthenticationPrincipal seller: UserPrincipal,
-        @PathVariable productId: Long
-    ): ResponseEntity<ProductSalesQuantityResponse> = ResponseEntity
+    ): ResponseEntity<List<ProductSalesResponse>> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(salesStatisticsService.getProductSalesQuantity(seller.id, productId))
-
-    @GetMapping("/{productId}/sales-amount")
-    @PreAuthorize("hasRole('SELLER')")
-    fun getProductSalesAmount(
-        @AuthenticationPrincipal seller: UserPrincipal,
-        @PathVariable productId: Long
-    ): ResponseEntity<ProductSalesResponse> = ResponseEntity
-        .status(HttpStatus.OK)
-        .body(salesStatisticsService.getProductSales(seller.id, productId))
+        .body(salesStatisticsService.getProductSales(seller.id))
 }

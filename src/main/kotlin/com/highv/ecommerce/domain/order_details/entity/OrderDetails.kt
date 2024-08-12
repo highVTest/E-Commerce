@@ -1,6 +1,5 @@
 package com.highv.ecommerce.domain.order_details.entity
 
-import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.InvalidRequestException
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
@@ -8,6 +7,7 @@ import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import com.highv.ecommerce.domain.product.entity.Product
+import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -62,8 +62,9 @@ class OrderDetails(
     @Column(name = "product_quantity", nullable = false)
     var productQuantity: Int,
 
-    @Column(name = "shop_id", nullable = false)
-    val shopId: Long,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id")
+    val shop: Shop,
 
     @Column(name = "total_price", nullable = false)
     val totalPrice: Int
@@ -72,7 +73,10 @@ class OrderDetails(
 
         when (buyerOrderStatusRequest.complainType.name) {
             "EXCHANGE" -> {
-                if (this.orderStatus != OrderStatus.DELIVERED) throw InvalidRequestException(400, "물건 수령 전에는 교환 요청이 어렵습니다")
+                if (this.orderStatus != OrderStatus.DELIVERED) throw InvalidRequestException(
+                    400,
+                    "물건 수령 전에는 교환 요청이 어렵습니다"
+                )
                 this.complainStatus = ComplainStatus.EXCHANGE_REQUESTED
                 this.orderStatus = OrderStatus.PENDING
             }
@@ -82,7 +86,7 @@ class OrderDetails(
                     OrderStatus.DELIVERY_PREPARING -> throw InvalidRequestException(400, "배송 준비 중에는 환불 요청이 어렵습니다")
                     OrderStatus.SHIPPING -> throw InvalidRequestException(400, "배송 중에는 환불 요청이 어렵습니다")
                     OrderStatus.PENDING -> throw InvalidRequestException(400, "이미 환불 및 교환 요청이 접수 되었습니다")
-                    else -> this.orderStatus = orderStatus
+                    else -> this.orderStatus = OrderStatus.PENDING
                 }
                 this.complainStatus = ComplainStatus.REFUND_REQUESTED
             }
@@ -99,8 +103,7 @@ class OrderDetails(
     ) {
         // order_cancelled 일 경우 로직 작성 필요
 
-
-        when(orderStatus) {
+        when (orderStatus) {
             OrderStatus.ORDER_CANCELED -> if (this.complainStatus == ComplainStatus.REFUNDED) throw InvalidRequestException(
                 404,
                 "이미 환불 처리된 상황 입니다"
@@ -117,10 +120,55 @@ class OrderDetails(
                 when (complainStatus) {
                     ComplainStatus.EXCHANGE_REQUESTED -> this.complainStatus = ComplainStatus.EXCHANGE_REJECTED
                     ComplainStatus.REFUND_REQUESTED -> this.complainStatus = ComplainStatus.REFUND_REJECTED
-                    ComplainStatus.REFUNDED -> this.complainStatus = ComplainStatus.REFUNDED
-                    ComplainStatus.EXCHANGED -> this.complainStatus = ComplainStatus.EXCHANGED
-                    else -> throw InvalidRequestException(400, "잘못된 접근 입니다")
+                    ComplainStatus.REFUNDED -> {
+                        this.complainStatus = ComplainStatus.REFUNDED
+                        this.orderStatus = OrderStatus.ORDER_CANCELED
+                    }
+
+                    ComplainStatus.EXCHANGED -> {
+                        this.complainStatus = ComplainStatus.EXCHANGED
+                        this.orderStatus = OrderStatus.PRODUCT_PREPARING
+                    }
+
+                    else -> throw InvalidRequestException(400, "이미 작업을 처리 하였거나 존재 하지 않는 작업 입니다")
                 }
+            }
+        }
+        this.sellerDateTime = LocalDateTime.now()
+        this.sellerDescription = sellerOrderStatusRequest.description
+    }
+
+    fun updateDeliveryStatus(orderStatus: OrderStatus) {
+        when (orderStatus) {
+            OrderStatus.DELIVERY_PREPARING -> {
+                if (this.orderStatus != OrderStatus.PRODUCT_PREPARING) throw InvalidRequestException(
+                    400,
+                    "상품 준비 중일 때만 배송 중으로 변경이 가능합니다."
+                )
+                this.orderStatus = orderStatus
+            }
+
+            OrderStatus.SHIPPING -> {
+                if (this.orderStatus != OrderStatus.DELIVERY_PREPARING) throw InvalidRequestException(
+                    400,
+                    "배송 준비 중일 때만 배송 중으로 변경이 가능합니다."
+                )
+                this.orderStatus = orderStatus
+            }
+
+            OrderStatus.DELIVERED -> {
+                if (this.orderStatus != OrderStatus.SHIPPING) throw InvalidRequestException(
+                    400,
+                    "배송 중일 때만 배송 완료로 변경이 가능합니다."
+                )
+                this.orderStatus = orderStatus
+            }
+
+            else -> {
+                throw InvalidRequestException(
+                    400,
+                    "잘못 요청 보냈습니다."
+                )
             }
         }
     }

@@ -6,6 +6,9 @@ import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.QuantityReque
 import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.SellersProductResponse
 import com.highv.ecommerce.domain.backoffice.service.InventoryManagementService
 import com.highv.ecommerce.infra.security.UserPrincipal
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -17,15 +20,6 @@ import org.springframework.web.bind.annotation.*
 class InventoryManagementController(
     private val inventoryManagementService: InventoryManagementService
 ) {
-    @GetMapping("/{productId}/left-quantity")
-    @PreAuthorize("hasRole('SELLER')")
-    fun getProductsQuantity(
-        @AuthenticationPrincipal seller: UserPrincipal,
-        @PathVariable productId: Long
-    ): ResponseEntity<ProductBackOfficeResponse> = ResponseEntity
-        .status(HttpStatus.OK)
-        .body(inventoryManagementService.getProductsQuantity(seller.id, productId))
-
     @PatchMapping("/{productId}/quantity")
     @PreAuthorize("hasRole('SELLER')")
     fun changeQuantity(
@@ -49,8 +43,11 @@ class InventoryManagementController(
     @GetMapping("/products")
     @PreAuthorize("hasRole('SELLER')")
     fun getSellerProducts(
-        @AuthenticationPrincipal seller: UserPrincipal
-    ): ResponseEntity<List<SellersProductResponse>> = ResponseEntity
-        .status(HttpStatus.OK)
-        .body(inventoryManagementService.getSellerProducts(seller.id))
+        @AuthenticationPrincipal seller: UserPrincipal,
+        @PageableDefault(size = 10, page = 0) pageable: Pageable
+    ): ResponseEntity<Page<SellersProductResponse>> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(inventoryManagementService.getSellerProducts(seller.id, pageable))
+    }
 }
