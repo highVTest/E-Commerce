@@ -50,7 +50,7 @@ class ItemCartController(
         @PathVariable(value = "productId") productId: Long,
         @AuthenticationPrincipal user: UserPrincipal,
         @RequestBody request: SelectProductQuantity
-    ): ResponseEntity<Unit> = ResponseEntity
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(itemCartService.updateItemIntoCart(productId, request, user.id))
 
@@ -59,7 +59,7 @@ class ItemCartController(
     fun deleteItemIntoCart(
         @PathVariable(value = "productId") productId: Long,
         @AuthenticationPrincipal user: UserPrincipal,
-    ): ResponseEntity<Unit> = ResponseEntity
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(itemCartService.deleteItemIntoCart(productId, user.id))
 }

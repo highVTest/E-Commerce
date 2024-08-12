@@ -38,13 +38,13 @@ class ItemCartEntityTest : AnnotationSpec() {
             product = product,
             quantity = 1,
             buyerId = 1L,
-            shopId = 1L
+            shop = shop
         ).apply { id = 1L }
 
         shouldThrow<InvalidQuantityException> {
             cart.updateQuantity(0)
         }.let {
-            it.message shouldBe "물품의 수량이 0보다 작거나 같을 수 없습니다."
+            it.message shouldBe "상품의 수량이 1개보다 적을 수 없습니다."
         }
     }
 
@@ -74,7 +74,7 @@ class ItemCartEntityTest : AnnotationSpec() {
 
         val cart = ItemCart(
             product = product,
-            shopId = 1L,
+            shop = shop,
             quantity = 1,
             buyerId = 1L,
         ).apply { id = 1L }

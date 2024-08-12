@@ -1,16 +1,9 @@
 package com.highv.ecommerce.domain.coupon.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.common.exception.BuyerNotFoundException
-import com.highv.ecommerce.common.exception.CouponAlreadyExistsException
-import com.highv.ecommerce.common.exception.CouponDistributionException
-import com.highv.ecommerce.common.exception.CouponNotFoundException
-import com.highv.ecommerce.common.exception.CustomRuntimeException
-import com.highv.ecommerce.common.exception.DuplicateCouponException
-import com.highv.ecommerce.common.exception.InvalidCouponDiscountException
-import com.highv.ecommerce.common.exception.ItemNotFoundException
-import com.highv.ecommerce.common.exception.ProductNotFoundException
-import com.highv.ecommerce.common.exception.UnauthorizedUserException
+import com.highv.ecommerce.common.exception.*
+import com.highv.ecommerce.common.innercall.TxAdvice
+import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.coupon.dto.CouponResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
@@ -20,14 +13,16 @@ import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
 import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
-import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
-import com.highv.ecommerce.infra.security.UserPrincipal
-import org.slf4j.LoggerFactory
+import org.redisson.api.RLock
+import org.redisson.api.RedissonClient
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
+
 
 @Service
 class CouponService(
@@ -35,10 +30,10 @@ class CouponService(
     private val productRepository: ProductRepository,
     private val couponToBuyerRepository: CouponToBuyerRepository,
     private val buyerRepository: BuyerRepository,
-    private val itemCartRepository: ItemCartRepository
+    private val txAdvice: TxAdvice,
+    private val redissonClient: RedissonClient,
+    private val redisTemplate: RedisTemplate<String, String>
 ) {
-
-    private val log = LoggerFactory.getLogger("CouponService::class.java")
 
     @Transactional
     fun createCoupon(couponRequest: CreateCouponRequest, sellerId: Long): DefaultResponse {
@@ -60,7 +55,8 @@ class CouponService(
                 expiredAt = couponRequest.expiredAt,
                 createdAt = LocalDateTime.now(),
                 quantity = couponRequest.quantity,
-                sellerId = sellerId
+                sellerId = sellerId,
+                couponName = couponRequest.couponName,
             )
         )
 
@@ -111,59 +107,82 @@ class CouponService(
         return CouponResponse.from(result.coupon)
     }
 
-    fun getBuyerCouponList(sellerId: Long): List<CouponResponse>? {
+    fun getBuyerCouponList(buyerId: Long): List<CouponResponse>? {
 
-        return couponToBuyerRepository.findAllProductIdWithBuyerId(sellerId).let {
+        return couponToBuyerRepository.findAllProductIdWithBuyerId(buyerId).let {
             couponRepository.findAllCouponIdWithBuyer(it).map { i -> CouponResponse.from(i) }
         }
     }
 
-    @Transactional
-    fun issuedCoupon(couponId: Long, sellerId: Long): DefaultResponse {
+    //낙관적 락의 장점
+    fun issuedCoupon(couponId: Long, buyerId: Long): DefaultResponse {
 
-        val getLock = couponRepository.getLock("lock_$couponId", 10) == 1
+        val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw BuyerNotFoundException(404, "바이어가 존재하지 않습니다")
 
-        if (!getLock) throw CustomRuntimeException(400, "락이 걸려있지 않습니다")
 
-        val buyer = buyerRepository.findByIdOrNull(sellerId) ?: throw BuyerNotFoundException(404, "바이어가 존재하지 않습니다")
+
+        if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw DuplicateCouponException(
+            400,
+            "동일한 쿠폰은 지급 받을 수 없습니다"
+        )
 
         kotlin.runCatching {
-            val coupon = couponRepository.findByIdOrNull(couponId) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
+            val lock : RLock = redissonClient.getFairLock(createCouponLockKey(couponId))
 
-            if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw DuplicateCouponException(400, "동일한 쿠폰은 지급 받을 수 없습니다")
+            // 바꿔야 하는 로직은 락 안에서 실행 해야함
+            // 잠금이 시도될 경우 기다 리는 시간 , 잠금이 유지 되는 시간, 시간의 단위
+            if(lock.tryLock(20, 1, TimeUnit.SECONDS)) {
 
-            coupon.validExpiredAt()
+                val coupon = couponRepository.findByIdOrNull(couponId) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
 
-            couponToBuyerRepository.save(
-                CouponToBuyer(
-                    buyer = buyer,
-                    coupon = coupon,
-                    isUsed = false,
-                )
-            )
+                coupon.validExpiredAt()
 
-            coupon.spendCoupon()
-
-            couponRepository.save(coupon)
-        }.onFailure {
-            throw CouponDistributionException(500, "쿠폰 지급 중 오류가 발생했습니다")
-        }.also {
-            couponRepository.releaseLock("lock_$couponId")
+                txAdvice.run { saveCoupon(coupon, buyer) }
+            }
+            else throw CustomRuntimeException(400, "락 획득 시에 애러가 발생 하였습니다")
         }
 
+            .onSuccess {
+                redisUnLock(createCouponLockKey(couponId))
+            }
+            .onFailure {
+                redisUnLock(createCouponLockKey(couponId))
+            }
+            .getOrThrow()
 
-        return DefaultResponse.from("쿠폰이 지급 되었습니다")
+        return DefaultResponse.from("쿠폰 지급이 완료 되었습니다")
+
     }
 
-    fun applyCoupon(couponId: Long, buyerId: Long): DefaultResponse {
+    fun saveCoupon(coupon: Coupon, buyer: Buyer){
 
-        val coupon = couponToBuyerRepository.findByCouponIdAndBuyerIdAndIsUsedFalse(couponId, buyerId)
-            ?: throw CouponNotFoundException(404, "쿠폰 정보가 존재하지 않습니다")
+        coupon.spendCoupon()
 
-        val itemCart = itemCartRepository.findByProductIdAndBuyerId(coupon.coupon.product.id!!, buyerId)
-            ?: throw ItemNotFoundException(404, "장바구니에 아이템이 존재하지 않습니다")
+        couponRepository.saveAndFlush(coupon)
 
-        return DefaultResponse.from("쿠폰 적용이 완료 되었습니다")
+        couponToBuyerRepository.save(
+            CouponToBuyer(
+                buyer = buyer,
+                coupon = coupon,
+                isUsed = false,
+            )
+        )
+    }
+
+
+    //해싱을 하는 방법
+    private fun createCouponLockKey(couponId: Long): String{
+        return "lock_${couponId}"
+    }
+
+    private fun redisUnLock(key: String): Boolean
+            = redisTemplate.delete(key)
+
+    fun getDetailCoupon(productId: Long): CouponResponse {
+
+       return couponRepository.findByProductId(productId)
+           .let { CouponResponse.from(it ?: throw CouponNotFoundException(409, "쿠폰이 존재하지 않습니다")) }
+
     }
 
 }

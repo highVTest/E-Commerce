@@ -85,15 +85,20 @@ class CouponRepositoryImpl(
         return query
     }
 
-    override fun getLock(name: String, time: Int): Int {
-        return couponJpaRepository.getLock(name, time)
-    }
-
-    override fun releaseLock(name: String): Int {
-        return couponJpaRepository.releaseLock(name)
-    }
 
     override fun findAllByProductId(productIdList: List<Long>): List<Long> {
         return couponJpaRepository.findAllByProductIdList(productIdList)
+    }
+
+    override fun flush() {
+        couponJpaRepository.flush()
+    }
+
+    override fun saveAndFlush(coupon: Coupon) {
+        couponJpaRepository.saveAndFlush(coupon)
+    }
+
+    override fun findByProductId(productId: Long): Coupon? {
+        return couponJpaRepository.findByProductId(productId)
     }
 }

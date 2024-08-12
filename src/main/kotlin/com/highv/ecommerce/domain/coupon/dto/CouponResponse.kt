@@ -5,17 +5,23 @@ import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import java.time.LocalDateTime
 
 class CouponResponse(
+    val couponId: Long,
     val discountPolicy: String,
     val discount : Int,
     val productId : Long,
-    val expiredAt : LocalDateTime
+    val expiredAt : LocalDateTime,
+    val quantity : Int,
+    val couponName : String,
 ){
     companion object {
         fun from(coupon: Coupon) = CouponResponse(
+            couponId = coupon.id!!,
             discountPolicy = coupon.discountPolicy.name,
             discount = coupon.discount,
             productId = coupon.product.id!!,
-            expiredAt = coupon.expiredAt
+            expiredAt = coupon.expiredAt,
+            quantity = coupon.quantity,
+            couponName = coupon.couponName,
         )
     }
 }

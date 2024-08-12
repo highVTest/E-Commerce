@@ -32,6 +32,7 @@ class CouponController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<DefaultResponse> {
 
+
         if (bindingResult.hasErrors()) throw InvalidCouponRequestException(
             400,
             bindingResult.fieldError?.defaultMessage.toString()
@@ -91,6 +92,13 @@ class CouponController(
         .status(HttpStatus.OK)
         .body(couponService.getSellerCouponList(userPrincipal.id))
 
+    @GetMapping("/coupon/{productId}")
+    fun getDetailCoupon(
+        @PathVariable("productId") productId: Long,
+    ): ResponseEntity<CouponResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(couponService.getDetailCoupon(productId))
+
 
     @PreAuthorize("hasRole('BUYER')")
     @GetMapping("/buyer/coupon/{couponId}")
@@ -122,15 +130,15 @@ class CouponController(
 
 
     // 최후의 보루
-    @PreAuthorize("hasRole('BUYER')")
-    @PatchMapping("/apply/{couponId}")
-    fun applyCoupon(
-        @PathVariable couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<DefaultResponse> {
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(couponService.applyCoupon(couponId, userPrincipal.id))
-    }
+//    @PreAuthorize("hasRole('BUYER')")
+//    @PatchMapping("/apply/{couponId}")
+//    fun applyCoupon(
+//        @PathVariable couponId: Long,
+//        @AuthenticationPrincipal userPrincipal: UserPrincipal
+//    ): ResponseEntity<DefaultResponse> {
+//
+//        return ResponseEntity
+//            .status(HttpStatus.OK)
+//            .body(couponService.applyCoupon(couponId, userPrincipal.id))
+//    }
 }

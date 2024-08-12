@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.backoffice.controller
 
+import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdatePasswordRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateSellerRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateShopRequest
@@ -11,11 +12,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/sellerInfo")
@@ -45,7 +42,7 @@ class SellerInfoController(
     fun changePassword(
         @AuthenticationPrincipal seller: UserPrincipal,
         @RequestBody updatePasswordRequest: UpdatePasswordRequest
-    ): ResponseEntity<String> = ResponseEntity
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(sellerInfoService.changePassword(seller.id, updatePasswordRequest))
 

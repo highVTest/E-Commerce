@@ -22,6 +22,8 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: 6379
+      repositories:
+        enabled: false
 
   mail:
     host: smtp.gmail.com
@@ -39,8 +41,8 @@ spring:
         writetimeout: 5000
     auth-code-expiration-millis: 300000 # 5 * 60 * 1000 = 5분
 
-    cache:
-      type: redis
+  cache:
+    type: redis
 
 
 
@@ -52,6 +54,8 @@ logging:
         orm:
           jdbc:
             bind: trace
+      springframework:
+        transaction: DEBUG
 
 oauth2:
   kakao:
@@ -71,7 +75,7 @@ auth:
   jwt:
     issuer: ${AUTH_ISSUER}
     secret: ${AUTH_SECRET}
-    accessTokenExpirationHour: 24
+    accessTokenExpirationHour: 24000
     refreshTokenExpirationHour: 168
 
 cloud:
@@ -86,3 +90,6 @@ cloud:
       static: "ap-northeast-2"
     stack:
       auto: false
+
+server:
+  port: 80

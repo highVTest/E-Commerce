@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile
 
 class SignUpServiceTest : BehaviorSpec({
 
+
     val buyerRepository: BuyerRepository = mockk()
     val passwordEncoder: PasswordEncoder = mockk()
     val s3Manager: S3Manager = mockk()
@@ -56,13 +57,14 @@ class SignUpServiceTest : BehaviorSpec({
             password = "테스트 비밀번호",
             email = "test@email.com",
             phoneNumber = "테스트 폰 번호",
-            address = "테스트 주소"
+            address = "테스트 주소",
+            profileImage = "테스트 이미지"
         )
         val file: MultipartFile? = null
-
         every { buyerRepository.findByIdOrNull(buyerId) } returns buyer
         every { buyerRepository.save(buyer) } returns buyer
         every { passwordEncoder.encode(request.password) } returns "123456"
+
 
         When("구매자가 로그인을 시도할 때") {
             val response = buyerService.signUp(request, file)
@@ -76,6 +78,7 @@ class SignUpServiceTest : BehaviorSpec({
                 response.profileImage shouldBe ""
             }
         }
+
     }
 
     Given("이메일 인증이 안된 경우 구매자 회원가입 시") {
@@ -95,7 +98,8 @@ class SignUpServiceTest : BehaviorSpec({
             password = "테스트 비밀번호",
             email = "test2@email.com",
             phoneNumber = "테스트 폰 번호",
-            address = "테스트 주소"
+            address = "테스트 주소",
+            profileImage = ""
         )
         val file: MultipartFile? = null
 

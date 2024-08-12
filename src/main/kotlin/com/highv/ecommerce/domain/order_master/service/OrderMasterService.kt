@@ -4,7 +4,6 @@ import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.BuyerNotFoundException
 import com.highv.ecommerce.common.exception.CartEmptyException
 import com.highv.ecommerce.common.exception.CouponExpiredException
-import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.InsufficientStockException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
@@ -33,11 +32,13 @@ class OrderMasterService(
     @Transactional
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
 
-        if (paymentRequest.cartIdList.isEmpty()) throw CartEmptyException(400, "장바구니에서 아이템 목록을 선택해 주세요")
-
         val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw BuyerNotFoundException(404, "구매자 정보가 존재하지 않습니다")
 
+        if (paymentRequest.cartIdList.isEmpty()) throw CartEmptyException(400, "장바구니 에서 아이템 목록을 선택해 주세요")
+
         val cart = itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
+
+        if(cart.isEmpty()) throw CartEmptyException(400, "장바구니에 아이템이 존재 하지 않습니다")
 
         val couponToBuyer =
             couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(paymentRequest.couponIdList, buyerId)
@@ -59,7 +60,7 @@ class OrderMasterService(
                     product = it.product,
                     orderMasterId = orderMaster.id!!,
                     productQuantity = it.quantity,
-                    shopId = it.shopId,
+                    shop = it.shop,
                     totalPrice = productPrice[it.id]!!,
                 )
             }
@@ -68,8 +69,9 @@ class OrderMasterService(
         couponToBuyer.forEach { it.useCoupon() }
 
         cart.forEach {
-            if (it.product.productBackOffice!!.quantity < it.quantity) throw InsufficientStockException(400, "재고가 부족합니다")
+            if (it.product.productBackOffice!!.quantity < it.quantity) throw InsufficientStockException(400, "재고가 부족 합니다")
             it.product.productBackOffice!!.quantity -= it.quantity
+            it.product.productBackOffice!!.soldQuantity += it.quantity
         }
 
         itemCartRepository.deleteAll(cart)
