@@ -38,7 +38,7 @@ class LockService(
     fun deleteLock(lockKey: LockKey){
         lockKeyRepository.delete(lockKey)
     }
-
+    
     fun <T> runExclusiveWithRedissonLock(lockKey: String, func: () -> T): T {
         val lock: RLock = redissonClient.getFairLock(lockKey)
         return kotlin.runCatching {
