@@ -212,7 +212,8 @@ class OrderMasterServiceService {
             expiredAt = LocalDateTime.of(2129, 1, 1, 1, 0),
             createdAt = LocalDateTime.of(2021, 1, 1, 1, 0),
             product = product1,
-            sellerId = 1L
+            sellerId = 1L,
+            couponName = "coupon",
         )
 
         private val couponToBuyer = CouponToBuyer(

@@ -39,22 +39,26 @@ class LockService(
         lockKeyRepository.delete(lockKey)
     }
 
-    fun <T> runExclusiveWithRedissonLock(lockKey: String, func: () -> T): T {
+
+    fun <T> runExclusiveWithRedissonLock(lockKey: String, waitTime: Long, func: () -> T): T {
         val lock: RLock = redissonClient.getFairLock(lockKey)
-        return kotlin.runCatching {
-            if (lock.tryLock(20, (timeToLiveMilliseconds / 1000), TimeUnit.SECONDS)) {
-                log.info("제발 들어가라 좀")
+        return try {
+            if (lock.tryLock(waitTime, 5, TimeUnit.SECONDS)) {
+                log.info("락 획득 성공: $lockKey")
                 func.invoke()
-            } else throw RuntimeException("Request timed out")
+            } else {
+                throw RuntimeException("락 획득 시간 초과: $lockKey")
+            }
+        } catch (ex: Exception) {
+            log.error("예외 발생: ${ex.message}", ex)
+            throw ex
+        } finally {
+            if (lock.isHeldByCurrentThread) {
+                lock.unlock()
+                log.info("락 해제: $lockKey")
+            } else {
+                log.warn("락 해제 실패, 락이 현재 스레드에 의해 잡히지 않음: $lockKey")
+            }
         }
-            .onSuccess {
-                lock.unlock()
-                log.info("성공시 풀림")
-            }
-            .onFailure {
-                lock.unlock()
-                log.info("실패시 풀림")
-            }
-            .getOrThrow()
     }
 }

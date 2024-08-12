@@ -9,31 +9,46 @@ import com.highv.ecommerce.domain.product.dto.ProductResponse
 import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
+import com.highv.ecommerce.domain.seller.dto.ActiveStatus
+import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
 class ProductService(
     private val productRepository: ProductRepository,
     private val shopRepository: ShopRepository,
+    private val sellerRepository: SellerRepository,
     private val productBackOfficeRepository: ProductBackOfficeRepository,
     private val favoriteService: FavoriteService,
     /*private val s3Manager: S3Manager,*/
 ) {
-
+    @Transactional
     fun createProduct(
         sellerId: Long,
         productRequest: CreateProductRequest,
         productBackOfficeRequest: ProductBackOfficeRequest,
     ): ProductResponse {
+
+        // Seller의 상태를 확인합니다.
+        val seller = sellerRepository.findByIdOrNull(sellerId)
+            ?: throw RuntimeException("Seller not found")
+
+        // Seller 상태가 PENDING 또는 RESIGNED일 경우 예외를 발생시킵니다.
+        if (seller.activeStatus == ActiveStatus.PENDING || seller.activeStatus == ActiveStatus.RESIGNED) {
+            throw RuntimeException("Seller is not authorized to create a product")
+        }
+
         val shop = shopRepository.findShopBySellerId(sellerId)
         val product = Product(
             name = productRequest.name,
             description = productRequest.description,
-            productImage = "", // Buyer 객체에 프로필 이미지 URL 저장
+            productImage = "",
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
             isSoldOut = false,
@@ -61,6 +76,7 @@ class ProductService(
         return ProductResponse.from(savedProduct)
     }
 
+    @Transactional
     fun updateProduct(
         sellerId: Long,
         productId: Long,
@@ -86,6 +102,7 @@ class ProductService(
         return ProductResponse.from(updatedProduct, favoriteService.countFavorite(productId))
     }
 
+    @Transactional
     fun deleteProduct(sellerId: Long, productId: Long) {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
         if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")

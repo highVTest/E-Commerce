@@ -10,6 +10,7 @@ import com.highv.ecommerce.domain.auth.dto.LoginRequest
 import com.highv.ecommerce.domain.auth.dto.UserRole
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
+import com.highv.ecommerce.domain.seller.dto.ActiveStatus
 import com.highv.ecommerce.domain.seller.entity.Seller
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.infra.email.EmailUtils
@@ -115,7 +116,8 @@ class UserService(
                 email = email,
                 profileImage = "",
                 phoneNumber = "",
-                address = ""
+                address = "",
+                activeStatus = ActiveStatus.PENDING
             )
 
             userId = sellerRepository.saveAndFlush(seller).id!!

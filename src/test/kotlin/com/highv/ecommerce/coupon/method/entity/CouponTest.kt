@@ -87,6 +87,7 @@ class CouponTest {
             quantity = 1,
             createdAt = LocalDateTime.of(2024, 7, 1, 0, 0),
             sellerId = 1L,
+            couponName = "Test coupon name",
         )
     }
 

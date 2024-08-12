@@ -34,7 +34,7 @@ class CouponToBuyerRepositoryImpl(
         return couponToBuyerJpaRepository.save(coupon)
     }
 
-    override fun findByCouponIdAndBuyerId(couponId: Long, buyerId: Long): CouponToBuyer? {
+    override fun findByProductIdAndBuyerId(productId: Long, buyerId: Long): CouponToBuyer? {
         val query = queryFactory
             .select(couponToBuyer)
             .from(couponToBuyer)
@@ -44,7 +44,7 @@ class CouponToBuyerRepositoryImpl(
             .innerJoin(couponToBuyer.coupon().product().shop()).fetchJoin()
             .innerJoin(couponToBuyer.buyer()).fetchJoin()
             .where(couponToBuyer.buyer().id.eq(buyerId))
-            .where(couponToBuyer.coupon().id.eq(coupon.id))
+            .where(couponToBuyer.coupon().product().id.eq(productId))
             .fetchOne()
 
         return query
@@ -67,5 +67,9 @@ class CouponToBuyerRepositoryImpl(
 
     override fun findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons: List<Long>, buyerId: Long): List<CouponToBuyer> {
         return couponToBuyerJpaRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons, buyerId)
+    }
+
+    override fun delete(couponToBuyer: CouponToBuyer) {
+        couponToBuyerJpaRepository.delete(couponToBuyer)
     }
 }
