@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
@@ -27,7 +28,7 @@ class ProductService(
     private val favoriteService: FavoriteService,
     /*private val s3Manager: S3Manager,*/
 ) {
-
+    @Transactional
     fun createProduct(
         sellerId: Long,
         productRequest: CreateProductRequest,
@@ -47,7 +48,7 @@ class ProductService(
         val product = Product(
             name = productRequest.name,
             description = productRequest.description,
-            productImage = "", // Buyer 객체에 프로필 이미지 URL 저장
+            productImage = "",
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
             isSoldOut = false,
@@ -75,6 +76,7 @@ class ProductService(
         return ProductResponse.from(savedProduct)
     }
 
+    @Transactional
     fun updateProduct(
         sellerId: Long,
         productId: Long,
@@ -100,6 +102,7 @@ class ProductService(
         return ProductResponse.from(updatedProduct, favoriteService.countFavorite(productId))
     }
 
+    @Transactional
     fun deleteProduct(sellerId: Long, productId: Long) {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
         if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")

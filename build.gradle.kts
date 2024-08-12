@@ -38,6 +38,8 @@ dependencies {
     implementation("com.mysql:mysql-connector-j")
     implementation("org.springframework.boot:spring-boot-starter-security") //security 사용 가능
 
+    implementation("org.redisson:redisson-spring-boot-starter:3.18.0")
+
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
     //s3
     implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
