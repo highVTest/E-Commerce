@@ -57,7 +57,7 @@ class OrderMasterService(
         val key = "락락"
         var masterId = 0L
         kotlin.runCatching {
-            redisLockService.runExclusiveWithRedissonLock(key) {
+            redisLockService.runExclusiveWithRedissonLock(key, 50) {
                 val buyer =
                     buyerRepository.findByIdOrNull(buyerId) ?: throw BuyerNotFoundException(404, "구매자 정보가 존재하지 않습니다")
                 if (paymentRequest.cartIdList.isEmpty()) throw CartEmptyException(400, "장바구니 에서 아이템 목록을 선택해 주세요")

@@ -206,7 +206,7 @@ class OrderDetailsService(
 
         var orderStatusResponse = OrderStatusResponse("요청에 실패 했습니다")
 
-        lockService.runExclusiveWithRedissonLock("${shopId}_${orderId}"){
+        lockService.runExclusiveWithRedissonLock("${shopId}_${orderId}", 1){
             val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(
                 shopId,
                 orderId
