@@ -1,0 +1,68 @@
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "username"
+    password: "password"
+    properties:
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+          required: true
+        connectiontimeout: 5000
+        timeout: 5000
+        writetimeout: 5000
+    auth-code-expiration-millis: 300000 # 5 * 60 * 1000 = 5분
+
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:test;MODE=MySQL;
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+auth:
+  jwt:
+    issuer: "test_issuer"
+    secret: "gfgieufnkengknkvaih324230i0fdlfnsafndkernfke"
+    accessTokenExpirationHour: 24000
+    refreshTokenExpirationHour: 168
+
+oauth2:
+  kakao:
+    client_id: "test"
+    redirect_url: "http://localhost:8080/oauth/login/callback/kakao"
+    auth_server_base_url: "https://kauth.kakao.com"
+    resource_server_base_url: "https://kapi.kakao.com"
+  naver:
+    client_id: "test"
+    client_secret: "test"
+    redirect_url: "http://localhost:8080/oauth/login/callback/naver/"
+    auth_server_base_url: "https://nid.naver.com/oauth2.0"
+    resource_server_base_url: "https://openapi.naver.com/v1"
+
+cloud:
+  aws:
+    s3:
+      bucket: "243324234"
+    credentials:
+      accessKey: "23423423432"
+      secretKey: "42342343"
+
+    region:
+      static: "ap-northeast-2"
+    stack:
+      auto: false

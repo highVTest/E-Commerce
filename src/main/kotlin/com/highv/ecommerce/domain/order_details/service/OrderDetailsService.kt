@@ -204,53 +204,58 @@ class OrderDetailsService(
         sellerId: Long
     ): OrderStatusResponse {
 
-        val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(
-            shopId,
-            orderId
-        )
-        val coupons = couponRepository.findAllByProductId(orderDetails.map { it.product.id!! })
-        val complainType =
-            if (orderDetails[0].complainStatus == ComplainStatus.REFUND_REQUESTED) ComplainType.REFUND
-            else ComplainType.EXCHANGE
-        when (orderDetails[0].complainStatus) {
-            ComplainStatus.REFUND_REQUESTED -> {
+        var orderStatusResponse = OrderStatusResponse("요청에 실패 했습니다")
 
-                val lock = createLockKey(shopId,orderId,sellerId).let{
-                    lockService.mySqlLock(it)
+        lockService.runExclusiveWithRedissonLock("${shopId}_${orderId}"){
+            val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(
+                shopId,
+                orderId
+            )
+
+            val coupons = couponRepository.findAllByProductId(orderDetails.map { it.product.id!! })
+
+            val complainType =
+                if (orderDetails[0].complainStatus == ComplainStatus.REFUND_REQUESTED) ComplainType.REFUND
+                else ComplainType.EXCHANGE
+
+            when (orderDetails[0].complainStatus) {
+
+                ComplainStatus.REFUND_REQUESTED -> {
+
+                    orderDetails.map {
+
+                        it.sellerUpdate(OrderStatus.ORDER_CANCELED, sellerOrderStatusRequest, ComplainStatus.REFUNDED)
+
+                        it.product.productBackOffice!!.quantity += it.productQuantity
+                        it.product.productBackOffice!!.soldQuantity -= it.productQuantity
+
+                        val couponToBuyerList = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(
+                            coupons,
+                            it.buyer.id!!
+                        )
+
+                        couponToBuyerList.map { couponToBuyer -> couponToBuyer.returnCoupon() }
+                    }
+
+
                 }
 
-                orderDetails.map {
+                ComplainStatus.EXCHANGE_REQUESTED -> {
+                    orderDetails.map {
+                        it.sellerUpdate(OrderStatus.PRODUCT_PREPARING, sellerOrderStatusRequest, ComplainStatus.EXCHANGED)
 
-                    it.sellerUpdate(OrderStatus.ORDER_CANCELED, sellerOrderStatusRequest, ComplainStatus.REFUNDED)
-
-                    it.product.productBackOffice!!.quantity += it.productQuantity
-                    it.product.productBackOffice!!.soldQuantity -= it.productQuantity
-
-                    val couponToBuyerList = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(
-                        coupons,
-                        it.buyer.id!!
-                    )
-
-                    couponToBuyerList.map { couponToBuyer -> couponToBuyer.returnCoupon() }
+                    }
                 }
 
-                lockService.deleteLock(lock)
+                else -> throw InvalidRequestException(400, "구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
             }
 
-            ComplainStatus.EXCHANGE_REQUESTED -> {
-                orderDetails.map {
-                    it.sellerUpdate(OrderStatus.PRODUCT_PREPARING, sellerOrderStatusRequest, ComplainStatus.EXCHANGED)
+            orderDetailsRepository.saveAll(orderDetails)
 
-                }
-            }
-
-            else -> throw InvalidRequestException(400, "구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
+            orderStatusResponse = OrderStatusResponse.from(complainType, "전체 요청 승인 완료 되었습니다")
         }
 
-
-        orderDetailsRepository.saveAll(orderDetails)
-
-        return OrderStatusResponse.from(complainType, "전체 요청 승인 완료 되었습니다")
+        return orderStatusResponse
     }
 
     private fun createLockKey(shopId: Long, orderId: Long, sellerId: Long): String{

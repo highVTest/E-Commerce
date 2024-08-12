@@ -5,8 +5,13 @@ import com.highv.ecommerce.common.exception.BuyerNotFoundException
 import com.highv.ecommerce.common.exception.CartEmptyException
 import com.highv.ecommerce.common.exception.CouponExpiredException
 import com.highv.ecommerce.common.exception.InsufficientStockException
+import com.highv.ecommerce.common.innercall.TxAdvice
+import com.highv.ecommerce.common.lock.service.LockService
+import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
+import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
+import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
@@ -15,9 +20,9 @@ import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepositor
 import com.highv.ecommerce.domain.order_master.dto.PaymentRequest
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
+import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
@@ -27,30 +32,77 @@ class OrderMasterService(
     private val itemCartRepository: ItemCartRepository,
     private val buyerRepository: BuyerRepository,
     private val couponToBuyerRepository: CouponToBuyerRepository,
+    private val redisLockService: LockService,
+    private val txAdvice: TxAdvice,
+    private val productBackOfficeRepository: ProductBackOfficeRepository
 ) {
 
-    @Transactional
+    val log = LoggerFactory.getLogger("동시성 이슈")
+
+    // fun paymentLock(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
+    //     var result = DefaultResponse.from("")
+    //     val key = "$buyerId"
+    //
+    //     kotlin.runCatching {
+    //         redisLockService.runExclusiveWithRedissonLock(key) {
+    //             result = txAdvice.run { requestPayment(buyerId, paymentRequest) }
+    //
+    //         }
+    //     }
+    //     return result
+    // }
+
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
 
-        val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw BuyerNotFoundException(404, "구매자 정보가 존재하지 않습니다")
+        val key = "락락"
+        var masterId = 0L
+        kotlin.runCatching {
+            redisLockService.runExclusiveWithRedissonLock(key) {
+                val buyer =
+                    buyerRepository.findByIdOrNull(buyerId) ?: throw BuyerNotFoundException(404, "구매자 정보가 존재하지 않습니다")
+                if (paymentRequest.cartIdList.isEmpty()) throw CartEmptyException(400, "장바구니 에서 아이템 목록을 선택해 주세요")
 
-        if (paymentRequest.cartIdList.isEmpty()) throw CartEmptyException(400, "장바구니 에서 아이템 목록을 선택해 주세요")
+                val cart = itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
+                val couponToBuyer =
+                    couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(
+                        paymentRequest.couponIdList,
+                        buyerId
+                    )
 
-        val cart = itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
 
-        if(cart.isEmpty()) throw CartEmptyException(400, "장바구니에 아이템이 존재 하지 않습니다")
+                couponToBuyer.forEach {
+                    if (it.coupon.expiredAt < LocalDateTime.now()) throw CouponExpiredException(
+                        400,
+                        "쿠폰 유효 시간이 만료 되었습니다"
+                    )
+                }
 
-        val couponToBuyer =
-            couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(paymentRequest.couponIdList, buyerId)
+                val productPrice = orderMasterRepository.discountTotalPriceList(buyerId, couponToBuyer)
 
-        couponToBuyer.forEach {
-            if (it.coupon.expiredAt < LocalDateTime.now()) throw CouponExpiredException(400, "쿠폰 유효 시간이 만료 되었습니다")
+                couponToBuyer.forEach { it.useCoupon() }
+
+                //트랜잭션 전파 수준 변경
+
+                val orderMaster = txAdvice.run { orderSave(buyer, cart, productPrice) }
+                masterId = orderMaster.id!!
+                //itemCartRepository.deleteAll(cart)
+            }
         }
+        return DefaultResponse.from("주문이 완료 되었습니다, 주문 번호 : $masterId")
+    }
 
-        val productPrice = orderMasterRepository.discountTotalPriceList(buyerId, couponToBuyer)
-
+    fun orderSave(buyer: Buyer, cart: List<ItemCart>, productPrice: Map<Long, Int>): OrderMaster {
+        log.info("수량 변경 시도")
+        cart.forEach {
+            if (it.product.productBackOffice!!.quantity < it.quantity)
+                throw InsufficientStockException(400, "재고가 부족 합니다")
+            it.product.productBackOffice!!.quantity -= it.quantity
+            it.product.productBackOffice!!.soldQuantity += it.quantity
+            productBackOfficeRepository.saveAndFlush(it.product.productBackOffice!!)
+        }
+        log.info("마스터 저장")
         val orderMaster = orderMasterRepository.saveAndFlush(OrderMaster())
-
+        log.info("디테일 저장")
         orderDetailsRepository.saveAll(
             cart.map {
                 OrderDetails(
@@ -65,17 +117,8 @@ class OrderMasterService(
                 )
             }
         )
-
-        couponToBuyer.forEach { it.useCoupon() }
-
-        cart.forEach {
-            if (it.product.productBackOffice!!.quantity < it.quantity) throw InsufficientStockException(400, "재고가 부족 합니다")
-            it.product.productBackOffice!!.quantity -= it.quantity
-            it.product.productBackOffice!!.soldQuantity += it.quantity
-        }
-
-        itemCartRepository.deleteAll(cart)
-
-        return DefaultResponse.from("주문이 완료 되었습니다, 주문 번호 : ${orderMaster.id}")
+        return orderMaster
     }
 }
+
+

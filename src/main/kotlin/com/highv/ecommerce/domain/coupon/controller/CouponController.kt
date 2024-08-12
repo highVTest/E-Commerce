@@ -128,6 +128,11 @@ class CouponController(
         .status(HttpStatus.OK)
         .body(couponService.issuedCoupon(couponId, userPrincipal.id))
 
-
+    @PreAuthorize("hasRole('BUYER')")
+    @DeleteMapping("/buyer/coupon/{couponId}")
+    fun deleteBuyerCoupon(
+        @PathVariable couponId: Long,
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ) : ResponseEntity<DefaultResponse> = ResponseEntity.status(HttpStatus.OK).body(couponService.deleteBuyerCoupon(couponId, userPrincipal.id))
 
 }

@@ -75,7 +75,6 @@ class CouponService(
         return DefaultResponse.from("쿠폰 업데이트가 완료 되었습니다")
     }
 
-    @Transactional
     fun deleteCoupon(couponId: Long, sellerId: Long): DefaultResponse {
 
         val result = couponRepository.findByIdOrNull(couponId)  ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
@@ -122,7 +121,7 @@ class CouponService(
 
             // 바꿔야 하는 로직은 락 안에서 실행 해야함
             // 잠금이 시도될 경우 기다 리는 시간 , 잠금이 유지 되는 시간, 시간의 단위
-            if(lock.tryLock(20, 1, TimeUnit.SECONDS)) {
+            if(lock.tryLock(20, 2, TimeUnit.SECONDS)) {
 
                 val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw BuyerNotFoundException(404, "바이어가 존재하지 않습니다")
 
@@ -183,6 +182,15 @@ class CouponService(
        return couponRepository.findByProductId(productId)
            .let { CouponResponse.from(it ?: throw CouponNotFoundException(409, "쿠폰이 존재하지 않습니다")) }
 
+    }
+
+    fun deleteBuyerCoupon(couponId: Long, buyerId: Long): DefaultResponse {
+
+        val couponToBuyer = couponToBuyerRepository.findByCouponIdAndBuyerIdAndIsUsedFalse(couponId, buyerId) ?: throw CouponNotFoundException(409, "쿠폰이 존재하지 않습니다")
+
+        couponToBuyerRepository.delete(couponToBuyer)
+
+        return DefaultResponse.from("쿠폰 삭제가 완료 되었습니다")
     }
 
 }
