@@ -20,6 +20,7 @@ import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepositor
 import com.highv.ecommerce.domain.order_master.dto.PaymentRequest
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
+import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -37,7 +38,8 @@ class OrderMasterService(
 ) {
 
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
-        val key = "payment"
+
+        val key = "락락"
         var masterId = 0L
         kotlin.runCatching {
             redisLockService.runExclusiveWithRedissonLock(key, 50) {
@@ -99,4 +101,6 @@ class OrderMasterService(
         )
         return orderMaster
     }
+
 }
+
