@@ -6,6 +6,7 @@ import com.highv.ecommerce.domain.product.dto.TopSearchKeyword
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.redis.core.HashOperations
 import org.springframework.data.redis.core.RedisTemplate
@@ -38,14 +39,21 @@ class ProductSearchService(
         val sortProperty = pageRequest.sort.iterator().next().property
         val sortDirection =
             if (pageRequest.sort.isSorted && pageRequest.sort.getOrderFor(sortProperty)?.isAscending == true) "ASC" else "DESC"
-        val cacheKey = createCacheKey(keyword, sortProperty, sortDirection)
+        val pageNumber = pageRequest.pageNumber
 
-        val cachedData = searchHash.get("searchList", cacheKey)
-        if (cachedData != null) {
-            return cachedData
+        if (pageNumber == 0) {
+            val cacheKey = createCacheKey(keyword, sortProperty, sortDirection)
+
+            val cachedData = searchHash.get("searchList", cacheKey)
+            if (cachedData != null) {
+                return cachedData
+            } else {
+                cacheAllFilterCases(keyword, pageRequest)
+                return searchHash.get("searchList", cacheKey) ?: Page.empty(pageRequest)
+            }
         } else {
-            cacheAllFilterCases(keyword, pageRequest)
-            return searchHash.get("searchList", cacheKey) ?: Page.empty(pageRequest)
+            val productInfo = productRepository.searchByKeywordPaginated(keyword, pageRequest)
+            return productInfo.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
         }
     }
 
@@ -78,6 +86,38 @@ class ProductSearchService(
                         productInfo.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) })
                 }
             }
+        }
+    }
+
+    fun getAllProducts(pageable: Pageable): Page<ProductResponse> {
+
+        val sortProperty = pageable.sort.iterator().next().property
+        val sortDirection =
+            if (pageable.sort.isSorted && pageable.sort.getOrderFor(sortProperty)?.isAscending == true) "ASC" else "DESC"
+
+        val pageNumber = pageable.pageNumber
+
+        if (pageNumber == 0) {
+            val cacheKey = createCacheKey("all", sortProperty, sortDirection)
+
+            val cachedData = searchHash.get("searchList", cacheKey)
+
+            if (cachedData != null) {
+                return cachedData
+            } else {
+                val products = productRepository.findAllPaginated(pageable)
+
+                searchHash.put(
+                    "searchList",
+                    cacheKey,
+                    products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
+                )
+
+                return searchHash.get("searchList", cacheKey) ?: Page.empty(pageable)
+            }
+        } else {
+            val products = productRepository.findAllPaginated(pageable)
+            return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
         }
     }
 }

@@ -101,11 +101,6 @@ class ProductService(
         return ProductResponse.from(product, favoriteService.countFavorite(productId))
     }
 
-    fun getAllProducts(pageable: Pageable): Page<ProductResponse> {
-        val products = productRepository.findAllPaginated(pageable)
-        return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
-    }
-
     fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductResponse> {
         val products = productRepository.findByCategoryPaginated(categoryId, pageable)
         return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
