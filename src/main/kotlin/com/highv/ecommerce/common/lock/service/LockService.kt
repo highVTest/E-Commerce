@@ -39,10 +39,10 @@ class LockService(
         lockKeyRepository.delete(lockKey)
     }
 
-    fun <T> runExclusiveWithRedissonLock(lockKey: String, func: () -> T): T {
+    fun <T> runExclusiveWithRedissonLock(lockKey: String, waitTime: Long, func: () -> T): T {
         val lock: RLock = redissonClient.getFairLock(lockKey)
         return try {
-            if (lock.tryLock(50, 5, TimeUnit.SECONDS)) {
+            if (lock.tryLock(waitTime, 5, TimeUnit.SECONDS)) {
                 log.info("락 획득 성공: $lockKey")
                 func.invoke()
             } else {
