@@ -37,12 +37,11 @@ class SalesStatisticsController(
         .body(salesStatisticsService.getMonthsProductSales(seller.id))
 
     //상품 판매 수량 및 금액
-    @GetMapping("/{productId}/sales")
+    @GetMapping("/sales")
     @PreAuthorize("hasRole('SELLER')")
     fun getProductSales(
         @AuthenticationPrincipal seller: UserPrincipal,
-        @PathVariable productId: Long
-    ): ResponseEntity<ProductSalesResponse> = ResponseEntity
+    ): ResponseEntity<List<ProductSalesResponse>> = ResponseEntity
         .status(HttpStatus.OK)
-        .body(salesStatisticsService.getProductSales(seller.id, productId))
+        .body(salesStatisticsService.getProductSales(seller.id))
 }
