@@ -92,6 +92,13 @@ class CouponController(
         .status(HttpStatus.OK)
         .body(couponService.getSellerCouponList(userPrincipal.id))
 
+    @GetMapping("/coupon/{productId}")
+    fun getDetailCoupon(
+        @PathVariable("productId") productId: Long,
+    ): ResponseEntity<CouponResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(couponService.getDetailCoupon(productId))
+
 
     @PreAuthorize("hasRole('BUYER')")
     @GetMapping("/buyer/coupon/{couponId}")

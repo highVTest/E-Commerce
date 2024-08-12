@@ -215,7 +215,7 @@ class OrderDetailsService(
         when (orderDetails[0].complainStatus) {
             ComplainStatus.REFUND_REQUESTED -> {
 
-                val lock = createLockKey(shopId,orderId,sellerId).let{
+                val lock = createLockKey(shopId, orderId, sellerId).let {
                     lockService.mySqlLock(it)
                 }
 
@@ -253,10 +253,9 @@ class OrderDetailsService(
         return OrderStatusResponse.from(complainType, "전체 요청 승인 완료 되었습니다")
     }
 
-    private fun createLockKey(shopId: Long, orderId: Long, sellerId: Long): String{
-        return "${shopId}_${orderId}_${sellerId}"
+    private fun createLockKey(shopId: Long, orderId: Long, sellerId: Long): String {
+        return "${shopId}_${orderId}"
     }
-}
 
     @Transactional
     fun updateProductsDelivery(

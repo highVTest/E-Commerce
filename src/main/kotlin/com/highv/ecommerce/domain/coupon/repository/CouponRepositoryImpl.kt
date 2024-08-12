@@ -97,4 +97,8 @@ class CouponRepositoryImpl(
     override fun saveAndFlush(coupon: Coupon) {
         couponJpaRepository.saveAndFlush(coupon)
     }
+
+    override fun findByProductId(productId: Long): Coupon? {
+        return couponJpaRepository.findByProductId(productId)
+    }
 }

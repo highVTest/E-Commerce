@@ -34,7 +34,6 @@ class CouponService(
     private val redisTemplate: RedisTemplate<String, String>
 ) {
 
-
     @Transactional
     fun createCoupon(couponRequest: CreateCouponRequest, sellerId: Long): DefaultResponse {
 
@@ -107,9 +106,9 @@ class CouponService(
         return CouponResponse.from(result.coupon)
     }
 
-    fun getBuyerCouponList(sellerId: Long): List<CouponResponse>? {
+    fun getBuyerCouponList(buyerId: Long): List<CouponResponse>? {
 
-        return couponToBuyerRepository.findAllProductIdWithBuyerId(sellerId).let {
+        return couponToBuyerRepository.findAllProductIdWithBuyerId(buyerId).let {
             couponRepository.findAllCouponIdWithBuyer(it).map { i -> CouponResponse.from(i) }
         }
     }
@@ -118,8 +117,6 @@ class CouponService(
     fun issuedCoupon(couponId: Long, buyerId: Long): DefaultResponse {
 
         val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw BuyerNotFoundException(404, "바이어가 존재하지 않습니다")
-
-
 
         if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw DuplicateCouponException(
             400,
@@ -180,5 +177,12 @@ class CouponService(
 
     private fun redisUnLock(key: String): Boolean
             = redisTemplate.delete(key)
+
+    fun getDetailCoupon(productId: Long): CouponResponse {
+
+       return couponRepository.findByProductId(productId)
+           .let { CouponResponse.from(it ?: throw CouponNotFoundException(409, "쿠폰이 존재하지 않습니다")) }
+
+    }
 
 }
