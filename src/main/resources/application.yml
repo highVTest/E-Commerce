@@ -25,10 +25,10 @@ spring:
 
     mongodb:
       search:
-        db: Cluster0807
-        host: cluster0807.e7xiz.mongodb.net
-        password: x-SQAQ7vbUJEe38
-        user: chadkim1021
+        db: ${MONGODB_URL}
+        host: ${MONGODB_HOST}
+        password: ${MONGODB_PASSWORD}
+        user: ${MONGODB_USER}
 
   mail:
     host: smtp.gmail.com

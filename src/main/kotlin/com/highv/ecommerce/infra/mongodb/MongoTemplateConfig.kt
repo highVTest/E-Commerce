@@ -5,7 +5,6 @@ import com.mongodb.client.MongoClients
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory
 
 @Configuration
@@ -21,12 +20,9 @@ class MongoTemplateConfig (
     fun searchMongoFactory(): SimpleMongoClientDatabaseFactory =
         SimpleMongoClientDatabaseFactory(searchMongoClient(), searchMongoDBProperties.getDB())
 
-    @Bean(name = [SEARCH_MONGODB_TEMPLATE])
-    fun searchMongoTemplate(): MongoTemplate = MongoTemplate(searchMongoFactory())
 
     companion object {
         private const val SEARCH_MONGODB_FACTORY = "search-mongodb-factory"
-        private const val SEARCH_MONGODB_TEMPLATE = "search-mongodb-template"
         private const val SEARCH_MONGODB_CLIENT = "search-mongodb-client"
     }
 }

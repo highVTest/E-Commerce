@@ -2,10 +2,11 @@ package com.highv.ecommerce.infra.mongodb
 
 
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Configuration
+import org.springframework.boot.context.properties.ConfigurationProperties
 
 
-@Configuration
+
+@ConfigurationProperties(prefix = "spring.data.mongodb.search")
 data class SearchMongoDBProperties(
     @Value("\${spring.data.mongodb.search.host}")
     private val host: String,
@@ -23,5 +24,6 @@ data class SearchMongoDBProperties(
         "mongodb+srv://$user:$password@$host/?retryWrites=true&w=majority&appName=$db&authSource=admin"
 
     fun getDB(): String = db
+
 
 }
