@@ -47,7 +47,6 @@ dependencies {
 
     implementation("org.apache.tika:tika-core:1.24")
 
-
     // 추가된 부분: JSON 웹 토큰(JWT) 관련 의존성
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
     implementation("io.jsonwebtoken:jjwt-impl:0.12.3")

@@ -1,20 +1,26 @@
 package com.highv.ecommerce.domain.admin.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.common.exception.*
+import com.highv.ecommerce.common.exception.BlackListNotFoundException
+import com.highv.ecommerce.common.exception.ProductNotFoundException
+import com.highv.ecommerce.common.exception.SellerNotFoundException
 import com.highv.ecommerce.domain.admin.dto.BlackListResponse
 import com.highv.ecommerce.domain.admin.entity.BlackList
 import com.highv.ecommerce.domain.admin.repository.BlackListRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
+import com.highv.ecommerce.domain.seller.dto.ActiveStatus
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
+import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class AdminService(
     private val sellerRepository: SellerRepository,
     private val productRepository: ProductRepository,
+    private val shopRepository: ShopRepository,
     private val blackListRepository: BlackListRepository
 ) {
     // 판매자 제재 로직 구현
@@ -54,7 +60,7 @@ class AdminService(
 
         // 상품에서 판매자 정보를 가져옵니다.
         val seller = product.shop.sellerId
-            ?.let { sellerRepository.findByIdOrNull(it) }
+            .let { sellerRepository.findByIdOrNull(it) }
             ?: throw SellerNotFoundException(message = "Seller not found for product id $productId")
 
         // 판매자의 이메일로 블랙리스트에서 검색합니다.
@@ -101,5 +107,40 @@ class AdminService(
             ?: throw BlackListNotFoundException(message = "블랙리스트 id $blackListId 존재하지 않습니다.")
         blackListRepository.delete(blackList)
         return DefaultResponse("블랙리스트 삭제 완료")
+    }
+
+    // 판매자 탈퇴 대기 회원 승인 로직 구현
+    @Transactional
+    fun approveSellerResignation(sellerId: Long): DefaultResponse {
+        val seller = sellerRepository.findByIdOrNull(sellerId)
+            ?: throw SellerNotFoundException(message = "판매자 id $sellerId not found")
+
+        // 판매자 상태를 탈퇴 승인으로 변경합니다.
+        seller.activeStatus = ActiveStatus.RESIGNED
+
+        // 해당 판매자의 Shop을 찾습니다.
+        val shop = shopRepository.findShopBySellerId(sellerId)
+
+        // Shop에 속한 모든 Product를 삭제(소프트 삭제)합니다.
+        val products = productRepository.findAllByShopId(shop.id!!)
+        products.forEach { product ->
+            product.isDeleted = true
+            product.deletedAt = LocalDateTime.now()
+            productRepository.save(product)
+        }
+
+        return DefaultResponse("판매자 탈퇴 승인 및 상품 삭제 완료")
+    }
+
+    // 판매자 승인 대기 회원 승격 로직 구현
+    @Transactional
+    fun promotePendingSeller(sellerId: Long): DefaultResponse {
+        val seller = sellerRepository.findByIdOrNull(sellerId)
+            ?: throw SellerNotFoundException(message = "판매자 id $sellerId not found")
+
+        // 판매자 상태를 승인 완료로 변경합니다.
+        seller.activeStatus = ActiveStatus.APPROVED
+
+        return DefaultResponse("판매자 승인 완료")
     }
 }
