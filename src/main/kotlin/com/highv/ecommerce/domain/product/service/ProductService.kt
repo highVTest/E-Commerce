@@ -48,7 +48,7 @@ class ProductService(
         val product = Product(
             name = productRequest.name,
             description = productRequest.description,
-            productImage = "",
+            productImage = productRequest.imageUrl,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
             isSoldOut = false,

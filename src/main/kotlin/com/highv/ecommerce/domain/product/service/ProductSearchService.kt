@@ -113,6 +113,8 @@ class ProductSearchService(
                     products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
                 )
 
+                redisTemplateForProductSearch.expire(cacheKey, 1, TimeUnit.MINUTES)
+
                 return searchHash.get("searchList", cacheKey) ?: Page.empty(pageable)
             }
         } else {
