@@ -10,6 +10,7 @@ import com.highv.ecommerce.domain.favorite.repository.FavoriteRepository
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class FavoriteService(
@@ -18,6 +19,7 @@ class FavoriteService(
     private val buyerRepository: BuyerRepository,
 ) {
 
+    @Transactional
     fun management(productId: Long, buyerId: Long): DefaultResponse {
 
         if (!productRepository.existsById(productId)) {
@@ -28,10 +30,10 @@ class FavoriteService(
             throw BuyerNotFoundException(404, "구매자 정보가 존재하지 않습니다.")
         }
 
-        val existsFavorite: Favorite? = favoriteRepository.findByProductIdAndBuyerId(productId, buyerId)
+        val existsFavorite: Boolean = favoriteRepository.existsByProductIdAndBuyerId(productId, buyerId)
 
-        if (existsFavorite != null) {
-            favoriteRepository.delete(existsFavorite)
+        if (existsFavorite) {
+            favoriteRepository.deleteFavorite(productId, buyerId)
             return DefaultResponse("찜 목록에서 삭제했습니다.")
         }
 

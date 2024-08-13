@@ -20,7 +20,6 @@ class ImageService(
         s3Manager.uploadFile(listOf(file))
         val imageUrl = s3Manager.getFile(file.originalFilename)
         val image = Image(
-
             usagePath = request.usagePath,
             imageUrl = listOf(imageUrl)
 
@@ -44,7 +43,6 @@ class ImageService(
         files.forEach {
             val imageUrl = s3Manager.getFile(it.originalFilename)
             val image = Image(
-
                 usagePath = request.usagePath,
                 imageUrl = listOf(imageUrl)
 

@@ -15,7 +15,6 @@ import com.highv.ecommerce.domain.seller.entity.Seller
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.infra.email.EmailUtils
 import com.highv.ecommerce.infra.redis.RedisUtils
-import com.highv.ecommerce.infra.s3.S3Manager
 import com.highv.ecommerce.infra.security.jwt.JwtPlugin
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -29,7 +28,6 @@ class UserService(
     private val jwtPlugin: JwtPlugin,
     private val redisUtils: RedisUtils,
     private val mailUtils: EmailUtils,
-    private val s3Manager: S3Manager,
 
     @Value("\${spring.mail.auth-code-expiration-millis}")
     private val expirationMillis: Long
@@ -124,6 +122,7 @@ class UserService(
 
             userId = sellerRepository.saveAndFlush(seller).id!!
         }
+
 
         return EmailAuthResponse(
             id = userId,

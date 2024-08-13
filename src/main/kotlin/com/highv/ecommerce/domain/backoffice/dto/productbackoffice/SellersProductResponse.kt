@@ -9,7 +9,8 @@ data class SellersProductResponse(
     val name: String,
     val quantity: Int,
     val price: Int,
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime,
+    val productImage: String
 ) {
     companion object {
         fun from(product: Product, productBackOffice: ProductBackOffice) = SellersProductResponse(
@@ -17,7 +18,8 @@ data class SellersProductResponse(
             product.name,
             productBackOffice.quantity,
             productBackOffice.price,
-            product.createdAt
+            product.createdAt,
+            product.productImage
         )
     }
 }

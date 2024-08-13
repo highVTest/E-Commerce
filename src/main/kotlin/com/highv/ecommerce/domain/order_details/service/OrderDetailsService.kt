@@ -4,17 +4,11 @@ import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.InvalidRequestException
 import com.highv.ecommerce.common.exception.ModelNotFoundException
-import com.highv.ecommerce.common.lock.service.LockService
+import com.highv.ecommerce.common.innercall.TxAdvice
+import com.highv.ecommerce.common.lock.service.RedisLockService
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
-import com.highv.ecommerce.domain.order_details.dto.BuyerOrderDetailProductResponse
-import com.highv.ecommerce.domain.order_details.dto.BuyerOrderResponse
-import com.highv.ecommerce.domain.order_details.dto.BuyerOrderShopResponse
-import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
-import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
-import com.highv.ecommerce.domain.order_details.dto.SellerOrderResponse
-import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
-import com.highv.ecommerce.domain.order_details.dto.UpdateDeliveryStatusRequest
+import com.highv.ecommerce.domain.order_details.dto.*
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
@@ -32,7 +26,8 @@ class OrderDetailsService(
     private val couponToBuyerRepository: CouponToBuyerRepository,
     private val couponRepository: CouponRepository,
     private val orderMasterRepository: OrderMasterRepository,
-    private val lockService: LockService
+    private val lockService: RedisLockService,
+    private val txAdvice: TxAdvice
 ) {
 
     @Transactional
@@ -162,7 +157,7 @@ class OrderDetailsService(
 
     fun getSellerOrderDetailsAll(shopId: Long, sellerId: Long): List<SellerOrderResponse> {
 
-        val orderDetails = orderDetailsRepository.findAllByShopId(shopId)
+        val orderDetails = orderDetailsRepository.findAllByShopIdOrderStatusPending(shopId)
 
         if (orderDetails.isEmpty()) throw CustomRuntimeException(404, "판매자가 운영 하는 상점이 아닙니다")
 
@@ -196,7 +191,7 @@ class OrderDetailsService(
         return SellerOrderResponse.from(orderMaster, orderDetails)
     }
 
-    @Transactional
+
     fun requestComplainAccept(
         shopId: Long,
         orderId: Long,
@@ -204,52 +199,66 @@ class OrderDetailsService(
         sellerId: Long
     ): OrderStatusResponse {
 
-         val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(
-                shopId,
-                orderId
-            )
+        val lockKey = "${shopId}_${sellerId}"
 
-            val coupons = couponRepository.findAllByProductId(orderDetails.map { it.product.id!! })
+        var complainType = ComplainType.REFUND
 
-            val complainType =
-                if (orderDetails[0].complainStatus == ComplainStatus.REFUND_REQUESTED) ComplainType.REFUND
-                else ComplainType.EXCHANGE
+        kotlin.runCatching {
+            lockService.runExclusiveWithRedissonLock(lockKey, 1){
+                val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(
+                    shopId,
+                    orderId
+                )
 
-            when (orderDetails[0].complainStatus) {
+                val couponIdList = couponRepository.findAllByProductId(orderDetails.map { it.product.id!! })
 
-                ComplainStatus.REFUND_REQUESTED -> {
+                complainType =
+                    if (orderDetails[0].complainStatus == ComplainStatus.REFUND_REQUESTED) ComplainType.REFUND
+                    else ComplainType.EXCHANGE
 
-                    orderDetails.map {
+                txAdvice.run { setAcceptLogic(orderDetails, sellerOrderStatusRequest, couponIdList) }
 
-                        it.sellerUpdate(OrderStatus.ORDER_CANCELED, sellerOrderStatusRequest, ComplainStatus.REFUNDED)
-
-                        it.product.productBackOffice!!.quantity += it.productQuantity
-                        it.product.productBackOffice!!.soldQuantity -= it.productQuantity
-
-                        val couponToBuyerList = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(
-                            coupons,
-                            it.buyer.id!!
-                        )
-
-                        couponToBuyerList.map { couponToBuyer -> couponToBuyer.returnCoupon() }
-                    }
-
-
-                }
-
-                ComplainStatus.EXCHANGE_REQUESTED -> {
-                    orderDetails.map {
-                        it.sellerUpdate(OrderStatus.PRODUCT_PREPARING, sellerOrderStatusRequest, ComplainStatus.EXCHANGED)
-
-                    }
-                }
-
-                else -> throw InvalidRequestException(400, "구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
+                orderDetailsRepository.saveAll(orderDetails)
             }
-
-            orderDetailsRepository.saveAll(orderDetails)
+        }
 
         return OrderStatusResponse.from(complainType, "전체 요청 승인 완료 되었습니다")
+    }
+
+    private fun setAcceptLogic(orderDetails: List<OrderDetails>, sellerOrderStatusRequest: SellerOrderStatusRequest, couponIdList: List<Long>) {
+
+        when (orderDetails[0].complainStatus) {
+
+            ComplainStatus.REFUND_REQUESTED -> {
+
+                orderDetails.map {
+
+                    it.sellerUpdate(OrderStatus.ORDER_CANCELED, sellerOrderStatusRequest, ComplainStatus.REFUNDED)
+
+                    it.product.productBackOffice!!.quantity += it.productQuantity
+                    it.product.productBackOffice!!.soldQuantity -= it.productQuantity
+
+                    val couponToBuyerList = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(
+                        couponIdList,
+                        it.buyer.id!!
+                    )
+
+                    couponToBuyerList.map { couponToBuyer -> couponToBuyer.returnCoupon() }
+                }
+
+
+            }
+
+            ComplainStatus.EXCHANGE_REQUESTED -> {
+                orderDetails.map {
+                    it.sellerUpdate(OrderStatus.PRODUCT_PREPARING, sellerOrderStatusRequest, ComplainStatus.EXCHANGED)
+
+                }
+            }
+
+            else -> throw InvalidRequestException(400, "구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
+        }
+
     }
 
 
