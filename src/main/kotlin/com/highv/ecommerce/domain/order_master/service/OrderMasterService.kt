@@ -71,9 +71,9 @@ class OrderMasterService(
                 val orderMaster = txAdvice.run { orderSave(buyer, cart, productPrice) }
 
                 masterId = orderMaster.id!!
-                //itemCartRepository.deleteAll(cart)
+                itemCartRepository.deleteAll(cart)
             }
-        }
+        }.getOrThrow()
         return DefaultResponse.from("주문이 완료 되었습니다, 주문 번호 : $masterId")
     }
 
