@@ -7,6 +7,8 @@ import java.time.LocalDateTime
 
 data class SellerComplainResponse(
     val orderDetailId: Long,
+    val productName: String,
+    val productImage: String,
     val statusCode: OrderStatus,
     val complainStatus: ComplainStatus,
     val complainBuyerName: String,
@@ -19,6 +21,8 @@ data class SellerComplainResponse(
         fun from(orderDetail: OrderDetails): SellerComplainResponse {
             return SellerComplainResponse(
                 orderDetailId = orderDetail.id!!,
+                productName = orderDetail.product.name,
+                productImage = orderDetail.product.productImage,
                 complainBuyerName = orderDetail.buyer.nickname,
                 statusCode = orderDetail.orderStatus,
                 complainStatus = orderDetail.complainStatus,

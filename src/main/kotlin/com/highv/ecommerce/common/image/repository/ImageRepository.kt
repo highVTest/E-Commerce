@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 class ImageRepository(
     private val mongoTemplate: MongoTemplate
 )  {
-    fun findByIdOrNull (id: Long): ImageUrlResponse {
+    fun findByIdOrNull (id: String): ImageUrlResponse {
         return mongoTemplate.findOne(
             Query().addCriteria(Criteria.where("_id").`is`(id)),
             ImageUrlResponse::class.java

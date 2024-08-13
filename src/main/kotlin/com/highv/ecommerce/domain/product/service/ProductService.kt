@@ -49,20 +49,6 @@ class ProductService(
                 throw RuntimeException("Seller is not authorized to create a product")
             }
 
-        val shop = shopRepository.findShopBySellerId(sellerId)
-        val product = Product(
-            name = productRequest.name,
-            description = productRequest.description,
-            productImage = productRequest.imageUrl,
-            createdAt = LocalDateTime.now(),
-            updatedAt = LocalDateTime.now(),
-            isSoldOut = false,
-            deletedAt = null,
-            isDeleted = false,
-            shop = shop,
-            categoryId = productRequest.categoryId,
-            productBackOffice = null
-        )
         // if (file != null) {
         //     s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
         //     product.productImage = s3Manager.getFile(file.originalFilename)

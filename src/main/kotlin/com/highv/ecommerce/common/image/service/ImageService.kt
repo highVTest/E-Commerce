@@ -17,10 +17,9 @@ class ImageService(
 ) {
 
     fun uploadImage(file: MultipartFile?, id: Long, request: ImageRequest): ImageUrlResponse {
-        s3Manager.uploadFile(file!!)
+        s3Manager.uploadFile(listOf(file!!))
         val imageUrl = s3Manager.getFile(file.originalFilename)
         val image = Image(
-            id = request.id,
             usagePath = request.usagePath,
             imageUrl = listOf(imageUrl)
 
@@ -44,14 +43,13 @@ class ImageService(
         files.forEach {
             val imageUrl = s3Manager.getFile(it.originalFilename)
             val image = Image(
-                id = request.id,
                 usagePath = request.usagePath,
                 imageUrl = listOf(imageUrl)
 
             )
             imageRepository.save(image)
 
-            s3Manager.uploadFile(it)
+            s3Manager.uploadFile(listOf(it))
 
         }
 
@@ -59,7 +57,7 @@ class ImageService(
     }
 
     fun getImage(id: Long): List<ImageUrlResponse> {
-        val image = imageRepository.findByIdOrNull(id)
+        val image = imageRepository.findByIdOrNull(id.toString())
 
         return  mutableListOf(image)
 
