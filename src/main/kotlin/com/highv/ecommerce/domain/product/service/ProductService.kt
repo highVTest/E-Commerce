@@ -48,7 +48,7 @@ class ProductService(
         val product = Product(
             name = productRequest.name,
             description = productRequest.description,
-            productImage = "",
+            productImage = productRequest.imageUrl,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
             isSoldOut = false,
@@ -116,11 +116,6 @@ class ProductService(
     fun getProductById(productId: Long): ProductResponse {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
         return ProductResponse.from(product, favoriteService.countFavorite(productId))
-    }
-
-    fun getAllProducts(pageable: Pageable): Page<ProductResponse> {
-        val products = productRepository.findAllPaginated(pageable)
-        return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
     }
 
     fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductResponse> {
