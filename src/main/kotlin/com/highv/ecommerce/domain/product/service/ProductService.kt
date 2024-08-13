@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.product.service
 
+import com.highv.ecommerce.common.lock.service.RedisLockService
 import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.ProductBackOfficeRequest
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
@@ -26,6 +27,7 @@ class ProductService(
     private val sellerRepository: SellerRepository,
     private val productBackOfficeRepository: ProductBackOfficeRepository,
     private val favoriteService: FavoriteService,
+    private val redisLockService: RedisLockService,
     /*private val s3Manager: S3Manager,*/
 ) {
     @Transactional
@@ -35,14 +37,17 @@ class ProductService(
         productBackOfficeRequest: ProductBackOfficeRequest,
     ): ProductResponse {
 
-        // Seller의 상태를 확인합니다.
-        val seller = sellerRepository.findByIdOrNull(sellerId)
-            ?: throw RuntimeException("Seller not found")
+        val lockKey = "createProduct:${sellerId}:${productRequest.name}"
+        return redisLockService.runExclusiveWithRedissonLock(lockKey, 5) {
 
-        // Seller 상태가 PENDING 또는 RESIGNED일 경우 예외를 발생시킵니다.
-        if (seller.activeStatus == ActiveStatus.PENDING || seller.activeStatus == ActiveStatus.RESIGNED) {
-            throw RuntimeException("Seller is not authorized to create a product")
-        }
+            // Seller의 상태를 확인합니다.
+            val seller = sellerRepository.findByIdOrNull(sellerId)
+                ?: throw RuntimeException("Seller not found")
+
+            // Seller 상태가 PENDING 또는 RESIGNED일 경우 예외를 발생시킵니다.
+            if (seller.activeStatus == ActiveStatus.PENDING || seller.activeStatus == ActiveStatus.RESIGNED) {
+                throw RuntimeException("Seller is not authorized to create a product")
+            }
 
         val shop = shopRepository.findShopBySellerId(sellerId)
         val product = Product(
@@ -63,17 +68,44 @@ class ProductService(
         //     product.productImage = s3Manager.getFile(file.originalFilename)
         // }
 
-        val savedProduct = productRepository.save(product)
-        val productBackOffice = ProductBackOffice(
-            quantity = productBackOfficeRequest.quantity,
-            price = productBackOfficeRequest.price,
-            soldQuantity = 0,
-            product = savedProduct
-        )
-        savedProduct.productBackOffice = productBackOffice
-        productBackOfficeRepository.save(productBackOffice)
-        productRepository.save(savedProduct)
-        return ProductResponse.from(savedProduct)
+            val shop = shopRepository.findShopBySellerId(sellerId)
+
+            if (productRepository.existsByNameAndShopId(
+                    productRequest.name,
+                    shop.id!!
+                )
+            ) throw RuntimeException("중복 상품 입니다.")
+
+            val product = Product(
+                name = productRequest.name,
+                description = productRequest.description,
+                productImage = "",
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now(),
+                isSoldOut = false,
+                deletedAt = null,
+                isDeleted = false,
+                shop = shop,
+                categoryId = productRequest.categoryId,
+                productBackOffice = null
+            )
+            // if (file != null) {
+            //     s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
+            //     product.productImage = s3Manager.getFile(file.originalFilename)
+            // }
+
+            val savedProduct = productRepository.save(product)
+            val productBackOffice = ProductBackOffice(
+                quantity = productBackOfficeRequest.quantity,
+                price = productBackOfficeRequest.price,
+                soldQuantity = 0,
+                product = savedProduct
+            )
+            savedProduct.productBackOffice = productBackOffice
+            productBackOfficeRepository.save(productBackOffice)
+            productRepository.save(savedProduct)
+            ProductResponse.from(savedProduct)
+        }
     }
 
     @Transactional

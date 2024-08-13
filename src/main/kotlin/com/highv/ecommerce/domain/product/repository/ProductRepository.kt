@@ -13,9 +13,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ProductRepository : JpaRepository<Product, Long>, ProductQueryDslRepository {
-    // fun findAllByShopId(shopId: Long): List<Product>
-    // @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productBackOffice WHERE p.id = :productId")
-    // fun findProductWithBackOfficeById(productId: Long): Product?
+    fun existsByNameAndShopId(name: String, shopId: Long): Boolean
 }
 
 @Repository
