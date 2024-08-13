@@ -17,7 +17,7 @@ class SalesStatisticsService(
     private val shopRepository: ShopRepository
 ) {
     fun getTotalSales(sellerId: Long): TotalSalesResponse {
-        val products = productRepository.findAllByShopId(sellerId)
+        val products = validateProduct(sellerId)
         val productIds = products.mapNotNull { it.id }
         val totalSales = productBackOfficeRepository.findTotalSalesStatisticsByProductIds(productIds)
         return TotalSalesResponse(totalSales.totalQuantity, totalSales.totalPrice)
@@ -30,18 +30,21 @@ class SalesStatisticsService(
     fun getProductSales(sellerId: Long): List<ProductSalesResponse> {
         val products = validateProduct(sellerId)
         products.forEach {
-            if(it.productBackOffice == null) throw CustomRuntimeException(404, "backoffice is null")
+            if (it.productBackOffice == null) throw CustomRuntimeException(404, "backoffice is null")
         }
 
-        return products.map { ProductSalesResponse(
-            it.name,
-            it.productBackOffice!!.soldQuantity,
-            (it.productBackOffice!!.soldQuantity * it.productBackOffice!!.price),
-        ) }
+        return products.map {
+            ProductSalesResponse(
+                it.name,
+                it.productBackOffice!!.soldQuantity,
+                (it.productBackOffice!!.soldQuantity * it.productBackOffice!!.price),
+            )
+        }
     }
 
-    private fun validateProduct(sellerId: Long): List<Product> {
-        val shop = shopRepository.findByIdOrNull(sellerId) ?: throw IllegalArgumentException("Seller not found for seller")
+    fun validateProduct(sellerId: Long): List<Product> {
+        val shop =
+            shopRepository.findByIdOrNull(sellerId) ?: throw IllegalArgumentException("Seller not found for seller")
         val products = productRepository.findAllByShopId(shop.id!!)
         return products
     }
