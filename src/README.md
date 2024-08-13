@@ -71,8 +71,8 @@
 - ![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat-square&logo=slack&logoColor=white)
 
 ## 📝 프로젝트 아키텍쳐
-![Project Architecture Image](https://www.figma.com/board/tbGm2ex2vfx3YhuwtpPaDf/HighVArchitecture?node-id=0-1&t=9aL0cdJVlXIddPno-0)
 
+![image](https://github.com/user-attachments/assets/603adef4-bdf8-49a3-899a-b6143cbb1c13)
 
 
 ## [Wireframe](https://www.figma.com/design/Pcn6VeErcGenAJxDOor9SG/Spa-2%EC%A1%B0-%EC%B5%9C%EC%A2%85?node-id=0-1&t=YT5Oho8LHWcjdKjn-0)
