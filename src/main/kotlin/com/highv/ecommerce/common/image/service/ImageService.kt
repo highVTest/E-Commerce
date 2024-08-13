@@ -16,11 +16,11 @@ class ImageService(
 
 ) {
 
-    fun uploadImage(file: MultipartFile?, id: Long, request: ImageRequest): ImageUrlResponse {
-        s3Manager.uploadFile(file!!)
+    fun uploadImage(file: MultipartFile, request: ImageRequest): ImageUrlResponse {
+        s3Manager.uploadFile(listOf(file))
         val imageUrl = s3Manager.getFile(file.originalFilename)
         val image = Image(
-            id = request.id,
+
             usagePath = request.usagePath,
             imageUrl = listOf(imageUrl)
 
@@ -31,7 +31,7 @@ class ImageService(
         return ImageUrlResponse(imageUrl = imageUrl)
     }
 
-    fun uploadImages(files: List<MultipartFile>, id: Long, request: ImageRequest): List<ImageUrlResponse> {
+    fun uploadImages(files: List<MultipartFile>, request: ImageRequest): List<ImageUrlResponse> {
 
         if (files.size > 9) {
             throw CustomRuntimeException(409, "이미지는 최대 9장만 등록 가능합니다.")
@@ -44,21 +44,21 @@ class ImageService(
         files.forEach {
             val imageUrl = s3Manager.getFile(it.originalFilename)
             val image = Image(
-                id = request.id,
+
                 usagePath = request.usagePath,
                 imageUrl = listOf(imageUrl)
 
             )
             imageRepository.save(image)
 
-            s3Manager.uploadFile(it)
+            s3Manager.uploadFile(files)
 
         }
 
         return imageUrls
     }
 
-    fun getImage(id: Long): List<ImageUrlResponse> {
+    fun getImage(id: String): List<ImageUrlResponse> {
         val image = imageRepository.findByIdOrNull(id)
 
         return  mutableListOf(image)
