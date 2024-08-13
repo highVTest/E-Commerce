@@ -38,7 +38,7 @@ class InventoryManagementService(
         return products.map { SellersProductResponse.from(it, it.productBackOffice!!) }
     }
 
-    private fun validateProductBO(sellerId: Long, productId: Long): ProductBackOffice {
+    fun validateProductBO(sellerId: Long, productId: Long): ProductBackOffice {
         val product = productRepository.findByIdOrNull(productId)
             ?: throw IllegalArgumentException("Product with id $productId not found")
         if (product.shop.sellerId != sellerId) throw IllegalArgumentException("No Authority")
