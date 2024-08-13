@@ -5,6 +5,7 @@ import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.DuplicatePasswordException
 import com.highv.ecommerce.common.exception.PasswordMismatchException
 import com.highv.ecommerce.common.exception.SellerNotFoundException
+import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateImageRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdatePasswordRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateSellerRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateShopRequest
@@ -56,6 +57,9 @@ class SellerInfoService(
         }
 
         seller.password = passwordEncoder.encode(request.newPassword)
+
+        sellerRepository.save(seller)
+
         return DefaultResponse("비밀번호가 변경되었습니다.")
     }
 
@@ -67,5 +71,34 @@ class SellerInfoService(
     fun getShopInfo(sellerId: Long): ShopResponse {
         val shop = shopRepository.findShopBySellerId(sellerId)
         return ShopResponse.from(shop)
+    }
+
+    fun changeSellerImage(sellerId: Long, request: UpdateImageRequest): DefaultResponse {
+        val seller =
+            sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "Seller not found")
+
+        seller.profileImage = request.imageUrl
+
+        sellerRepository.save(seller)
+
+        if (request.imageUrl.isEmpty()) {
+            return DefaultResponse("이미지를 삭제했습니다.")
+        }
+
+        return DefaultResponse("이미지를 변경했습니다.")
+    }
+
+    fun changeShopImage(sellerId: Long, request: UpdateImageRequest): DefaultResponse {
+        val shop = shopRepository.findShopBySellerId(sellerId)
+
+        shop.shopImage = request.imageUrl
+
+        shopRepository.save(shop)
+
+        if (request.imageUrl.isEmpty()) {
+            return DefaultResponse("이미지를 삭제했습니다.")
+        }
+
+        return DefaultResponse("이미지를 변경했습니다.")
     }
 }

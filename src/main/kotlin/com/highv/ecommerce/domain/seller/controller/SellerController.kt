@@ -16,7 +16,6 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController
 class SellerController(private val sellerService: SellerService) {
     @PostMapping("/user_signup")
     fun signUp(
-        @RequestPart @Valid request: CreateSellerRequest,
+        @RequestBody @Valid request: CreateSellerRequest,
         bindingResult: BindingResult
     ): ResponseEntity<SellerResponse> {
 
@@ -37,7 +36,7 @@ class SellerController(private val sellerService: SellerService) {
             .body(sellerService.signUp(request))
     }
 
-    @PostMapping
+    @PostMapping("/shop")
     @PreAuthorize("hasRole('SELLER')")
     fun createShop(
         @AuthenticationPrincipal seller: UserPrincipal,
