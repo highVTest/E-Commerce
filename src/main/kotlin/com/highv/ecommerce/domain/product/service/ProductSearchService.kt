@@ -46,6 +46,7 @@ class ProductSearchService(
 
             val cachedData = searchHash.get("searchList", cacheKey)
             if (cachedData != null) {
+                addTermSearch(cacheKey, cachedData)
                 return cachedData
             } else {
                 cacheAllFilterCases(keyword, pageRequest)
@@ -59,12 +60,12 @@ class ProductSearchService(
 
     fun addTermTopSearch(term: String) {
         topSearchZSet.incrementScore("topSearch", term, 1.0)
-        redisTemplate.expire(term, 10, TimeUnit.MINUTES)
+        redisTemplate.expire("topSearch", 10, TimeUnit.MINUTES)
     }
 
     fun addTermSearch(term: String, showInfos: Page<ProductResponse>) {
         searchHash.put("searchList", term, showInfos)
-        redisTemplateForProductSearch.expire(term, 10, TimeUnit.MINUTES)
+        redisTemplateForProductSearch.expire("searchList", 10, TimeUnit.MINUTES)
     }
 
     fun createCacheKey(keyword: String, sortProperty: String, sortDirection: String): String {
@@ -100,7 +101,7 @@ class ProductSearchService(
         if (pageNumber == 0) {
             val cacheKey = createCacheKey("all", sortProperty, sortDirection)
 
-            val cachedData = searchHash.get("searchList", cacheKey)
+            val cachedData = searchHash.get("productList", cacheKey)
 
             if (cachedData != null) {
                 return cachedData
@@ -108,14 +109,14 @@ class ProductSearchService(
                 val products = productRepository.findAllPaginated(pageable)
 
                 searchHash.put(
-                    "searchList",
+                    "productList",
                     cacheKey,
                     products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
                 )
 
-                redisTemplateForProductSearch.expire(cacheKey, 1, TimeUnit.MINUTES)
+                redisTemplateForProductSearch.expire("productList", 60, TimeUnit.MINUTES)
 
-                return searchHash.get("searchList", cacheKey) ?: Page.empty(pageable)
+                return searchHash.get("productList", cacheKey) ?: Page.empty(pageable)
             }
         } else {
             val products = productRepository.findAllPaginated(pageable)
