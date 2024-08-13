@@ -11,12 +11,10 @@ import com.highv.ecommerce.domain.seller.shop.dto.CreateShopRequest
 import com.highv.ecommerce.domain.seller.shop.dto.ShopResponse
 import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
-
 import com.highv.ecommerce.infra.s3.S3Manager
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 
 @Service
 class SellerService(
@@ -26,7 +24,7 @@ class SellerService(
     private val shopRepository: ShopRepository
 ) {
 
-    fun signUp(request: CreateSellerRequest, file: MultipartFile?): SellerResponse {
+    fun signUp(request: CreateSellerRequest): SellerResponse {
 
         val seller: Seller =
             sellerRepository.findByIdOrNull(request.id) ?: throw EmailVerificationNotFoundException(
@@ -45,17 +43,12 @@ class SellerService(
             address = request.address
         }
 
-        // if (file != null) {
-        //     s3Manager.uploadFile(file)
-        //     seller.profileImage = s3Manager.getFile(file.originalFilename)
-        // }
-
         val savedSeller = sellerRepository.save(seller)
 
         return SellerResponse.from(savedSeller)
     }
 
-    fun createShop(sellerId: Long, createShopRequest: CreateShopRequest, file: MultipartFile?): ShopResponse {
+    fun createShop(sellerId: Long, createShopRequest: CreateShopRequest): ShopResponse {
         if (shopRepository.existsBySellerId(sellerId)) throw CustomRuntimeException(
             409,
             "Shop with seller id $sellerId already exists"
@@ -64,14 +57,10 @@ class SellerService(
             sellerId = sellerId,
             name = createShopRequest.name,
             description = createShopRequest.description,
-            shopImage = "",
+            shopImage = createShopRequest.shopImage,
             rate = 0.0f
         )
 
-        // if (file != null) {
-        //     s3Manager.uploadFile(file)
-        //     shop.shopImage = s3Manager.getFile(file.originalFilename)
-        // }
         val savedShop = shopRepository.save(shop)
         return ShopResponse.from(savedShop)
     }

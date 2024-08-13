@@ -69,6 +69,7 @@ class OrderMasterService(
                 //트랜잭션 전파 수준 변경
 
                 val orderMaster = txAdvice.run { orderSave(buyer, cart, productPrice) }
+
                 masterId = orderMaster.id!!
                 //itemCartRepository.deleteAll(cart)
             }

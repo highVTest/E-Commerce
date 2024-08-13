@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size
 
 data class CreateSellerRequest(
     val id: Long,
+    @field:NotBlank(message = "닉네임은 공백일 수 없습니다.")
     val nickname: String,
 
     @field : NotBlank(message = "비밀번호는 공백일 수 없습니다.")

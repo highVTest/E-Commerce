@@ -58,6 +58,14 @@ dependencies {
     implementation("com.querydsl:querydsl-jpa:$queryDslVersion:jakarta")
     kapt("com.querydsl:querydsl-apt:$queryDslVersion:jakarta")
 
+    // Kotlin coroutine dependency
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+
+    // MongoDB Kotlin driver dependency
+    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:4.10.1")
+    implementation ("org.springframework.boot:spring-boot-starter-data-mongodb")
+
+
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

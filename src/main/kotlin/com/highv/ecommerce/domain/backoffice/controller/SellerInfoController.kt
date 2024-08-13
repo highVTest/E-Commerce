@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.backoffice.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateImageRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdatePasswordRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateSellerRequest
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateShopRequest
@@ -12,7 +13,11 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/sellerInfo")
@@ -27,6 +32,15 @@ class SellerInfoController(
     ): ResponseEntity<ShopResponse> = ResponseEntity
         .status(HttpStatus.CREATED)
         .body(sellerInfoService.updateShopInfo(seller.id, updateShopRequest))
+
+    @PatchMapping("/myShopInfo/image")
+    @PreAuthorize("hasRole('SELLER')")
+    fun changeShopImage(
+        @AuthenticationPrincipal seller: UserPrincipal,
+        @RequestBody request: UpdateImageRequest
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(sellerInfoService.changeShopImage(seller.id, request))
 
     @PatchMapping("/myInfo")
     @PreAuthorize("hasRole('SELLER')")
@@ -45,6 +59,15 @@ class SellerInfoController(
     ): ResponseEntity<DefaultResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(sellerInfoService.changePassword(seller.id, updatePasswordRequest))
+
+    @PatchMapping("/myInfo/image")
+    @PreAuthorize("hasRole('SELLER')")
+    fun changeSellerImage(
+        @AuthenticationPrincipal seller: UserPrincipal,
+        @RequestBody request: UpdateImageRequest
+    ): ResponseEntity<DefaultResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(sellerInfoService.changeSellerImage(seller.id, request))
 
     @GetMapping("/myInfo")
     fun getSellerInfo(

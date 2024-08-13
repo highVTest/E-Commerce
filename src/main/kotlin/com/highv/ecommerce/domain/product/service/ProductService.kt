@@ -49,6 +49,25 @@ class ProductService(
                 throw RuntimeException("Seller is not authorized to create a product")
             }
 
+        val shop = shopRepository.findShopBySellerId(sellerId)
+        val product = Product(
+            name = productRequest.name,
+            description = productRequest.description,
+            productImage = productRequest.imageUrl,
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now(),
+            isSoldOut = false,
+            deletedAt = null,
+            isDeleted = false,
+            shop = shop,
+            categoryId = productRequest.categoryId,
+            productBackOffice = null
+        )
+        // if (file != null) {
+        //     s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
+        //     product.productImage = s3Manager.getFile(file.originalFilename)
+        // }
+
             val shop = shopRepository.findShopBySellerId(sellerId)
 
             if (productRepository.existsByNameAndShopId(
@@ -129,11 +148,6 @@ class ProductService(
     fun getProductById(productId: Long): ProductResponse {
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
         return ProductResponse.from(product, favoriteService.countFavorite(productId))
-    }
-
-    fun getAllProducts(pageable: Pageable): Page<ProductResponse> {
-        val products = productRepository.findAllPaginated(pageable)
-        return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
     }
 
     fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductResponse> {
