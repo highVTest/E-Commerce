@@ -4,6 +4,7 @@ import com.highv.ecommerce.common.image.dto.ImageRequest
 import com.highv.ecommerce.common.image.dto.ImageUrlResponse
 import com.highv.ecommerce.common.image.service.ImageService
 import com.highv.ecommerce.infra.security.UserPrincipal
+import jakarta.persistence.Id
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -20,11 +21,12 @@ class ImageController(
     @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER') or hasRole('BUYER')")
     @PostMapping("/image")
     fun uploadImage(
+        @RequestPart(value = "file",required = false) file: MultipartFile,
         @AuthenticationPrincipal user: UserPrincipal,
         @RequestPart request: ImageRequest,
-        @RequestPart(value = "file",required = false) file: MultipartFile?,
 
-    ): ResponseEntity<ImageUrlResponse> = ResponseEntity.ok(imageService.uploadImage(file, user.id, request))
+
+    ): ResponseEntity<ImageUrlResponse> = ResponseEntity.ok(imageService.uploadImage(file, request))
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER') or hasRole('BUYER')")
     @PostMapping("/images")
@@ -32,12 +34,13 @@ class ImageController(
         @RequestPart files: List<MultipartFile>,
         @AuthenticationPrincipal user: UserPrincipal,
         @RequestPart request: ImageRequest,
-    ): ResponseEntity<List<ImageUrlResponse>> = ResponseEntity.ok(imageService.uploadImages(files, user.id, request))
+    ): ResponseEntity<List<ImageUrlResponse>> = ResponseEntity.ok(imageService.uploadImages(files,request))
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER') or hasRole('BUYER')")
     @GetMapping("/images/{id}")
     fun getImage(
+        @PathVariable id:String,
         @AuthenticationPrincipal user: UserPrincipal
-    ): ResponseEntity<List<ImageUrlResponse>> = ResponseEntity.ok(imageService.getImage(user.id))
+    ): ResponseEntity<List<ImageUrlResponse>> = ResponseEntity.ok(imageService.getImage(id))
 }
 
