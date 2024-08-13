@@ -165,7 +165,7 @@ class OrderDetailsService(
 
     fun getSellerOrderDetailsAll(shopId: Long, sellerId: Long): List<SellerOrderResponse> {
 
-        val orderDetails = orderDetailsRepository.findAllByShopId(shopId)
+        val orderDetails = orderDetailsRepository.findAllByShopIdOrderStatusPending(shopId)
 
         if (orderDetails.isEmpty()) throw CustomRuntimeException(404, "판매자가 운영 하는 상점이 아닙니다")
 
