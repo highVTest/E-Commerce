@@ -105,4 +105,13 @@ class CouponRepositoryImpl(
     override fun deleteAllByExpiredAt(){
         couponJpaRepository.deleteAllByExpiredAt()
     }
+
+    override fun findAllByCouponId(couponIdList: List<Long>): List<Coupon> {
+
+        val query = queryFactory.selectFrom(coupon)
+            .where(coupon.id.`in`(couponIdList))
+            .fetch()
+
+        return query
+    }
 }

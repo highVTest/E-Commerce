@@ -15,7 +15,6 @@ data class BuyerOrderDetailProductResponse(
     // val productTotalPrice: Int
 ) {
     companion object {
-        // TODO("수정 필요")
         fun from(
             orderDetails: OrderDetails,
         ): BuyerOrderDetailProductResponse =
@@ -24,7 +23,7 @@ data class BuyerOrderDetailProductResponse(
                 orderStatus = orderDetails.orderStatus,
                 complainStatus = orderDetails.complainStatus,
                 productName = orderDetails.product.name,
-                productPrice = orderDetails.product.productBackOffice!!.price,
+                productPrice = orderDetails.totalPrice,
                 productQuantity = orderDetails.productQuantity,
                 productImageUrl = orderDetails.product.productImage
                 // productTotalPrice = cart.product.p
