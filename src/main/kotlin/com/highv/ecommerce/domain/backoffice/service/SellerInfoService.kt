@@ -5,10 +5,7 @@ import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.DuplicatePasswordException
 import com.highv.ecommerce.common.exception.PasswordMismatchException
 import com.highv.ecommerce.common.exception.SellerNotFoundException
-import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateImageRequest
-import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdatePasswordRequest
-import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateSellerRequest
-import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateShopRequest
+import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.*
 import com.highv.ecommerce.domain.seller.dto.SellerResponse
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.domain.seller.shop.dto.ShopResponse
@@ -100,5 +97,14 @@ class SellerInfoService(
         }
 
         return DefaultResponse("이미지를 변경했습니다.")
+    }
+
+    fun getAllUserShopInfo(shopId: Long): AllShopResponse {
+
+        val shop = shopRepository.findByIdOrNull(shopId) ?: throw CustomRuntimeException(404, "Shop not found")
+
+        val seller = sellerRepository.findByIdOrNull(shop.sellerId) ?: throw SellerNotFoundException(message = "Seller not found")
+
+        return AllShopResponse.from(shop, seller)
     }
 }

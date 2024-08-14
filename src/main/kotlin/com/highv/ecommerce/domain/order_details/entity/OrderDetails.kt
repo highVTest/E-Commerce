@@ -140,6 +140,13 @@ class OrderDetails(
 
     fun updateDeliveryStatus(orderStatus: OrderStatus) {
         when (orderStatus) {
+            OrderStatus.PRODUCT_PREPARING ->{
+                if(this.orderStatus != OrderStatus.ORDERED) throw InvalidRequestException(
+                    400,
+                    "주문 접수 일때만 배송 중으로 변경이 가능합니다."
+                )
+                this.orderStatus = orderStatus
+            }
             OrderStatus.DELIVERY_PREPARING -> {
                 if (this.orderStatus != OrderStatus.PRODUCT_PREPARING) throw InvalidRequestException(
                     400,

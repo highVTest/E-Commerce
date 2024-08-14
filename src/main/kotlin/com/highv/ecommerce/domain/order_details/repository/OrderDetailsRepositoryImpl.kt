@@ -107,7 +107,7 @@ class OrderDetailsRepositoryImpl(
         orderDetailsJpaRepository.updateDeliveryStatus(changeStatus, whereStatus)
     }
 
-    override fun findAllByShopIdOrderStatusPending(shopId: Long): List<OrderDetails> {
+    override fun findAllByShopIdOrderStatus(shopId: Long, orderStatus: OrderStatus): List<OrderDetails> {
         val query = queryFactory
             .selectFrom(orderDetails)
             .innerJoin(orderDetails.product()).fetchJoin()
@@ -115,7 +115,7 @@ class OrderDetailsRepositoryImpl(
             .innerJoin(orderDetails.buyer()).fetchJoin()
             .innerJoin(orderDetails.product().productBackOffice()).fetchJoin()
             .where(orderDetails.product().shop().id.eq(shopId))
-            .where(orderDetails.orderStatus.eq(OrderStatus.PENDING))
+            .where(orderDetails.orderStatus.eq(orderStatus))
             .fetch()
 
         return query
