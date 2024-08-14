@@ -99,12 +99,12 @@ class SellerInfoService(
         return DefaultResponse("이미지를 변경했습니다.")
     }
 
-    fun getAllUserShopInfo(shopId: Long): AllShopResponse {
+    fun getShopInfoByShopId(shopId: Long): ShopAndSellerResponse {
 
         val shop = shopRepository.findByIdOrNull(shopId) ?: throw CustomRuntimeException(404, "Shop not found")
 
         val seller = sellerRepository.findByIdOrNull(shop.sellerId) ?: throw SellerNotFoundException(message = "Seller not found")
 
-        return AllShopResponse.from(shop, seller)
+        return ShopAndSellerResponse.from(shop, seller)
     }
 }

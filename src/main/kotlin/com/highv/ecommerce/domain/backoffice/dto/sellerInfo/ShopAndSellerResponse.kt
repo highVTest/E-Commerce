@@ -3,7 +3,7 @@ package com.highv.ecommerce.domain.backoffice.dto.sellerInfo
 import com.highv.ecommerce.domain.seller.entity.Seller
 import com.highv.ecommerce.domain.seller.shop.entity.Shop
 
-data class AllShopResponse(
+data class ShopAndSellerResponse(
     val id: Long,
     val sellerId: Long,
     val name: String,
@@ -14,7 +14,7 @@ data class AllShopResponse(
     val sellerEmail: String,
 ) {
     companion object {
-        fun from(shop: Shop, seller: Seller) = AllShopResponse(
+        fun from(shop: Shop, seller: Seller) = ShopAndSellerResponse(
             id = shop.id!!,
             sellerId = shop.sellerId,
             name = shop.name,
