@@ -1,15 +1,19 @@
 package com.highv.ecommerce.domain.backoffice.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
+import com.highv.ecommerce.common.exception.LoginException
 import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.*
 import com.highv.ecommerce.domain.backoffice.service.SellerInfoService
 import com.highv.ecommerce.domain.seller.dto.SellerResponse
 import com.highv.ecommerce.domain.seller.shop.dto.ShopResponse
 import com.highv.ecommerce.infra.security.UserPrincipal
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -39,10 +43,18 @@ class SellerInfoController(
     @PreAuthorize("hasRole('SELLER')")
     fun updateSellerInfo(
         @AuthenticationPrincipal seller: UserPrincipal,
-        @RequestBody updateSellerRequest: UpdateSellerRequest
-    ): ResponseEntity<SellerResponse> = ResponseEntity
-        .status(HttpStatus.OK)
-        .body(sellerInfoService.updateSellerInfo(seller.id, updateSellerRequest))
+        @Valid @RequestBody updateSellerRequest: UpdateSellerRequest,
+        bindingResult: BindingResult
+    ): ResponseEntity<SellerResponse> {
+
+        if (bindingResult.hasErrors()) {
+            throw CustomRuntimeException(400, bindingResult.fieldError?.defaultMessage.toString())
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(sellerInfoService.updateSellerInfo(seller.id, updateSellerRequest))
+    }
 
     @PatchMapping("/myInfo/changePassword")
     @PreAuthorize("hasRole('SELLER')")
