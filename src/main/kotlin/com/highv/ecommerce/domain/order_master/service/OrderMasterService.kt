@@ -71,13 +71,7 @@ class OrderMasterService(
 
                 val totalPrice = mutableMapOf<Long, Int>()
 
-                couponList.forEach {
-                    log.info(it.toString())
-                }
-
-
                 cart.map { cartItem ->
-                    log.info(cartItem.toString())
                     couponList.forEach { coupon ->
                         if (cartItem.product.id == coupon.product.id) {
                             when (coupon.discountPolicy) {
