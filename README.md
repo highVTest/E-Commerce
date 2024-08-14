@@ -1,6 +1,6 @@
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=180&text=최종프로젝트 E-Commerce %20&animation=fadeIn&fontColor=F8FBEF&fontSize=60" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=180&text=최종프로젝트 E-Commerce%20&animation=fadeIn&fontColor=F8FBEF&fontSize=60" />
 
-# 소규모의 다양한 상품을 쉽게 거래할 수 있는 플랫폼 Made By 
+# 소규모의 다양한 상품을 쉽게 거래할 수 있는 Made By 
 
 ## 팀원 소개
 
