@@ -1,4 +1,4 @@
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=180&text=최종프로젝트%20&animation=fadeIn&fontColor=000000&fontSize=60" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=180&text=최종프로젝트%20&animation=fadeIn&fontColor=F8FBEF&fontSize=60" />
 
 # HighV - E-Commerce
 
