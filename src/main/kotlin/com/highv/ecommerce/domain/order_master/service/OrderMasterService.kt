@@ -10,6 +10,8 @@ import com.highv.ecommerce.common.lock.service.RedisLockService
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
+import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
+import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
@@ -34,9 +36,11 @@ class OrderMasterService(
     private val couponToBuyerRepository: CouponToBuyerRepository,
     private val redisLockService: RedisLockService,
     private val txAdvice: TxAdvice,
-    private val productBackOfficeRepository: ProductBackOfficeRepository
+    private val productBackOfficeRepository: ProductBackOfficeRepository,
+    private val couponRepository: CouponRepository
 ) {
 
+    private val log = LoggerFactory.getLogger("맵 확인")
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
 
         val key = "락락"
@@ -53,22 +57,55 @@ class OrderMasterService(
                         paymentRequest.couponIdList,
                         buyerId
                     )
-
+                val couponIdList = mutableListOf<Long>()
 
                 couponToBuyer.forEach {
                     if (it.coupon.expiredAt < LocalDateTime.now()) throw CouponExpiredException(
                         400,
                         "쿠폰 유효 시간이 만료 되었습니다"
                     )
+                    couponIdList.add(it.coupon.id!!)
                 }
 
-                val productPrice = orderMasterRepository.discountTotalPriceList(buyerId, couponToBuyer)
+                val couponList = couponRepository.findAllByCouponId(couponIdList)
+
+                val totalPrice = mutableMapOf<Long, Int>()
+
+                couponList.forEach {
+                    log.info(it.toString())
+                }
+
+
+                cart.map { cartItem ->
+                    log.info(cartItem.toString())
+                    couponList.forEach { coupon ->
+                        if (cartItem.product.id == coupon.product.id) {
+                            when (coupon.discountPolicy) {
+                                DiscountPolicy.DISCOUNT_RATE -> {
+                                    val price = (cartItem.quantity * cartItem.product.productBackOffice!!.price) - (
+                                            (cartItem.quantity * cartItem.product.productBackOffice!!.price) * ((coupon.discount).toDouble() / 100.0)).toInt()
+                                    totalPrice[cartItem.id!!] = price
+                                }
+
+                                DiscountPolicy.DISCOUNT_PRICE -> {
+                                    val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity) - coupon.discount
+                                    totalPrice[cartItem.id!!] = price
+                                }
+                            }
+
+                        } else {
+                            val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity)
+                            totalPrice[cartItem.id!!] = price
+                        }
+                    }
+
+                }
 
                 couponToBuyer.forEach { it.useCoupon() }
 
                 //트랜잭션 전파 수준 변경
 
-                val orderMaster = txAdvice.run { orderSave(buyer, cart, productPrice) }
+                val orderMaster = txAdvice.run { orderSave(buyer, cart, totalPrice) }
 
                 masterId = orderMaster.id!!
                 itemCartRepository.deleteAll(cart)

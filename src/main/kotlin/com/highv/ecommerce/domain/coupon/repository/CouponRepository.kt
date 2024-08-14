@@ -31,4 +31,6 @@ interface CouponRepository {
     fun findByProductId(productId: Long): Coupon?
 
     fun deleteAllByExpiredAt()
+
+    fun findAllByCouponId(couponIdList: List<Long>): List<Coupon>
 }

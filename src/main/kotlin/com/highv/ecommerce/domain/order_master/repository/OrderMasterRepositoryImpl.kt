@@ -45,7 +45,7 @@ class OrderMasterRepositoryImpl(
         val query = queryFactory.select(
             QTotalPriceDto(
                 itemCart.id,
-                getTotalPrice().sum()
+                getTotalPrice()
             )
         ).from(itemCart)
             .leftJoin(couponToBuyer).fetchJoin()
@@ -78,7 +78,7 @@ class OrderMasterRepositoryImpl(
 
         return CaseBuilder()
             .`when`(
-                couponToBuyer.coupon().id.isNotNull
+                couponToBuyer.coupon().id.isNotNull()
                     .and(coupon.discountPolicy.eq(DiscountPolicy.DISCOUNT_RATE))
             )
             .then(
@@ -89,7 +89,7 @@ class OrderMasterRepositoryImpl(
                     )
             )
             .`when`(
-                couponToBuyer.coupon().id.isNotNull
+                couponToBuyer.coupon().id.isNotNull()
                     .and(coupon.discountPolicy.eq(DiscountPolicy.DISCOUNT_PRICE))
             )
             .then(
