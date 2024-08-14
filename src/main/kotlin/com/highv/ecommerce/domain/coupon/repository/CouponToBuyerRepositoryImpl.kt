@@ -3,10 +3,13 @@ package com.highv.ecommerce.domain.coupon.repository
 import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
 import com.highv.ecommerce.domain.coupon.entity.QCoupon.coupon
 import com.highv.ecommerce.domain.coupon.entity.QCouponToBuyer
+import com.querydsl.jpa.impl.JPADeleteClause
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Repository
 class CouponToBuyerRepositoryImpl(
@@ -71,5 +74,13 @@ class CouponToBuyerRepositoryImpl(
 
     override fun delete(couponToBuyer: CouponToBuyer) {
         couponToBuyerJpaRepository.delete(couponToBuyer)
+    }
+
+    @Transactional
+    override fun deleteAllByExpiredAt() {
+
+        JPADeleteClause(em, couponToBuyer)
+            .where(couponToBuyer.coupon().expiredAt.loe(LocalDateTime.now()))
+            .execute()
     }
 }

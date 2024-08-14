@@ -18,6 +18,7 @@ import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -74,13 +75,11 @@ class CouponService(
         return DefaultResponse.from("쿠폰 업데이트가 완료 되었습니다")
     }
 
+    @Scheduled(cron = "0 0 0 * * *")
     fun deleteCoupon(couponId: Long, sellerId: Long): DefaultResponse {
 
-        val result = couponRepository.findByIdOrNull(couponId)  ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
-
-        if (result.sellerId != sellerId)  throw UnauthorizedUserException(401, "다른 사용자는 해당 쿠폰을 삭제할 수 없습니다")
-
-        couponRepository.delete(result)
+        couponToBuyerRepository.deleteAllByExpiredAt()
+        couponRepository.deleteAllByExpiredAt()
 
         return DefaultResponse.from("쿠폰 삭제가 완료 되었습니다")
     }
