@@ -36,9 +36,6 @@
     </thead>
     <tbody>
         <tr>
-
-          
-
             <td><a href="https://ibb.co/XytT1N0"><img width="160" src="https://ca.slack-edge.com/T07BXLG6UF8-U07CGV6JBA5-2192acff0763-512" alt="김도균"></a></td>
             <td><a href="https://ibb.co/XytT1N0"><img width="160" src="https://i.ibb.co/SQBpbWY/DALL-E-2024-06-18-22-05-45-An-illustration-of-a-young-boy-who-loves-boxing-and-is-also-a-developer-i.png" alt="류원형"></a></td>
             <td><a href="https://imgbb.com/"><img width="160" src="https://i.ibb.co/z4t29cZ/162294237.png" alt="김형섭"></a></td>
