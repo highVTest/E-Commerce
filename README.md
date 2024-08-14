@@ -54,14 +54,12 @@
 <h2 style="border-bottom: 1px solid #d8dee4; color: #22d33;"> 
  🛠️ Tech Stacks </h2>
 
-### ✔️Frond-end
+## ✔️Frond-end
 
 <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=black"><img src="https://img.shields.io/badge/Css-1572B6?style=for-the-badge&logo=Css&logoColor=white"><img src="https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white"><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=JavaScript&logoColor=white">
 ### ✔️Back-end
-<img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=green"><img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=yellow"><img src="https://img.shields.io/badge/Spring Squrity-6DB33F?style=for-the-badge&logo=Spring Security&logoColor=yellow">
-
-## ⚡ Database
-<img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white"><img src="https://img.shields.io/badge/mongodb-47A248?style=for-the-badge&logo=MongoDB&logoColor=white"><img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white">
+<img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=green"><img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=yellow"><img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white"><img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white"><img src="https://img.shields.io/badge/aws-232F3E?style=for-the-badge&logo=Amazon Web Services&logoColor=white"><img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white"><img src="https://img.shields.io/badge/mongodb-47A248?style=for-the-badge&logo=MongoDB&logoColor=white">
+    
 
 ## 🚀 Infra
 <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=Swagger&logoColor=white"><img src="https://img.shields.io/badge/aws-232F3E?style=for-the-badge&logo=Amazon Web Services&logoColor=white"><img src="https://img.shields.io/badge/postman-FF6C37?style=for-the-badge&logo=Postman&logoColor=white"><img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white"><img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=NGINX&logoColor=white">
@@ -96,6 +94,8 @@
     - **탈퇴 승인 처리**: 판매자가 탈퇴할 경우, 해당 판매자의 상태를 RESIGNED(탈퇴 승인)으로 변경합니다.
     - **상품 삭제**: 탈퇴한 판매자와 관련된 모든 상품을 소프트 삭제 처리하여 데이터베이스에서 제거된 것처럼 표시합니다.
     - **API 구현**: 탈퇴 승인 시 해당 판매자의 상품을 자동으로 삭제하는 로직을 포함한 API를 구현했습니다.
+
+
 
 
 ## 환경설정
