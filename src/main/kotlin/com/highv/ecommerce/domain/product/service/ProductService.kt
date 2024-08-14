@@ -49,10 +49,10 @@ class ProductService(
                 throw RuntimeException("Seller is not authorized to create a product")
             }
 
-        // if (file != null) {
-        //     s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
-        //     product.productImage = s3Manager.getFile(file.originalFilename)
-        // }
+            // if (file != null) {
+            //     s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
+            //     product.productImage = s3Manager.getFile(file.originalFilename)
+            // }
 
             val shop = shopRepository.findShopBySellerId(sellerId)
 
@@ -75,10 +75,6 @@ class ProductService(
                 categoryId = productRequest.categoryId,
                 productBackOffice = null
             )
-            // if (file != null) {
-            //     s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
-            //     product.productImage = s3Manager.getFile(file.originalFilename)
-            // }
 
             val savedProduct = productRepository.save(product)
             val productBackOffice = ProductBackOffice(
@@ -100,8 +96,17 @@ class ProductService(
         productId: Long,
         updateProductRequest: UpdateProductRequest,
     ): ProductResponse {
+
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
+
         if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")
+
+        if (productRepository.existsByNameAndShopId(
+                updateProductRequest.name,
+                product.shop.id!!
+            )
+        ) throw RuntimeException("중복 상품명 입니다.")
+
         product.apply {
             name = updateProductRequest.name
             description = updateProductRequest.description
@@ -110,11 +115,6 @@ class ProductService(
             isSoldOut = updateProductRequest.isSoldOut
             categoryId = updateProductRequest.categoryId
         }
-
-        // if (file != null) {
-        //     s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
-        //     product.productImage = s3Manager.getFile(file.originalFilename)
-        // }
 
         val updatedProduct = productRepository.save(product)
         return ProductResponse.from(updatedProduct, favoriteService.countFavorite(productId))
