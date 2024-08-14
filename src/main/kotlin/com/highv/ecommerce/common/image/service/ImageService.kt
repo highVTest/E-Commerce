@@ -3,6 +3,7 @@ package com.highv.ecommerce.common.image.service
 import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.image.dto.ImageRequest
 import com.highv.ecommerce.common.image.dto.ImageUrlResponse
+import com.highv.ecommerce.common.image.entity.UsagePath
 import com.highv.ecommerce.common.image.repository.ImageRepository
 import com.highv.ecommerce.infra.s3.S3Manager
 import com.highv.ecommerce.infra.s3.entity.Image
