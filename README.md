@@ -36,6 +36,9 @@
     </thead>
     <tbody>
         <tr>
+
+          
+
             <td><a href="https://ibb.co/XytT1N0"><img width="160" src="https://ca.slack-edge.com/T07BXLG6UF8-U07CGV6JBA5-2192acff0763-512" alt="김도균"></a></td>
             <td><a href="https://ibb.co/XytT1N0"><img width="160" src="https://i.ibb.co/SQBpbWY/DALL-E-2024-06-18-22-05-45-An-illustration-of-a-young-boy-who-loves-boxing-and-is-also-a-developer-i.png" alt="류원형"></a></td>
             <td><a href="https://imgbb.com/"><img width="160" src="https://i.ibb.co/z4t29cZ/162294237.png" alt="김형섭"></a></td>
@@ -54,15 +57,17 @@
 <h2 style="border-bottom: 1px solid #d8dee4; color: #22d33;"> 
  🛠️ Tech Stacks </h2>
 
+  
+
 ### ✔️Frond-end
 
 <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=black"><img src="https://img.shields.io/badge/Css-1572B6?style=for-the-badge&logo=Css&logoColor=white"><img src="https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white"><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=JavaScript&logoColor=white"><img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=Swagger&logoColor=white">
 ### ✔️Back-end
 <img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=green"><img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=yellow"><img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white"><img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white"><img src="https://img.shields.io/badge/aws-232F3E?style=for-the-badge&logo=Amazon Web Services&logoColor=white">
 
-## ⚡ Database
+## 🚀 Infra
+<img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=Swagger&logoColor=white"><img src="https://img.shields.io/badge/aws-232F3E?style=for-the-badge&logo=Amazon Web Services&logoColor=white"><img src="https://img.shields.io/badge/postman-FF6C37?style=for-the-badge&logo=Postman&logoColor=white"><img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white"><img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=NGINX&logoColor=white">
 
-<img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white"><img src="https://img.shields.io/badge/mongodb-47A248?style=for-the-badge&logo=MongoDB&logoColor=white">
 
 ## 협업 도구
 
@@ -75,13 +80,16 @@
 ![image](https://github.com/user-attachments/assets/26a35b5d-411c-4cdd-a1df-3c00fd454a96)
 
 
+
 ## [Wireframe](https://www.figma.com/design/Pcn6VeErcGenAJxDOor9SG/Spa-2%EC%A1%B0-%EC%B5%9C%EC%A2%85?node-id=0-1&t=YT5Oho8LHWcjdKjn-0)
+
 
 ![Wireframe Image](https://github.com/user-attachments/assets/984b9027-4d4a-48e8-92bf-c5937aed494a)
 
 ## [ERD](https://www.figma.com/board/9tp3ICiW8Z5K6XbrL9iiQ9/%EC%8B%A4%EC%A0%84%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-5%EC%A1%B0?node-id=128-646&t=zWtge9vkIq5qf5xp-0)
 
 ![ERD Image](https://github.com/user-attachments/assets/a76b28ef-cd1b-40fc-8226-76b3147a6d5f)
+
 
 ## 기능 구현 세부사항
 
@@ -93,6 +101,7 @@
     - **탈퇴 승인 처리**: 판매자가 탈퇴할 경우, 해당 판매자의 상태를 RESIGNED(탈퇴 승인)으로 변경합니다.
     - **상품 삭제**: 탈퇴한 판매자와 관련된 모든 상품을 소프트 삭제 처리하여 데이터베이스에서 제거된 것처럼 표시합니다.
     - **API 구현**: 탈퇴 승인 시 해당 판매자의 상품을 자동으로 삭제하는 로직을 포함한 API를 구현했습니다.
+
 
 
 ## 환경설정
