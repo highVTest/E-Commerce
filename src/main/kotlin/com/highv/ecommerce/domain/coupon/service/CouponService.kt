@@ -76,12 +76,9 @@ class CouponService(
     }
 
     @Scheduled(cron = "0 0 0 * * *")
-    fun deleteCoupon(couponId: Long, sellerId: Long): DefaultResponse {
-
+    fun deleteCoupon() {
         couponToBuyerRepository.deleteAllByExpiredAt()
         couponRepository.deleteAllByExpiredAt()
-
-        return DefaultResponse.from("쿠폰 삭제가 완료 되었습니다")
     }
 
 
