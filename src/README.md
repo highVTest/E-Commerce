@@ -36,7 +36,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><a href="https://ibb.co/XytT1N0"><img width="160" src="https://github.com/user-attachments/assets/6f90a5f2-4368-45e5-b9a7-2c64ce5aa3ae" alt="김도균"></a></td>
+            <td><a href="https://ibb.co/XytT1N0"><img width="160" src="https://ca.slack-edge.com/T07BXLG6UF8-U07CGV6JBA5-2192acff0763-512" alt="김도균"></a></td>
             <td><a href="https://ibb.co/XytT1N0"><img width="160" src="https://i.ibb.co/SQBpbWY/DALL-E-2024-06-18-22-05-45-An-illustration-of-a-young-boy-who-loves-boxing-and-is-also-a-developer-i.png" alt="류원형"></a></td>
             <td><a href="https://imgbb.com/"><img width="160" src="https://i.ibb.co/z4t29cZ/162294237.png" alt="김형섭"></a></td>
             <td><a href="https://imgbb.com/"><img width="160" src="https://ca.slack-edge.com/T07BXLG6UF8-U07BPNS8CTZ-26ee1b54322e-512" alt="최민수"></a></td>
@@ -72,16 +72,16 @@
 
 ## 📝 프로젝트 아키텍쳐
 
-![image](https://github.com/user-attachments/assets/603adef4-bdf8-49a3-899a-b6143cbb1c13)
+![image](https://github.com/user-attachments/assets/26a35b5d-411c-4cdd-a1df-3c00fd454a96)
 
 
 ## [Wireframe](https://www.figma.com/design/Pcn6VeErcGenAJxDOor9SG/Spa-2%EC%A1%B0-%EC%B5%9C%EC%A2%85?node-id=0-1&t=YT5Oho8LHWcjdKjn-0)
 
-![Wireframe Image](https://github.com/user-attachments/assets/cd24b2ca-ed0f-4b69-987c-9f70445bbf58)
+![Wireframe Image](https://github.com/user-attachments/assets/984b9027-4d4a-48e8-92bf-c5937aed494a)
 
 ## [ERD](https://www.figma.com/board/9tp3ICiW8Z5K6XbrL9iiQ9/%EC%8B%A4%EC%A0%84%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-5%EC%A1%B0?node-id=128-646&t=zWtge9vkIq5qf5xp-0)
 
-![ERD Image](https://github.com/user-attachments/assets/e6da319d-a03c-4490-945c-daffd647a00d)
+![ERD Image](https://github.com/user-attachments/assets/a76b28ef-cd1b-40fc-8226-76b3147a6d5f)
 
 ## 기능 구현 세부사항
 
