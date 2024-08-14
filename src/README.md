@@ -1,4 +1,13 @@
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=180&text=최종프로젝트%20&animation=fadeIn&fontColor=000000&fontSize=60" />
+
 # HighV - E-Commerce
+
+## 개요
+- 프로젝트 이름: E-Commerce 
+- 프로젝트 지속기간: 2024.07.12 ~ 2024.08.22
+- 개발 엔진 및 언어: Kotlin 
+
+
 
 ## 프로젝트 설명
 
@@ -42,12 +51,29 @@
         </tr>
     </tbody>
 </table>
+<h2 style="border-bottom: 1px solid #d8dee4; color: #22d33;"> 
+ 🛠️ Tech Stacks </h2>
+
+### ✔️Frond-end
+
+<img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=black"><img src="https://img.shields.io/badge/Css-1572B6?style=for-the-badge&logo=Css&logoColor=white"><img src="https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white"><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=JavaScript&logoColor=white"><img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=Swagger&logoColor=white">
+### ✔️Back-end
+<img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=green"><img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=yellow"><img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white"><img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white"><img src="https://img.shields.io/badge/aws-232F3E?style=for-the-badge&logo=Amazon Web Services&logoColor=white">
+
+## ⚡ Database
+
+<img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white"><img src="https://img.shields.io/badge/mongodb-47A248?style=for-the-badge&logo=MongoDB&logoColor=white">
 
 ## 협업 도구
 
 - ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white)
 - ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)
 - ![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat-square&logo=slack&logoColor=white)
+
+## 📝 프로젝트 아키텍쳐
+
+![image](https://github.com/user-attachments/assets/603adef4-bdf8-49a3-899a-b6143cbb1c13)
+
 
 ## [Wireframe](https://www.figma.com/design/Pcn6VeErcGenAJxDOor9SG/Spa-2%EC%A1%B0-%EC%B5%9C%EC%A2%85?node-id=0-1&t=YT5Oho8LHWcjdKjn-0)
 
