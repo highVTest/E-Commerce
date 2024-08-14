@@ -7,6 +7,7 @@ import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderResponse
 import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
 import com.highv.ecommerce.domain.order_details.dto.UpdateDeliveryStatusRequest
+import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 import com.highv.ecommerce.domain.order_details.service.OrderDetailsService
 import com.highv.ecommerce.infra.security.UserPrincipal
 import org.springframework.http.HttpStatus
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -66,9 +68,10 @@ class OrderDetailsController(
     @GetMapping("/shop/order-details/{shopId}")
     fun getSellerOrderDetailsAll(
         @PathVariable("shopId") shopId: Long,
+        @RequestParam orderStatus: OrderStatus,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<List<SellerOrderResponse>> = ResponseEntity.status(HttpStatus.OK)
-        .body(orderDetailsService.getSellerOrderDetailsAll(shopId, userPrincipal.id))
+        .body(orderDetailsService.getSellerOrderDetailsAll(shopId, orderStatus, userPrincipal.id))
 
     @PreAuthorize("hasRole('SELLER')")
     @GetMapping("/shop/order-details/{shopId}/{orderId}")
@@ -89,7 +92,7 @@ class OrderDetailsController(
     ): ResponseEntity<OrderStatusResponse> = ResponseEntity.status(HttpStatus.OK)
         .body(orderDetailsService.requestComplainAccept(shopId, orderId, sellerOrderStatusRequest, userPrincipal.id))
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/{order-master-id}/{shop-id}")
     fun updateProductsDelivery(
         @PathVariable("order-master-id") orderMasterId: Long,
