@@ -29,4 +29,6 @@ interface CouponRepository {
     fun saveAndFlush(coupon: Coupon)
 
     fun findByProductId(productId: Long): Coupon?
+
+    fun deleteAllByExpiredAt()
 }

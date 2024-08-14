@@ -63,18 +63,6 @@ class CouponController(
     }
 
     @PreAuthorize("hasRole('SELLER')")
-    @DeleteMapping("/seller/coupon/{couponId}")
-    fun deleteCoupon(
-        @PathVariable couponId: Long,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<DefaultResponse> {
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(couponService.deleteCoupon(couponId, userPrincipal.id))
-    }
-
-    @PreAuthorize("hasRole('SELLER')")
     @GetMapping("/seller/coupon/{couponId}")
     fun getSellerCouponById(
         @PathVariable("couponId") couponId: Long,

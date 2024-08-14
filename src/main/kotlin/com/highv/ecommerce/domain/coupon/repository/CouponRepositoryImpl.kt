@@ -101,4 +101,8 @@ class CouponRepositoryImpl(
     override fun findByProductId(productId: Long): Coupon? {
         return couponJpaRepository.findByProductId(productId)
     }
+
+    override fun deleteAllByExpiredAt(){
+        couponJpaRepository.deleteAllByExpiredAt()
+    }
 }
