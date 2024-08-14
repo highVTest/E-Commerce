@@ -114,7 +114,7 @@ class ProductSearchService(
                     products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
                 )
 
-                redisTemplateForProductSearch.expire("productList", 60, TimeUnit.MINUTES)
+                redisTemplateForProductSearch.expire("productList", 5, TimeUnit.MINUTES)
 
                 return searchHash.get("productList", cacheKey) ?: Page.empty(pageable)
             }
