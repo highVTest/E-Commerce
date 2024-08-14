@@ -79,7 +79,7 @@ class SellerInfoController(
     @GetMapping("/shopInfo/{shopId}")
     fun getShopInfoByShopId(
         @PathVariable("shopId") shopId: Long
-    ): ResponseEntity<AllShopResponse> = ResponseEntity
+    ): ResponseEntity<ShopAndSellerResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(sellerInfoService.getShopInfoByShopId(shopId))
 }
