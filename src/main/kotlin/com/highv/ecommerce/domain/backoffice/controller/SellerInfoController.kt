@@ -1,10 +1,7 @@
 package com.highv.ecommerce.domain.backoffice.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateImageRequest
-import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdatePasswordRequest
-import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateSellerRequest
-import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.UpdateShopRequest
+import com.highv.ecommerce.domain.backoffice.dto.sellerInfo.*
 import com.highv.ecommerce.domain.backoffice.service.SellerInfoService
 import com.highv.ecommerce.domain.seller.dto.SellerResponse
 import com.highv.ecommerce.domain.seller.shop.dto.ShopResponse
@@ -13,11 +10,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/sellerInfo")
@@ -82,4 +75,11 @@ class SellerInfoController(
     ): ResponseEntity<ShopResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(sellerInfoService.getShopInfo(seller.id))
+
+    @GetMapping("/shopInfo/{shopId}")
+    fun getAllUserShopInfo(
+        @PathVariable("shopId") shopId: Long
+    ): ResponseEntity<AllShopResponse> = ResponseEntity
+        .status(HttpStatus.OK)
+        .body(sellerInfoService.getAllUserShopInfo(shopId))
 }

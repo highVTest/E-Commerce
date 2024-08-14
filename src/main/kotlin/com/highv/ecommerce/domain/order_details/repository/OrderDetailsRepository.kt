@@ -11,7 +11,7 @@ interface OrderDetailsRepository {
 
     fun findAllByShopId(shopId: Long): List<OrderDetails>
 
-    fun findAllByShopIdOrderStatusPending(shopId: Long): List<OrderDetails>
+    fun findAllByShopIdOrderStatus(shopId: Long, orderStatus: OrderStatus): List<OrderDetails>
 
     fun findByItemCartIdAndBuyerId(orderStatusId: Long, buyerId: Long): OrderDetails?
 

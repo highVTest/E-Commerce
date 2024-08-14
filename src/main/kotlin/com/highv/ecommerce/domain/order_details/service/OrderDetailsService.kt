@@ -155,11 +155,11 @@ class OrderDetailsService(
         return OrderStatusResponse.from(complainType, "전체 요청 거절 완료 되었습니다")
     }
 
-    fun getSellerOrderDetailsAll(shopId: Long, sellerId: Long): List<SellerOrderResponse> {
+    fun getSellerOrderDetailsAll(shopId: Long, orderStatus: OrderStatus, sellerId: Long): List<SellerOrderResponse> {
 
-        val orderDetails = orderDetailsRepository.findAllByShopIdOrderStatusPending(shopId)
+        val orderDetails = orderDetailsRepository.findAllByShopIdOrderStatus(shopId, orderStatus)
 
-        if (orderDetails.isEmpty()) throw CustomRuntimeException(404, "판매자가 운영 하는 상점이 아닙니다")
+        if (orderDetails.isEmpty()) throw CustomRuntimeException(404, "검색 결과가 존재 하지 않습니다")
 
         val orderMasters =
             orderMasterRepository.findByIdInOrderByIdDesc(orderDetails.map { it.orderMasterId }.toSet())
@@ -205,6 +205,7 @@ class OrderDetailsService(
 
         kotlin.runCatching {
             lockService.runExclusiveWithRedissonLock(lockKey, 1){
+                // orderDetails
                 val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(
                     shopId,
                     orderId
@@ -220,7 +221,7 @@ class OrderDetailsService(
 
                 orderDetailsRepository.saveAll(orderDetails)
             }
-        }
+        }.getOrThrow()
 
         return OrderStatusResponse.from(complainType, "전체 요청 승인 완료 되었습니다")
     }
@@ -233,7 +234,7 @@ class OrderDetailsService(
 
                 orderDetails.map {
 
-                    it.sellerUpdate(OrderStatus.ORDER_CANCELED, sellerOrderStatusRequest, ComplainStatus.REFUNDED)
+                    it.sellerUpdate(it.orderStatus, sellerOrderStatusRequest, ComplainStatus.REFUNDED)
 
                     it.product.productBackOffice!!.quantity += it.productQuantity
                     it.product.productBackOffice!!.soldQuantity -= it.productQuantity
@@ -251,7 +252,7 @@ class OrderDetailsService(
 
             ComplainStatus.EXCHANGE_REQUESTED -> {
                 orderDetails.map {
-                    it.sellerUpdate(OrderStatus.PRODUCT_PREPARING, sellerOrderStatusRequest, ComplainStatus.EXCHANGED)
+                    it.sellerUpdate(it.orderStatus, sellerOrderStatusRequest, ComplainStatus.EXCHANGED)
 
                 }
             }
