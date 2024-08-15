@@ -1,10 +1,9 @@
 package com.highv.ecommerce.domain.coupon.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.InvalidCouponRequestException
-import com.highv.ecommerce.common.exception.UnauthorizedUserException
-import com.highv.ecommerce.domain.coupon.dto.CouponResponse
+import com.highv.ecommerce.domain.coupon.dto.BuyerCouponResponse
+import com.highv.ecommerce.domain.coupon.dto.SellerCouponResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import com.highv.ecommerce.domain.coupon.service.CouponService
@@ -14,7 +13,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 
@@ -67,7 +65,7 @@ class CouponController(
     fun getSellerCouponById(
         @PathVariable("couponId") couponId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<CouponResponse> = ResponseEntity
+    ): ResponseEntity<SellerCouponResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(couponService.getSellerCouponById(couponId, userPrincipal.id))
 
@@ -76,14 +74,14 @@ class CouponController(
     @GetMapping("/seller/coupon")
     fun getSellerCouponList(
         @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<List<CouponResponse>> = ResponseEntity
+    ): ResponseEntity<List<SellerCouponResponse>> = ResponseEntity
         .status(HttpStatus.OK)
         .body(couponService.getSellerCouponList(userPrincipal.id))
 
     @GetMapping("/coupon/{productId}")
     fun getDetailCoupon(
         @PathVariable("productId") productId: Long,
-    ): ResponseEntity<CouponResponse> = ResponseEntity
+    ): ResponseEntity<SellerCouponResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(couponService.getDetailCoupon(productId))
 
@@ -93,7 +91,7 @@ class CouponController(
     fun getBuyerCouponById(
         @PathVariable("productId") productId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<CouponResponse> = ResponseEntity
+    ): ResponseEntity<BuyerCouponResponse> = ResponseEntity
         .status(HttpStatus.OK)
         .body(couponService.getBuyerCouponById(productId, userPrincipal.id))
 
@@ -102,7 +100,7 @@ class CouponController(
     @GetMapping("/buyer/coupon")
     fun getBuyerCouponList(
         @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<List<CouponResponse>> = ResponseEntity
+    ): ResponseEntity<List<BuyerCouponResponse>> = ResponseEntity
         .status(HttpStatus.OK)
         .body(couponService.getBuyerCouponList(userPrincipal.id))
 

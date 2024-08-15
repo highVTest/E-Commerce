@@ -45,12 +45,12 @@ class OrderMasterRepositoryImpl(
         val query = queryFactory.select(
             QTotalPriceDto(
                 itemCart.id,
-                getTotalPrice().sum()
+                getTotalPrice()
             )
         ).from(itemCart)
             .leftJoin(couponToBuyer).fetchJoin()
             .on(
-                couponToBuyer.buyer().id.eq(itemCart.buyerId)
+                couponToBuyer.buyerId.eq(itemCart.buyer().id)
                     .and(couponToBuyer.coupon().id.`in`(couponIdList.map { it.id }))
             )
             .leftJoin(coupon).fetchJoin()
@@ -58,8 +58,8 @@ class OrderMasterRepositoryImpl(
                 coupon.id.eq(couponToBuyer.coupon().id)
                     .and(coupon.product().id.eq(itemCart.product().id))
             )
-            .where(itemCart.buyerId.eq(buyerId))
-            .groupBy(itemCart.buyerId, itemCart.product().id)
+            .where(itemCart.buyer().id.eq(buyerId))
+            .groupBy(itemCart.buyer().id, itemCart.product().id)
             .fetch()
 
 
@@ -78,7 +78,7 @@ class OrderMasterRepositoryImpl(
 
         return CaseBuilder()
             .`when`(
-                couponToBuyer.coupon().id.isNotNull
+                couponToBuyer.coupon().id.isNotNull()
                     .and(coupon.discountPolicy.eq(DiscountPolicy.DISCOUNT_RATE))
             )
             .then(
@@ -89,7 +89,7 @@ class OrderMasterRepositoryImpl(
                     )
             )
             .`when`(
-                couponToBuyer.coupon().id.isNotNull
+                couponToBuyer.coupon().id.isNotNull()
                     .and(coupon.discountPolicy.eq(DiscountPolicy.DISCOUNT_PRICE))
             )
             .then(

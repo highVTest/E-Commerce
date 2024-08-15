@@ -1,14 +1,18 @@
 package com.highv.ecommerce.domain.review.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
+import com.highv.ecommerce.common.exception.CustomRuntimeException
+import com.highv.ecommerce.domain.review.dto.BuyerReviewResponse
 import com.highv.ecommerce.domain.review.dto.ReviewRequest
 import com.highv.ecommerce.domain.review.dto.ReviewResponse
 import com.highv.ecommerce.domain.review.service.ReviewService
 import com.highv.ecommerce.infra.security.UserPrincipal
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -20,9 +24,15 @@ class ReviewController(
     @PreAuthorize("hasRole('BUYER')")
     fun addReview(
         @PathVariable productId: Long,
-        @RequestBody reviewRequest: ReviewRequest,
-        @AuthenticationPrincipal buyerId: UserPrincipal
-    ): ResponseEntity<ReviewResponse> {
+        @AuthenticationPrincipal buyerId: UserPrincipal,
+        @Valid @RequestBody reviewRequest: ReviewRequest,
+        bindingResult: BindingResult
+    ): ResponseEntity<DefaultResponse> {
+
+        if (bindingResult.hasErrors()) {
+            throw CustomRuntimeException(400, bindingResult.fieldError?.defaultMessage.toString())
+        }
+
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(reviewService.addReview(productId, reviewRequest, buyerId.id))
@@ -33,9 +43,15 @@ class ReviewController(
     fun updateReview(
         @PathVariable productId: Long,
         @PathVariable reviewId: Long,
-        @RequestBody reviewRequest: ReviewRequest,
-        @AuthenticationPrincipal buyerId: UserPrincipal
-    ): ResponseEntity<ReviewResponse> {
+        @AuthenticationPrincipal buyerId: UserPrincipal,
+        @Valid @RequestBody reviewRequest: ReviewRequest,
+        bindingResult: BindingResult
+    ): ResponseEntity<DefaultResponse> {
+
+        if (bindingResult.hasErrors()) {
+            throw CustomRuntimeException(400, bindingResult.fieldError?.defaultMessage.toString())
+        }
+
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(reviewService.updateReview(productId, reviewId, reviewRequest, buyerId.id))
@@ -66,7 +82,7 @@ class ReviewController(
     @PreAuthorize("hasRole('BUYER')")
     fun getBuyerReviews(
         @AuthenticationPrincipal buyerId: UserPrincipal
-    ): ResponseEntity<List<ReviewResponse>> {
+    ): ResponseEntity<List<BuyerReviewResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(reviewService.getBuyerReviews(buyerId.id))

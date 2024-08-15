@@ -8,7 +8,8 @@ data class SellerResponse(
     val nickname: String,
     val profileImage: String?,
     val phoneNumber: String,
-    val address: String
+    val address: String,
+    val activeStatus: ActiveStatus
 ) {
     companion object {
         fun from(seller: Seller): SellerResponse {
@@ -18,9 +19,9 @@ data class SellerResponse(
                 nickname = seller.nickname,
                 profileImage = seller.profileImage,
                 phoneNumber = seller.phoneNumber,
-                address = seller.address
+                address = seller.address,
+                activeStatus = seller.activeStatus
             )
         }
     }
-
 }

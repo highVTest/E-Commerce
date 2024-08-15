@@ -4,7 +4,7 @@ import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
 
 interface CouponToBuyerRepository {
 
-    fun findAllProductIdWithBuyerId(buyerId: Long): List<Long>
+    fun findAllByBuyerId(buyerId: Long): List<CouponToBuyer>
 
     fun existsByCouponIdAndBuyerId(couponId: Long, buyerId: Long): Boolean
 
@@ -18,7 +18,7 @@ interface CouponToBuyerRepository {
 
     fun findByCouponIdAndBuyerIdAndIsUsedFalse(couponId: Long, buyerId: Long): CouponToBuyer?
 
-    fun findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons: List<Long>, buyerId: Long):List<CouponToBuyer>
+    fun saveAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons: List<Long>, buyerId: Long)
 
     fun delete(couponToBuyer: CouponToBuyer)
 

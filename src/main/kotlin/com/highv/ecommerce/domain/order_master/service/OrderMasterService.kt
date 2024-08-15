@@ -10,6 +10,8 @@ import com.highv.ecommerce.common.lock.service.RedisLockService
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
 import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
+import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
+import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
@@ -30,11 +32,10 @@ class OrderMasterService(
     private val orderMasterRepository: OrderMasterRepository,
     private val orderDetailsRepository: OrderDetailsRepository,
     private val itemCartRepository: ItemCartRepository,
-    private val buyerRepository: BuyerRepository,
     private val couponToBuyerRepository: CouponToBuyerRepository,
     private val redisLockService: RedisLockService,
     private val txAdvice: TxAdvice,
-    private val productBackOfficeRepository: ProductBackOfficeRepository
+    private val productBackOfficeRepository: ProductBackOfficeRepository,
 ) {
 
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
@@ -43,49 +44,78 @@ class OrderMasterService(
         var masterId = 0L
         kotlin.runCatching {
             redisLockService.runExclusiveWithRedissonLock(key, 50) {
-                val buyer =
-                    buyerRepository.findByIdOrNull(buyerId) ?: throw BuyerNotFoundException(404, "구매자 정보가 존재하지 않습니다")
-                if (paymentRequest.cartIdList.isEmpty()) throw CartEmptyException(400, "장바구니 에서 아이템 목록을 선택해 주세요")
 
                 val cart = itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
-                val couponToBuyer =
+
+                val couponToBuyerList =
                     couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(
                         paymentRequest.couponIdList,
                         buyerId
                     )
 
+                val totalPrice = mutableMapOf<Long, Int>()
 
-                couponToBuyer.forEach {
-                    if (it.coupon.expiredAt < LocalDateTime.now()) throw CouponExpiredException(
-                        400,
-                        "쿠폰 유효 시간이 만료 되었습니다"
-                    )
+                cart.map { cartItem ->
+
+                    if(couponToBuyerList.isEmpty()){
+                        val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity)
+                        totalPrice[cartItem.id!!] = price
+                    }else{
+                        couponToBuyerList.forEach {
+                            if (it.coupon.expiredAt < LocalDateTime.now()) throw CouponExpiredException(
+                                400,
+                                "쿠폰 유효 시간이 만료 되었습니다"
+                            )
+                            if (cartItem.product.id == it.coupon.product.id) {
+                                when (it.coupon.discountPolicy) {
+                                    DiscountPolicy.DISCOUNT_RATE -> {
+                                        val price = (cartItem.quantity * cartItem.product.productBackOffice!!.price) - (
+                                                (cartItem.quantity * cartItem.product.productBackOffice!!.price) * ((it.coupon.discount).toDouble() / 100.0)).toInt()
+                                        totalPrice[cartItem.id!!] = price
+                                        it.useCoupon()
+                                    }
+
+                                    DiscountPolicy.DISCOUNT_PRICE -> {
+                                        val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity) - it.coupon.discount
+                                        totalPrice[cartItem.id!!] = price
+                                        it.useCoupon()
+                                    }
+                                }
+
+                            } else {
+                                val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity)
+                                totalPrice[cartItem.id!!] = price
+                            }
+                        }
+                    }
                 }
-
-                val productPrice = orderMasterRepository.discountTotalPriceList(buyerId, couponToBuyer)
-
-                couponToBuyer.forEach { it.useCoupon() }
 
                 //트랜잭션 전파 수준 변경
 
-                val orderMaster = txAdvice.run { orderSave(buyer, cart, productPrice) }
+                val orderMaster = txAdvice.run { orderSave(cart[0].buyer, cart, totalPrice) }
 
                 masterId = orderMaster.id!!
-                itemCartRepository.deleteAll(cart)
+
+                itemCartRepository.deleteAll(paymentRequest.cartIdList)
             }
         }.getOrThrow()
         return DefaultResponse.from("주문이 완료 되었습니다, 주문 번호 : $masterId")
     }
 
     fun orderSave(buyer: Buyer, cart: List<ItemCart>, productPrice: Map<Long, Int>): OrderMaster {
+
+
         cart.forEach {
-            if (it.product.productBackOffice!!.quantity < it.quantity)
+            val productBackOffice = it.product.productBackOffice!!
+            if (productBackOffice.quantity < it.quantity)
                 throw InsufficientStockException(400, "재고가 부족 합니다")
-            it.product.productBackOffice!!.quantity -= it.quantity
-            it.product.productBackOffice!!.soldQuantity += it.quantity
+            productBackOffice.quantity -= it.quantity
+            productBackOffice.soldQuantity += it.quantity
             productBackOfficeRepository.saveAndFlush(it.product.productBackOffice!!)
         }
+
         val orderMaster = orderMasterRepository.saveAndFlush(OrderMaster())
+
         orderDetailsRepository.saveAll(
             cart.map {
                 OrderDetails(
@@ -100,6 +130,7 @@ class OrderMasterService(
                 )
             }
         )
+
         return orderMaster
     }
 

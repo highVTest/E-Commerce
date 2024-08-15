@@ -1,6 +1,10 @@
 package com.highv.ecommerce.domain.product.repository
 
 import com.highv.ecommerce.domain.backoffice.entity.QProductBackOffice.productBackOffice
+import com.highv.ecommerce.domain.product.dto.ProductSummaryDto
+import com.highv.ecommerce.domain.product.dto.QProductSummaryDto
+import com.highv.ecommerce.domain.product.dto.QReviewProductDto
+import com.highv.ecommerce.domain.product.dto.ReviewProductDto
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.entity.QProduct.product
 import com.querydsl.core.types.dsl.BooleanExpression
@@ -18,88 +22,107 @@ interface ProductRepository : JpaRepository<Product, Long>, ProductQueryDslRepos
 
 @Repository
 interface ProductQueryDslRepository {
-    fun findAllPaginated(pageable: Pageable): Page<Product>
-    fun findByCategoryPaginated(categoryId: Long, pageable: Pageable): Page<Product>
-    fun searchByKeywordPaginated(keyword: String, pageable: Pageable): Page<Product>
-    fun findAllById(productIds: Collection<Long>): List<Product>
+    fun findAllPaginated(pageable: Pageable): Page<ProductSummaryDto>
+    fun findByCategoryPaginated(categoryId: Long, pageable: Pageable): Page<ProductSummaryDto>
+    fun searchByKeywordPaginated(keyword: String, pageable: Pageable): Page<ProductSummaryDto>
+    fun findAllById(productIds: Collection<Long>): List<ProductSummaryDto>
     fun findByIdOrNull(id: Long): Product?
     fun findAllByShopId(shopId: Long): List<Product>
     fun findPaginatedByShopId(shopId: Long, pageable: Pageable): Page<Product>
+    fun findAllByProductId(productIdList: List<Long>): List<ReviewProductDto>
 }
 
 class ProductQueryDslRepositoryImpl(
     private val jpaQueryFactory: JPAQueryFactory
 ) : ProductQueryDslRepository {
 
-    override fun findAllPaginated(pageable: Pageable): Page<Product> {
-        val totalCount = jpaQueryFactory
-            .select(product.count())
+    override fun findAllPaginated(pageable: Pageable): Page<ProductSummaryDto> {
+        val results = jpaQueryFactory
+            .select(
+                QProductSummaryDto(
+                    product.id,
+                    product.productImage,
+                    product.name,
+                    product.productBackOffice().price,
+                )
+            )
             .from(product)
-            .leftJoin(product.productBackOffice(), productBackOffice)
-            .where(product.isDeleted.eq(false))
-            .fetchOne() ?: 0L
-
-        val query = jpaQueryFactory
-            .selectFrom(product)
-            .leftJoin(product.productBackOffice(), productBackOffice).fetchJoin()
-            .leftJoin(product.shop()).fetchJoin()
-            .where(product.isDeleted.eq(false))
+            .orderBy(*pageable.sort.map { it.toOrderSpecifier() }.toList().toTypedArray())
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
-            .orderBy(*pageable.sort.map { it.toOrderSpecifier() }.toList().toTypedArray())
+            .fetch()
 
-        val results = query.fetch()
+        val totalCount = jpaQueryFactory.select(product.count())
+            .from(product)
+            .fetchOne() ?: 0
+
+
         return PageImpl(results, pageable, totalCount)
     }
 
-    override fun findByCategoryPaginated(categoryId: Long, pageable: Pageable): Page<Product> {
+    override fun findByCategoryPaginated(categoryId: Long, pageable: Pageable): Page<ProductSummaryDto> {
         val totalCount = jpaQueryFactory
             .select(product.count())
             .from(product)
-            .leftJoin(product.productBackOffice(), productBackOffice)
             .where(product.categoryId.eq(categoryId))
             .fetchOne() ?: 0L
 
         val query = jpaQueryFactory
-            .selectFrom(product)
-            .leftJoin(product.productBackOffice(), productBackOffice).fetchJoin()
-            .leftJoin(product.shop()).fetchJoin()
+            .select(
+                QProductSummaryDto(
+                    product.id,
+                    product.productImage,
+                    product.name,
+                    product.productBackOffice().price,
+                )
+            ).from(product)
             .where(product.categoryId.eq(categoryId))
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .orderBy(*pageable.sort.map { it.toOrderSpecifier() }.toList().toTypedArray())
 
         val results = query.fetch()
+
         return PageImpl(results, pageable, totalCount)
     }
 
-    override fun searchByKeywordPaginated(keyword: String, pageable: Pageable): Page<Product> {
-        val totalCount = jpaQueryFactory
-            .select(product.count())
-            .from(product)
-            .leftJoin(product.productBackOffice(), productBackOffice)
-            .where(keywordLike(keyword))
-            .fetchOne() ?: 0L
-
-        val query = jpaQueryFactory
-            .selectFrom(product)
-            .leftJoin(product.productBackOffice(), productBackOffice).fetchJoin()
-            .leftJoin(product.shop()).fetchJoin()
+    override fun searchByKeywordPaginated(keyword: String, pageable: Pageable): Page<ProductSummaryDto> {
+        val results = jpaQueryFactory
+            .select(
+                QProductSummaryDto(
+                    product.id,
+                    product.productImage,
+                    product.name,
+                    product.productBackOffice().price,
+                )
+            ).from(product)
+            .innerJoin(product.productBackOffice())
             .where(keywordLike(keyword))
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .orderBy(*pageable.sort.map { it.toOrderSpecifier() }.toList().toTypedArray())
+            .fetch()
 
-        val results = query.fetch()
+        val totalCount = jpaQueryFactory.select(product.count())
+            .from(product)
+            .where((keywordLike(keyword)))
+            .fetchOne() ?: 0
+
         return PageImpl(results, pageable, totalCount)
     }
 
-    override fun findAllById(productIds: Collection<Long>): List<Product> {
+    override fun findAllById(productIds: Collection<Long>): List<ProductSummaryDto> {
         val query = jpaQueryFactory
-            .select(product)
+            .select(
+                QProductSummaryDto(
+                    product.id,
+                    product.productImage,
+                    product.name,
+                    product.productBackOffice().price,
+                )
+            )
             .from(product)
-            .innerJoin(product.productBackOffice()).fetchJoin()
-            .innerJoin(product.shop()).fetchJoin()
+            .innerJoin(product.productBackOffice()) // 살리고 함 테스트 해보기
             .where(product.id.`in`(productIds.toList()))
             .fetch()
 
@@ -123,7 +146,7 @@ class ProductQueryDslRepositoryImpl(
             .selectFrom(product)
             .innerJoin(product.productBackOffice()).fetchJoin()
             .innerJoin(product.shop()).fetchJoin()
-            .where(product.shop().sellerId.eq(shopId))
+            .where(product.shop().id.eq(shopId))
             .fetch()
 
         return query
@@ -133,8 +156,6 @@ class ProductQueryDslRepositoryImpl(
         val totalCount = jpaQueryFactory
             .select(product.count())
             .from(product)
-            .innerJoin(product.productBackOffice(), productBackOffice)
-            .innerJoin(product.shop())
             .where(product.shop().id.eq(shopId))
             .fetchOne() ?: 0L
 
@@ -154,9 +175,20 @@ class ProductQueryDslRepositoryImpl(
     private fun keywordLike(keyword: String): BooleanExpression? {
         return if (keyword.isNotBlank()) {
             product.name.containsIgnoreCase(keyword)
-                .or(product.description.containsIgnoreCase(keyword))
         } else {
             null
         }
+    }
+
+    override fun findAllByProductId(productIdList: List<Long>): List<ReviewProductDto> {
+        return jpaQueryFactory.select(
+            QReviewProductDto(
+                product.id,
+                product.name,
+                product.productImage,
+            )
+        ).from(product)
+            .where(product.id.`in`(productIdList))
+            .fetch()
     }
 }

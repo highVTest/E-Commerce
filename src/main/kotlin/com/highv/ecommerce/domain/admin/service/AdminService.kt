@@ -1,17 +1,22 @@
 package com.highv.ecommerce.domain.admin.service
 
+import com.highv.ecommerce.common.dto.AccessTokenResponse
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.common.exception.BlackListNotFoundException
-import com.highv.ecommerce.common.exception.ProductNotFoundException
-import com.highv.ecommerce.common.exception.SellerNotFoundException
+import com.highv.ecommerce.common.exception.*
+import com.highv.ecommerce.domain.admin.dto.AdminBySellerResponse
 import com.highv.ecommerce.domain.admin.dto.BlackListResponse
 import com.highv.ecommerce.domain.admin.entity.BlackList
+import com.highv.ecommerce.domain.admin.repository.AdminRepository
 import com.highv.ecommerce.domain.admin.repository.BlackListRepository
+import com.highv.ecommerce.domain.auth.dto.LoginRequest
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.dto.ActiveStatus
+import com.highv.ecommerce.domain.seller.dto.SellerResponse
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
+import com.highv.ecommerce.infra.security.jwt.JwtPlugin
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -21,8 +26,22 @@ class AdminService(
     private val sellerRepository: SellerRepository,
     private val productRepository: ProductRepository,
     private val shopRepository: ShopRepository,
-    private val blackListRepository: BlackListRepository
-) {
+    private val blackListRepository: BlackListRepository,
+    private val adminRepository: AdminRepository,
+    private val passwordEncoder: PasswordEncoder,
+    private val jwtPlugin: JwtPlugin,
+
+    ) {
+    fun loginAdmin(loginRequest: LoginRequest): AccessTokenResponse {
+
+        val admin = adminRepository.findByEmail(loginRequest.email)
+        if (admin != null && passwordEncoder.matches(loginRequest.password, admin.password)) {
+            val token = jwtPlugin.generateAccessToken(admin.id.toString(), admin.email, "ADMIN")
+            return AccessTokenResponse(token)
+        }
+        throw AdminLoginFailedException(message = "관리자 로그인 실패")
+    }
+
     // 판매자 제재 로직 구현
     @Transactional
     fun sanctionSeller(sellerId: Long): DefaultResponse {
@@ -37,6 +56,7 @@ class AdminService(
             // 제재 횟수가 5 이상이면 제재 상태로 설정합니다.
             if (existingBlackList.sanctionsCount >= 5) {
                 existingBlackList.isSanctioned = true
+                seller.activeStatus = ActiveStatus.SANCTIONED
             }
             blackListRepository.save(existingBlackList)
         } else {
@@ -90,7 +110,7 @@ class AdminService(
     // 블랙리스트 조회 로직 구현
     fun getBlackLists(): List<BlackListResponse> {
         return blackListRepository.findAll().map {
-            BlackListResponse(it.nickname, it.email, it.sanctionsCount, it.isSanctioned)
+            BlackListResponse(it.id!!, it.nickname, it.email, it.sanctionsCount, it.isSanctioned)
         }
     }
 
@@ -98,7 +118,7 @@ class AdminService(
     fun getBlackList(blackListId: Long): BlackListResponse {
         val blackList = blackListRepository.findByIdOrNull(blackListId)
             ?: throw BlackListNotFoundException(message = "블랙리스트가 존재하지 않습니다.")
-        return BlackListResponse(blackList.nickname, blackList.email, blackList.sanctionsCount, blackList.isSanctioned)
+        return BlackListResponse(blackListId, blackList.nickname, blackList.email, blackList.sanctionsCount, blackList.isSanctioned)
     }
 
     // 블랙리스트 삭제 로직 구현
@@ -119,7 +139,7 @@ class AdminService(
         seller.activeStatus = ActiveStatus.RESIGNED
 
         // 해당 판매자의 Shop을 찾습니다.
-        val shop = shopRepository.findShopBySellerId(sellerId)
+        val shop = shopRepository.findBySellerId(sellerId)
 
         // Shop에 속한 모든 Product를 삭제(소프트 삭제)합니다.
         val products = productRepository.findAllByShopId(shop.id!!)
@@ -143,4 +163,19 @@ class AdminService(
 
         return DefaultResponse("판매자 승인 완료")
     }
+
+    // 판매자 전체 조회 로직 구현
+    fun getSellerLists(): List<SellerResponse> {
+        val sellers = sellerRepository.findAll()
+        return sellers.map { seller ->
+            SellerResponse.from(seller)
+        }
+    }
+
+   fun getSellerBySellerId(sellerId: Long): AdminBySellerResponse {
+       val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "판매자 id $sellerId not found")
+       val shop = shopRepository.findBySellerId(sellerId)
+
+       return AdminBySellerResponse.from(shop, seller)
+   }
 }

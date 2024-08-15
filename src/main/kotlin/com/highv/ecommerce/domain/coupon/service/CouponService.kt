@@ -3,9 +3,8 @@ package com.highv.ecommerce.domain.coupon.service
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.*
 import com.highv.ecommerce.common.innercall.TxAdvice
-import com.highv.ecommerce.domain.buyer.entity.Buyer
-import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
-import com.highv.ecommerce.domain.coupon.dto.CouponResponse
+import com.highv.ecommerce.domain.coupon.dto.BuyerCouponResponse
+import com.highv.ecommerce.domain.coupon.dto.SellerCouponResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import com.highv.ecommerce.domain.coupon.entity.Coupon
@@ -17,7 +16,6 @@ import com.highv.ecommerce.domain.product.repository.ProductRepository
 import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,7 +27,6 @@ class CouponService(
     private val couponRepository: CouponRepository,
     private val productRepository: ProductRepository,
     private val couponToBuyerRepository: CouponToBuyerRepository,
-    private val buyerRepository: BuyerRepository,
     private val txAdvice: TxAdvice,
     private val redissonClient: RedissonClient,
     private val redisTemplate: RedisTemplate<String, String>
@@ -38,10 +35,21 @@ class CouponService(
     @Transactional
     fun createCoupon(couponRequest: CreateCouponRequest, sellerId: Long): DefaultResponse {
 
+        val product = productRepository.findByIdOrNull(couponRequest.productId) ?: throw ProductNotFoundException(404, "상품이 존재하지 않습니다")
+
         if (couponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && couponRequest.discount > 40)
             throw InvalidCouponDiscountException(400, "할인율은 40%를 넘길 수 없습니다")
 
-        val product = productRepository.findByIdOrNull(couponRequest.productId) ?: throw ProductNotFoundException(404, "상품이 존재하지 않습니다")
+        if (couponRequest.discountPolicy == DiscountPolicy.DISCOUNT_PRICE && couponRequest.discount >
+            (product.productBackOffice!!.price * (40f / 100f)).toInt()){
+
+            throw InvalidCouponDiscountException(400, "최대 가격 할인율은 현재 상품 가격의 40% 입니다")
+
+        }
+
+        if (couponRequest.expiredAt <= LocalDateTime.now())
+            throw InvalidCouponDiscountException(400, "만료 시간이 현재 시간 보다 이후 시간 이어야 합니다")
+
 
         if(product.shop.sellerId != sellerId) throw RuntimeException("다른 사용자는 해당 쿠폰을 생성 할 수 없습니다")
 
@@ -66,11 +74,22 @@ class CouponService(
     @Transactional
     fun updateCoupon(couponId: Long, updateCouponRequest: UpdateCouponRequest, sellerId: Long): DefaultResponse {
 
-        val result = couponRepository.findByIdOrNull(couponId) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
+        val coupon = couponRepository.findByIdOrNull(couponId) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
 
-        if (result.sellerId != sellerId) throw UnauthorizedUserException(401, "다른 사용자는 해당 쿠폰을 수정할 수 없습니다")
+        if (updateCouponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && updateCouponRequest.discount > 40)
+            throw InvalidCouponDiscountException(400, "할인율은 40%를 넘길 수 없습니다")
 
-        result.update(updateCouponRequest)
+
+        if (updateCouponRequest.discountPolicy == DiscountPolicy.DISCOUNT_PRICE && updateCouponRequest.discount >
+            (coupon.product.productBackOffice!!.price * (40f / 100f)).toInt()){
+
+            throw InvalidCouponDiscountException(400, "최대 가격 할인율은 현재 상품 가격의 40% 입니다")
+
+        }
+
+        if (coupon.sellerId != sellerId) throw UnauthorizedUserException(401, "다른 사용자는 해당 쿠폰을 수정할 수 없습니다")
+
+        coupon.update(updateCouponRequest)
 
         return DefaultResponse.from("쿠폰 업데이트가 완료 되었습니다")
     }
@@ -82,30 +101,28 @@ class CouponService(
     }
 
 
-    fun getSellerCouponById(couponId: Long, sellerId: Long): CouponResponse {
+    fun getSellerCouponById(couponId: Long, sellerId: Long): SellerCouponResponse {
 
         val coupon = couponRepository.findByIdAndSellerId(couponId, sellerId) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
 
-        return CouponResponse.from(coupon)
+        return SellerCouponResponse.from(coupon)
     }
 
-    fun getSellerCouponList(sellerId: Long): List<CouponResponse> {
-        return couponRepository.findAllBySellerId(sellerId).map { CouponResponse.from(it) }
+    fun getSellerCouponList(sellerId: Long): List<SellerCouponResponse> {
+        return couponRepository.findAllBySellerId(sellerId).map { SellerCouponResponse.from(it) }
     }
 
-    fun getBuyerCouponById(productId: Long, buyerId: Long): CouponResponse {
+    fun getBuyerCouponById(productId: Long, buyerId: Long): BuyerCouponResponse {
 
         val result =
             couponToBuyerRepository.findByProductIdAndBuyerId(productId, buyerId) ?: throw CouponNotFoundException(404, "쿠폰을 가지고 있지 않습니다")
 
-        return CouponResponse.from(result.coupon)
+        return BuyerCouponResponse.from(result)
     }
 
-    fun getBuyerCouponList(buyerId: Long): List<CouponResponse>? {
+    fun getBuyerCouponList(buyerId: Long): List<BuyerCouponResponse>? {
 
-        return couponToBuyerRepository.findAllProductIdWithBuyerId(buyerId).let {
-            couponRepository.findAllCouponIdWithBuyer(it).map { i -> CouponResponse.from(i) }
-        }
+        return couponToBuyerRepository.findAllByBuyerId(buyerId).map { BuyerCouponResponse.from(it) }
     }
 
     //낙관적 락의 장점
@@ -118,11 +135,7 @@ class CouponService(
             // 잠금이 시도될 경우 기다 리는 시간 , 잠금이 유지 되는 시간, 시간의 단위
             if(lock.tryLock(20, 2, TimeUnit.SECONDS)) {
 
-                val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw BuyerNotFoundException(404, "바이어가 존재하지 않습니다")
-
-
-
-                if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw DuplicateCouponException(
+                if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyerId)) throw DuplicateCouponException(
                     400,
                     "동일한 쿠폰은 지급 받을 수 없습니다"
                 )
@@ -132,7 +145,7 @@ class CouponService(
                 coupon.validExpiredAt()
 
                 txAdvice.run {
-                    saveCoupon(coupon, buyer)
+                    saveCoupon(coupon, buyerId)
                 }
 
             }
@@ -151,7 +164,7 @@ class CouponService(
 
     }
 
-    fun saveCoupon(coupon: Coupon, buyer: Buyer){
+    fun saveCoupon(coupon: Coupon, buyerId: Long){
 
         coupon.spendCoupon()
 
@@ -159,7 +172,7 @@ class CouponService(
 
         couponToBuyerRepository.save(
             CouponToBuyer(
-                buyer = buyer,
+                buyerId = buyerId,
                 coupon = coupon,
                 isUsed = false,
             )
@@ -175,10 +188,10 @@ class CouponService(
     private fun redisUnLock(key: String): Boolean
             = redisTemplate.delete(key)
 
-    fun getDetailCoupon(productId: Long): CouponResponse {
+    fun getDetailCoupon(productId: Long): SellerCouponResponse {
 
        return couponRepository.findByProductId(productId)
-           .let { CouponResponse.from(it ?: throw CouponNotFoundException(409, "쿠폰이 존재하지 않습니다")) }
+           .let { SellerCouponResponse.from(it ?: throw CouponNotFoundException(409, "쿠폰이 존재하지 않습니다")) }
 
     }
 

@@ -1,10 +1,9 @@
 package com.highv.ecommerce.domain.coupon.dto
 
 import com.highv.ecommerce.domain.coupon.entity.Coupon
-import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
 import java.time.LocalDateTime
 
-class CouponResponse(
+class SellerCouponResponse(
     val couponId: Long,
     val discountPolicy: String,
     val discount : Int,
@@ -14,7 +13,7 @@ class CouponResponse(
     val couponName : String,
 ){
     companion object {
-        fun from(coupon: Coupon) = CouponResponse(
+        fun from(coupon: Coupon) = SellerCouponResponse(
             couponId = coupon.id!!,
             discountPolicy = coupon.discountPolicy.name,
             discount = coupon.discount,
