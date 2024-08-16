@@ -7,6 +7,7 @@ import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeReposit
 import com.highv.ecommerce.domain.favorite.service.FavoriteService
 import com.highv.ecommerce.domain.product.dto.CreateProductRequest
 import com.highv.ecommerce.domain.product.dto.ProductResponse
+import com.highv.ecommerce.domain.product.dto.ProductSummaryResponse
 import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
@@ -49,10 +50,10 @@ class ProductService(
                 throw RuntimeException("Seller is not authorized to create a product")
             }
 
-        // if (file != null) {
-        //     s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
-        //     product.productImage = s3Manager.getFile(file.originalFilename)
-        // }
+            // if (file != null) {
+            //     s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
+            //     product.productImage = s3Manager.getFile(file.originalFilename)
+            // }
 
             val shop = shopRepository.findShopBySellerId(sellerId)
 
@@ -136,8 +137,8 @@ class ProductService(
         return ProductResponse.from(product, favoriteService.countFavorite(productId))
     }
 
-    fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductResponse> {
+    fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductSummaryResponse> {
         val products = productRepository.findByCategoryPaginated(categoryId, pageable)
-        return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
+        return products.map { ProductSummaryResponse.from(it, favoriteService.countFavorite(it.id)) }
     }
 }

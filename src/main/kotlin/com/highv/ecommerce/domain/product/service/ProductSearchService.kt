@@ -1,7 +1,7 @@
 package com.highv.ecommerce.domain.product.service
 
 import com.highv.ecommerce.domain.favorite.service.FavoriteService
-import com.highv.ecommerce.domain.product.dto.ProductResponse
+import com.highv.ecommerce.domain.product.dto.ProductSummaryResponse
 import com.highv.ecommerce.domain.product.dto.TopSearchKeyword
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import org.springframework.data.domain.Page
@@ -17,12 +17,12 @@ import java.util.concurrent.TimeUnit
 @Service
 class ProductSearchService(
     private val redisTemplate: RedisTemplate<String, String>,
-    private val redisTemplateForProductSearch: RedisTemplate<String, Page<ProductResponse>>,
+    private val redisTemplateForProductSearch: RedisTemplate<String, Page<ProductSummaryResponse>>,
     private val productRepository: ProductRepository,
     private val favoriteService: FavoriteService
 ) {
     private val topSearchZSet: ZSetOperations<String, String> = redisTemplate.opsForZSet()
-    private val searchHash: HashOperations<String, String, Page<ProductResponse>> =
+    private val searchHash: HashOperations<String, String, Page<ProductSummaryResponse>> =
         redisTemplateForProductSearch.opsForHash()
 
     fun topSearch10(limit: Long): Set<TopSearchKeyword> {
@@ -33,7 +33,7 @@ class ProductSearchService(
         return emptySet()
     }
 
-    fun searchByRedis(keyword: String, pageRequest: PageRequest): Page<ProductResponse> {
+    fun searchByRedis(keyword: String, pageRequest: PageRequest): Page<ProductSummaryResponse> {
         addTermTopSearch(keyword)
 
         val sortProperty = pageRequest.sort.iterator().next().property
@@ -54,7 +54,7 @@ class ProductSearchService(
             }
         } else {
             val productInfo = productRepository.searchByKeywordPaginated(keyword, pageRequest)
-            return productInfo.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
+            return productInfo.map { ProductSummaryResponse.from(it, favoriteService.countFavorite(it.id)) }
         }
     }
 
@@ -63,7 +63,7 @@ class ProductSearchService(
         redisTemplate.expire("topSearch", 10, TimeUnit.MINUTES)
     }
 
-    fun addTermSearch(term: String, showInfos: Page<ProductResponse>) {
+    fun addTermSearch(term: String, showInfos: Page<ProductSummaryResponse>) {
         searchHash.put("searchList", term, showInfos)
         redisTemplateForProductSearch.expire("searchList", 10, TimeUnit.MINUTES)
     }
@@ -84,13 +84,13 @@ class ProductSearchService(
                     val cacheKey = createCacheKey(keyword, filterCase, direction)
                     addTermSearch(
                         cacheKey,
-                        productInfo.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) })
+                        productInfo.map { ProductSummaryResponse.from(it, favoriteService.countFavorite(it.id)) })
                 }
             }
         }
     }
 
-    fun getAllProducts(pageable: Pageable): Page<ProductResponse> {
+    fun getAllProducts(pageable: Pageable): Page<ProductSummaryResponse> {
 
         val sortProperty = pageable.sort.iterator().next().property
         val sortDirection =
@@ -100,7 +100,6 @@ class ProductSearchService(
 
         if (pageNumber == 0) {
             val cacheKey = createCacheKey("all", sortProperty, sortDirection)
-
             val cachedData = searchHash.get("productList", cacheKey)
 
             if (cachedData != null) {
@@ -111,7 +110,7 @@ class ProductSearchService(
                 searchHash.put(
                     "productList",
                     cacheKey,
-                    products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
+                    products.map { ProductSummaryResponse.from(it, favoriteService.countFavorite(it.id)) }
                 )
 
                 redisTemplateForProductSearch.expire("productList", 60, TimeUnit.MINUTES)
@@ -120,7 +119,7 @@ class ProductSearchService(
             }
         } else {
             val products = productRepository.findAllPaginated(pageable)
-            return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
+            return products.map { ProductSummaryResponse.from(it, favoriteService.countFavorite(it.id)) }
         }
     }
 }
