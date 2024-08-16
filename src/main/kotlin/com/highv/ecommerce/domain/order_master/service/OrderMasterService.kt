@@ -91,6 +91,9 @@ class OrderMasterService(
                                     }
                                 }
 
+                            }else {
+                                val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity)
+                                totalPrice[cartItem.id!!] = price
                             }
                         }
                     }
