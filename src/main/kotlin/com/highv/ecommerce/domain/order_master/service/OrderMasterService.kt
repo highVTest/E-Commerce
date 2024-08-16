@@ -1,6 +1,5 @@
 package com.highv.ecommerce.domain.order_master.service
 
-import com.highv.ecommerce.common.aop.StopWatch
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.BuyerNotFoundException
 import com.highv.ecommerce.common.exception.CartEmptyException
@@ -39,7 +38,7 @@ class OrderMasterService(
     private val productBackOfficeRepository: ProductBackOfficeRepository,
 ) {
 
-    @StopWatch
+    private val log = LoggerFactory.getLogger("맵 확인")
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
 
         val key = "락락"
