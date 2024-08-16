@@ -27,6 +27,7 @@ class ReviewQueryDslRepositoryImpl(
             .innerJoin(review.product()).fetchJoin()
             .innerJoin(review.product().productBackOffice()).fetchJoin()
             .innerJoin(review.product().shop()).fetchJoin()
+            .innerJoin(review.buyer()).fetchJoin()
             .where(review.product().id.eq(productId))
             .fetch()
 
@@ -40,7 +41,7 @@ class ReviewQueryDslRepositoryImpl(
             .innerJoin(review.product()).fetchJoin()
             .innerJoin(review.product().productBackOffice()).fetchJoin()
             .innerJoin(review.product().shop()).fetchJoin()
-            .where(review.buyerId.eq(buyerId))
+            .where(review.buyer().id.eq(buyerId))
             .fetch()
 
         return query

@@ -1,10 +1,9 @@
 package com.highv.ecommerce.domain.review.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.common.exception.CustomRuntimeException
-import com.highv.ecommerce.common.exception.ProductNotFoundException
-import com.highv.ecommerce.common.exception.ReviewNotFoundException
-import com.highv.ecommerce.common.exception.ShopNotFoundException
+import com.highv.ecommerce.common.exception.*
+import com.highv.ecommerce.domain.buyer.entity.Buyer
+import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.review.dto.ReviewRequest
 import com.highv.ecommerce.domain.review.dto.ReviewResponse
@@ -20,20 +19,24 @@ class ReviewService(
     private val reviewRepository: ReviewRepository,
     private val productRepository: ProductRepository,
     private val shopRepository: ShopRepository,
+    private val buyerRepository: BuyerRepository,
 ) {
-    fun addReview(productId: Long, reviewRequest: ReviewRequest, buyerId: Long): ReviewResponse {
+    fun addReview(productId: Long, reviewRequest: ReviewRequest, buyerId: Long): DefaultResponse {
         val product = productRepository.findByIdOrNull(productId)
             ?: throw ProductNotFoundException(404, "Product id $productId not found")
+        val buyer = buyerRepository.findByIdOrNull(buyerId)!!
+
 
         val review = Review(
-            buyerId = buyerId,
+            buyer = buyer,
             product = product,
             rate = reviewRequest.rate,
             content = reviewRequest.content
         )
-        val savedReview = reviewRepository.saveAndFlush(review)
+
+        reviewRepository.saveAndFlush(review)
         updateShopAverageRate(productId)
-        return ReviewResponse.from(savedReview)
+        return DefaultResponse("리뷰가 추가되었습니다.")
     }
 
     fun updateReview(
@@ -41,13 +44,13 @@ class ReviewService(
         reviewId: Long,
         reviewRequest: ReviewRequest,
         buyerId: Long
-    ): ReviewResponse {
+    ): DefaultResponse {
         val review = reviewRepository.findByIdOrNull(reviewId) ?: throw ReviewNotFoundException(
             404,
             "Review id $reviewId not found"
         )
 
-        if (review.buyerId != buyerId) {
+        if (review.buyer.id != buyerId) {
             throw CustomRuntimeException(400, "자기 리뷰가 아닙니다.")
         }
 
@@ -55,9 +58,9 @@ class ReviewService(
             rate = reviewRequest.rate
             content = reviewRequest.content
         }
-        val savedReview = reviewRepository.saveAndFlush(review)
+        reviewRepository.saveAndFlush(review)
         updateShopAverageRate(productId)
-        return ReviewResponse.from(savedReview)
+        return DefaultResponse("리뷰가 수정되었습니다.")
     }
 
     fun deleteReview(productId: Long, reviewId: Long, buyerId: Long): DefaultResponse {
@@ -66,7 +69,7 @@ class ReviewService(
             "Review id $reviewId not found"
         )
 
-        if (review.buyerId != buyerId) {
+        if (review.buyer.id != buyerId) {
             throw CustomRuntimeException(400, "자기 리뷰가 아닙니다.")
         }
         
@@ -76,7 +79,10 @@ class ReviewService(
     }
 
     fun getProductReviews(productId: Long): List<ReviewResponse> {
-        return reviewRepository.findAllByProductId(productId).map { ReviewResponse.from(it) }
+
+        val reviews = reviewRepository.findAllByProductId(productId)
+        return reviews.map { ReviewResponse.from(it) }
+
     }
 
     fun getBuyerReviews(buyerId: Long): List<ReviewResponse> {

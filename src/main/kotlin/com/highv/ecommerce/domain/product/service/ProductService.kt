@@ -7,6 +7,7 @@ import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeReposit
 import com.highv.ecommerce.domain.favorite.service.FavoriteService
 import com.highv.ecommerce.domain.product.dto.CreateProductRequest
 import com.highv.ecommerce.domain.product.dto.ProductResponse
+import com.highv.ecommerce.domain.product.dto.ProductSummaryResponse
 import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
@@ -35,15 +36,12 @@ class ProductService(
         productRequest: CreateProductRequest,
         productBackOfficeRequest: ProductBackOfficeRequest,
     ): ProductResponse {
-
         val lockKey = "createProduct:${sellerId}:${productRequest.name}"
         return redisLockService.runExclusiveWithRedissonLock(lockKey, 5) {
 
-            // Seller의 상태를 확인합니다.
             val seller = sellerRepository.findByIdOrNull(sellerId)
                 ?: throw RuntimeException("Seller not found")
 
-            // Seller 상태가 PENDING 또는 RESIGNED일 경우 예외를 발생시킵니다.
             if (seller.activeStatus == ActiveStatus.PENDING || seller.activeStatus == ActiveStatus.RESIGNED) {
                 throw RuntimeException("Seller is not authorized to create a product")
             }
@@ -106,7 +104,6 @@ class ProductService(
         product.apply {
             name = updateProductRequest.name
             description = updateProductRequest.description
-            productImage = ""
             updatedAt = LocalDateTime.now()
             isSoldOut = updateProductRequest.isSoldOut
             categoryId = updateProductRequest.categoryId
@@ -132,8 +129,8 @@ class ProductService(
         return ProductResponse.from(product, favoriteService.countFavorite(productId))
     }
 
-    fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductResponse> {
+    fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductSummaryResponse> {
         val products = productRepository.findByCategoryPaginated(categoryId, pageable)
-        return products.map { ProductResponse.from(it, favoriteService.countFavorite(it.id!!)) }
+        return products.map { ProductSummaryResponse.from(it, favoriteService.countFavorite(it.id)) }
     }
 }

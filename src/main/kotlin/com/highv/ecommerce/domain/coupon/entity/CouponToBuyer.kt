@@ -23,9 +23,8 @@ class CouponToBuyer(
     @JoinColumn(name = "coupon_id")
     val coupon: Coupon,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "buyer_id")
-    val buyer: Buyer,
+    @Column(name="buyer_id",nullable = false)
+    val buyerId: Long,
 
     @Column(name = "is_used", nullable = false)
     var isUsed: Boolean = false,
@@ -35,7 +34,4 @@ class CouponToBuyer(
         isUsed = true
     }
 
-    fun returnCoupon() {
-        isUsed = false
-    }
 }
