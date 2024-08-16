@@ -79,9 +79,17 @@ class BuyerController(private val buyerService: BuyerService) {
     @PreAuthorize("hasRole('BUYER')")
     @PatchMapping("/profile")
     fun changeProfile(
-        @RequestBody request: UpdateBuyerProfileRequest,
+        @Valid @RequestBody request: UpdateBuyerProfileRequest,
+        bindingResult: BindingResult,
         @AuthenticationPrincipal user: UserPrincipal,
-    ): ResponseEntity<BuyerResponse> = ResponseEntity
-        .status(HttpStatus.OK)
-        .body(buyerService.changeProfile(request, user.id))
+
+        ): ResponseEntity<BuyerResponse> {
+        if (bindingResult.hasErrors()) {
+            throw LoginException(bindingResult.fieldError?.defaultMessage.toString())
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(buyerService.changeProfile(request, user.id))
+    }
 }

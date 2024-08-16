@@ -19,7 +19,10 @@ data class CreateSellerRequest(
         message = "이메일은 네이버 또는 지메일만 가능합니다."
     )
     val email: String,
-
+    @field: Pattern(
+        regexp = "^(010)-?[0-9]{4}-?[0-9]{4}$",
+        message = "유효한 핸드폰 번호가 아닙니다."
+    )
     val phoneNumber: String,
     val address: String,
 )
