@@ -1,6 +1,6 @@
 package com.highv.ecommerce.domain.product.controller
 
-import com.highv.ecommerce.domain.product.dto.ProductResponse
+import com.highv.ecommerce.domain.product.dto.ProductSummaryResponse
 import com.highv.ecommerce.domain.product.dto.TopSearchKeyword
 import com.highv.ecommerce.domain.product.service.ProductSearchService
 import org.springframework.data.domain.Page
@@ -34,7 +34,7 @@ class ProductSearchController(
         @RequestParam(required = false, defaultValue = "ASC") sortOrder: String,
         @RequestParam(required = false, defaultValue = "0") page: Int,
         @RequestParam(required = false, defaultValue = "10") size: Int
-    ): ResponseEntity<Page<ProductResponse>> {
+    ): ResponseEntity<Page<ProductSummaryResponse>> {
         val pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order(Sort.Direction.fromString(sortOrder), sortBy)))
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -44,7 +44,7 @@ class ProductSearchController(
     @GetMapping("/all")
     fun getAllProducts(
         @PageableDefault(size = 10, page = 0) pageable: Pageable
-    ): ResponseEntity<Page<ProductResponse>> = ResponseEntity
+    ): ResponseEntity<Page<ProductSummaryResponse>> = ResponseEntity
         .status(HttpStatus.OK)
         .body(productSearchService.getAllProducts(pageable))
 }
