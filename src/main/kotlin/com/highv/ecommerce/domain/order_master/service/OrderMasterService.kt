@@ -38,8 +38,7 @@ class OrderMasterService(
     private val txAdvice: TxAdvice,
     private val productBackOfficeRepository: ProductBackOfficeRepository,
 ) {
-
-    @StopWatch
+    
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
 
         val key = "락락"
