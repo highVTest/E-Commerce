@@ -72,27 +72,28 @@ class OrderMasterService(
                 val totalPrice = mutableMapOf<Long, Int>()
 
                 cart.map { cartItem ->
-                    couponList.forEach { coupon ->
-                        if (cartItem.product.id == coupon.product.id) {
-                            when (coupon.discountPolicy) {
-                                DiscountPolicy.DISCOUNT_RATE -> {
-                                    val price = (cartItem.quantity * cartItem.product.productBackOffice!!.price) - (
-                                            (cartItem.quantity * cartItem.product.productBackOffice!!.price) * ((coupon.discount).toDouble() / 100.0)).toInt()
-                                    totalPrice[cartItem.id!!] = price
+                    if(couponList.isEmpty()){
+                        val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity)
+                        totalPrice[cartItem.id!!] = price
+                    } else{
+                        couponList.forEach { coupon ->
+                            if (cartItem.product.id == coupon.product.id) {
+                                when (coupon.discountPolicy) {
+                                    DiscountPolicy.DISCOUNT_RATE -> {
+                                        val price = (cartItem.quantity * cartItem.product.productBackOffice!!.price) - (
+                                                (cartItem.quantity * cartItem.product.productBackOffice!!.price) * ((coupon.discount).toDouble() / 100.0)).toInt()
+                                        totalPrice[cartItem.id!!] = price
+                                    }
+
+                                    DiscountPolicy.DISCOUNT_PRICE -> {
+                                        val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity) - coupon.discount
+                                        totalPrice[cartItem.id!!] = price
+                                    }
                                 }
 
-                                DiscountPolicy.DISCOUNT_PRICE -> {
-                                    val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity) - coupon.discount
-                                    totalPrice[cartItem.id!!] = price
-                                }
                             }
-
-                        } else {
-                            val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity)
-                            totalPrice[cartItem.id!!] = price
                         }
                     }
-
                 }
 
                 couponToBuyer.forEach { it.useCoupon() }
