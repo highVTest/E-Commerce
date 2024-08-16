@@ -22,7 +22,7 @@ class ReviewController(
         @PathVariable productId: Long,
         @RequestBody reviewRequest: ReviewRequest,
         @AuthenticationPrincipal buyerId: UserPrincipal
-    ): ResponseEntity<ReviewResponse> {
+    ): ResponseEntity<DefaultResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(reviewService.addReview(productId, reviewRequest, buyerId.id))
@@ -35,7 +35,7 @@ class ReviewController(
         @PathVariable reviewId: Long,
         @RequestBody reviewRequest: ReviewRequest,
         @AuthenticationPrincipal buyerId: UserPrincipal
-    ): ResponseEntity<ReviewResponse> {
+    ): ResponseEntity<DefaultResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(reviewService.updateReview(productId, reviewId, reviewRequest, buyerId.id))
