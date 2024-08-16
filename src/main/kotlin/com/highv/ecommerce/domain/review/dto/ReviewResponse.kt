@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.review.dto
 
+import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.review.entity.Review
 
 data class ReviewResponse(
@@ -9,6 +10,8 @@ data class ReviewResponse(
     val productImage: String,
     val rate: Float,
     val content: String,
+    val buyerName: String,
+    val buyerProfileImage: String,
 )
 {
     companion object {
@@ -18,7 +21,10 @@ data class ReviewResponse(
             content = review.content,
             productImage = review.product.productImage,
             productName = review.product.name,
-            productId = review.product.id!!
+            productId = review.product.id!!,
+            buyerName = review.buyer.nickname,
+            buyerProfileImage = review.buyer.profileImage
+
         )
     }
 }
