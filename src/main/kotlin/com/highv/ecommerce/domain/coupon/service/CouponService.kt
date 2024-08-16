@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.coupon.service
 
+import com.highv.ecommerce.common.aop.StopWatch
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.*
 import com.highv.ecommerce.common.innercall.TxAdvice
@@ -29,7 +30,6 @@ class CouponService(
     private val couponRepository: CouponRepository,
     private val productRepository: ProductRepository,
     private val couponToBuyerRepository: CouponToBuyerRepository,
-    private val buyerRepository: BuyerRepository,
     private val txAdvice: TxAdvice,
     private val redissonClient: RedissonClient,
     private val redisTemplate: RedisTemplate<String, String>
@@ -41,11 +41,14 @@ class CouponService(
         if (couponRequest.discountPolicy == DiscountPolicy.DISCOUNT_RATE && couponRequest.discount > 40)
             throw InvalidCouponDiscountException(400, "할인율은 40%를 넘길 수 없습니다")
 
+        if (couponRequest.expiredAt <= LocalDateTime.now())
+            throw InvalidCouponDiscountException(400, "만료 시간이 현재 시간 보다 이후 시간 이어야 합니다")
+
         val product = productRepository.findByIdOrNull(couponRequest.productId) ?: throw ProductNotFoundException(404, "상품이 존재하지 않습니다")
 
         if(product.shop.sellerId != sellerId) throw RuntimeException("다른 사용자는 해당 쿠폰을 생성 할 수 없습니다")
 
-        if (couponRepository.existsByProductId(couponRequest.productId)) throw CouponAlreadyExistsException(400, "이미 해당 상품에 쿠폰이 발급되어 있습니다")
+        if (couponRepository.existsByProductId(couponRequest.productId)) throw CouponAlreadyExistsException(400, "이미 해당 상품에 쿠폰이 발급 되어 있습니다")
 
         couponRepository.save(
             Coupon(
@@ -118,11 +121,7 @@ class CouponService(
             // 잠금이 시도될 경우 기다 리는 시간 , 잠금이 유지 되는 시간, 시간의 단위
             if(lock.tryLock(20, 2, TimeUnit.SECONDS)) {
 
-                val buyer = buyerRepository.findByIdOrNull(buyerId) ?: throw BuyerNotFoundException(404, "바이어가 존재하지 않습니다")
-
-
-
-                if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyer.id!!)) throw DuplicateCouponException(
+                if (couponToBuyerRepository.existsByCouponIdAndBuyerId(couponId, buyerId)) throw DuplicateCouponException(
                     400,
                     "동일한 쿠폰은 지급 받을 수 없습니다"
                 )
@@ -132,7 +131,7 @@ class CouponService(
                 coupon.validExpiredAt()
 
                 txAdvice.run {
-                    saveCoupon(coupon, buyer)
+                    saveCoupon(coupon, buyerId)
                 }
 
             }
@@ -151,7 +150,7 @@ class CouponService(
 
     }
 
-    fun saveCoupon(coupon: Coupon, buyer: Buyer){
+    fun saveCoupon(coupon: Coupon, buyerId: Long){
 
         coupon.spendCoupon()
 
@@ -159,7 +158,7 @@ class CouponService(
 
         couponToBuyerRepository.save(
             CouponToBuyer(
-                buyer = buyer,
+                buyerId = buyerId,
                 coupon = coupon,
                 isUsed = false,
             )

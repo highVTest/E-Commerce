@@ -25,7 +25,7 @@ class CouponToBuyerRepositoryImpl(
 
         return queryFactory.select(couponToBuyer.coupon().id)
             .from(couponToBuyer)
-            .where(couponToBuyer.buyer().id.eq(buyerId))
+            .where(couponToBuyer.buyerId.eq(buyerId))
             .fetch()
     }
 
@@ -45,8 +45,7 @@ class CouponToBuyerRepositoryImpl(
             .innerJoin(couponToBuyer.coupon().product()).fetchJoin()
             .innerJoin(couponToBuyer.coupon().product().productBackOffice()).fetchJoin()
             .innerJoin(couponToBuyer.coupon().product().shop()).fetchJoin()
-            .innerJoin(couponToBuyer.buyer()).fetchJoin()
-            .where(couponToBuyer.buyer().id.eq(buyerId))
+            .where(couponToBuyer.buyerId.eq(buyerId))
             .where(couponToBuyer.coupon().product().id.eq(productId))
             .fetchOne()
 
@@ -68,8 +67,13 @@ class CouponToBuyerRepositoryImpl(
         return couponToBuyerJpaRepository.findByCouponIdAndBuyerIdAndIsUsedFalse(couponId, buyerId)
     }
 
-    override fun findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons: List<Long>, buyerId: Long): List<CouponToBuyer> {
-        return couponToBuyerJpaRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons, buyerId)
+    override fun saveAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons: List<Long>, buyerId: Long){
+
+            queryFactory.update(couponToBuyer)
+            .set(couponToBuyer.isUsed, false)
+            .where(couponToBuyer.coupon().id.`in`(coupons))
+            .where(couponToBuyer.buyerId.eq(buyerId))
+            .execute()
     }
 
     override fun delete(couponToBuyer: CouponToBuyer) {

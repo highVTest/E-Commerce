@@ -50,7 +50,7 @@ class OrderMasterRepositoryImpl(
         ).from(itemCart)
             .leftJoin(couponToBuyer).fetchJoin()
             .on(
-                couponToBuyer.buyer().id.eq(itemCart.buyer().id)
+                couponToBuyer.buyerId.eq(itemCart.buyer().id)
                     .and(couponToBuyer.coupon().id.`in`(couponIdList.map { it.id }))
             )
             .leftJoin(coupon).fetchJoin()

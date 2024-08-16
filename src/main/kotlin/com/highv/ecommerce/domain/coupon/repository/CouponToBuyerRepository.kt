@@ -18,7 +18,7 @@ interface CouponToBuyerRepository {
 
     fun findByCouponIdAndBuyerIdAndIsUsedFalse(couponId: Long, buyerId: Long): CouponToBuyer?
 
-    fun findAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons: List<Long>, buyerId: Long):List<CouponToBuyer>
+    fun saveAllByCouponIdAndBuyerIdAndIsUsedTrue(coupons: List<Long>, buyerId: Long)
 
     fun delete(couponToBuyer: CouponToBuyer)
 
