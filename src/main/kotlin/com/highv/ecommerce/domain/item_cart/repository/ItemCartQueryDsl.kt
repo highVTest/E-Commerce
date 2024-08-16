@@ -7,4 +7,6 @@ interface ItemCartQueryDsl {
     fun findByProductIdAndBuyerId(productId: Long, buyerId: Long): ItemCart?
 
     fun findAllByIdAndBuyerId(id: List<Long>, buyerId: Long): List<ItemCart>
+
+    fun deleteAll(cartIdList: List<Long>)
 }

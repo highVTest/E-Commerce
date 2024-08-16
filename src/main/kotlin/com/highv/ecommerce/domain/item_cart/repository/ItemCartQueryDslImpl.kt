@@ -3,7 +3,9 @@ package com.highv.ecommerce.domain.item_cart.repository
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.item_cart.entity.QItemCart.itemCart
 import com.querydsl.jpa.impl.JPAQueryFactory
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 
 @Repository
 class ItemCartQueryDslImpl(
@@ -55,5 +57,14 @@ class ItemCartQueryDslImpl(
             .fetch()
 
         return query
+    }
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    override fun deleteAll(cartIdList: List<Long>) {
+
+        queryFactory.delete(itemCart)
+            .where(itemCart.id.`in`(cartIdList))
+            .execute()
     }
 }
