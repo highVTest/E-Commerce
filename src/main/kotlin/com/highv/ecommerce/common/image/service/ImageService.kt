@@ -9,8 +9,6 @@ import org.springframework.web.multipart.MultipartFile
 @Service
 class ImageService(
     private val s3Manager: S3Manager,
-
-
 ) {
 
     fun uploadImage(file: MultipartFile): ImageUrlResponse {
@@ -28,17 +26,10 @@ class ImageService(
             throw CustomRuntimeException(409, "이미지를 등록해주세요")
         }
 
-        val imageUrls: MutableList<ImageUrlResponse> = mutableListOf()
-
-        files.forEach {
-            val imageUrl = s3Manager.getFile(it.originalFilename)
-
-
-            s3Manager.uploadFile(files)
-
+        val imageUrls: List<ImageUrlResponse> = s3Manager.uploadFile(files).map {
+            ImageUrlResponse(it)
         }
 
         return imageUrls
     }
-
 }
