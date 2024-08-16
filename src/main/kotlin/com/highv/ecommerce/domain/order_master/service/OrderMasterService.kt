@@ -57,6 +57,7 @@ class OrderMasterService(
                 val totalPrice = mutableMapOf<Long, Int>()
 
                 cart.map { cartItem ->
+
                     if(couponToBuyerList.isEmpty()){
                         val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity)
                         totalPrice[cartItem.id!!] = price
