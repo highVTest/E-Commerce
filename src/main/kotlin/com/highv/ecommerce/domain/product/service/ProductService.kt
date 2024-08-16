@@ -28,7 +28,6 @@ class ProductService(
     private val productBackOfficeRepository: ProductBackOfficeRepository,
     private val favoriteService: FavoriteService,
     private val redisLockService: RedisLockService,
-    /*private val s3Manager: S3Manager,*/
 ) {
     @Transactional
     fun createProduct(
@@ -49,11 +48,6 @@ class ProductService(
                 throw RuntimeException("Seller is not authorized to create a product")
             }
 
-            // if (file != null) {
-            //     s3Manager.uploadFile(file)  // S3Manager를 통해 파일 업로드
-            //     product.productImage = s3Manager.getFile(file.originalFilename)
-            // }
-
             val shop = shopRepository.findShopBySellerId(sellerId)
 
             if (productRepository.existsByNameAndShopId(
@@ -65,7 +59,7 @@ class ProductService(
             val product = Product(
                 name = productRequest.name,
                 description = productRequest.description,
-                productImage = "",
+                productImage = productRequest.imageUrl,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now(),
                 isSoldOut = false,
@@ -77,12 +71,14 @@ class ProductService(
             )
 
             val savedProduct = productRepository.save(product)
+
             val productBackOffice = ProductBackOffice(
                 quantity = productBackOfficeRequest.quantity,
                 price = productBackOfficeRequest.price,
                 soldQuantity = 0,
                 product = savedProduct
             )
+
             savedProduct.productBackOffice = productBackOffice
             productBackOfficeRepository.save(productBackOffice)
             productRepository.save(savedProduct)
