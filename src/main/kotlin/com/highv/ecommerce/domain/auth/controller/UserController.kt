@@ -7,19 +7,15 @@ import com.highv.ecommerce.domain.auth.dto.EmailAuthRequest
 import com.highv.ecommerce.domain.auth.dto.EmailAuthResponse
 import com.highv.ecommerce.domain.auth.dto.LoginRequest
 import com.highv.ecommerce.domain.auth.service.UserService
-import com.highv.ecommerce.infra.security.UserPrincipal
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/v1")
@@ -37,7 +33,7 @@ class UserController(
     // email 컨트롤러 분리하기? 구매자, 판매자
     @PostMapping("/email/send")
     fun sendMail(
-        @RequestBody request: EmailAuthRequest,
+        @Valid @RequestBody request: EmailAuthRequest,
         bindingResult: BindingResult
     ): ResponseEntity<DefaultResponse> {
 
@@ -52,7 +48,7 @@ class UserController(
 
     @PostMapping("/email/confirm")
     fun verifyEmail(
-        @RequestBody request: EmailAuthRequest,
+        @Valid @RequestBody request: EmailAuthRequest,
         bindingResult: BindingResult,
         @RequestParam(value = "code") code: String
     ): ResponseEntity<EmailAuthResponse> {
@@ -65,5 +61,4 @@ class UserController(
             .status(HttpStatus.OK)
             .body(userService.verifyCode(request.email, request.role, code))
     }
-
 }
