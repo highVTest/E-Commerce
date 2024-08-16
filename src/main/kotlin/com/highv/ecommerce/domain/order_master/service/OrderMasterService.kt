@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.order_master.service
 
+import com.highv.ecommerce.common.aop.StopWatch
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.BuyerNotFoundException
 import com.highv.ecommerce.common.exception.CartEmptyException
@@ -40,62 +41,63 @@ class OrderMasterService(
     private val couponRepository: CouponRepository
 ) {
 
-    private val log = LoggerFactory.getLogger("맵 확인")
+    @StopWatch
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
 
         val key = "락락"
         var masterId = 0L
         kotlin.runCatching {
             redisLockService.runExclusiveWithRedissonLock(key, 50) {
+                //얘는 연관 관계를 맺는 다면 없엘 수 있지 않을까??
                 val buyer =
                     buyerRepository.findByIdOrNull(buyerId) ?: throw BuyerNotFoundException(404, "구매자 정보가 존재하지 않습니다")
-                if (paymentRequest.cartIdList.isEmpty()) throw CartEmptyException(400, "장바구니 에서 아이템 목록을 선택해 주세요")
 
                 val cart = itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
-                val couponToBuyer =
+
+                val couponToBuyerList =
                     couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedFalse(
                         paymentRequest.couponIdList,
                         buyerId
                     )
-                val couponIdList = mutableListOf<Long>()
 
-                couponToBuyer.forEach {
+                couponToBuyerList.forEach {
                     if (it.coupon.expiredAt < LocalDateTime.now()) throw CouponExpiredException(
                         400,
                         "쿠폰 유효 시간이 만료 되었습니다"
                     )
-                    couponIdList.add(it.coupon.id!!)
                 }
-
-                val couponList = couponRepository.findAllByCouponId(couponIdList)
 
                 val totalPrice = mutableMapOf<Long, Int>()
 
                 cart.map { cartItem ->
-                    couponList.forEach { coupon ->
-                        if (cartItem.product.id == coupon.product.id) {
-                            when (coupon.discountPolicy) {
-                                DiscountPolicy.DISCOUNT_RATE -> {
-                                    val price = (cartItem.quantity * cartItem.product.productBackOffice!!.price) - (
-                                            (cartItem.quantity * cartItem.product.productBackOffice!!.price) * ((coupon.discount).toDouble() / 100.0)).toInt()
-                                    totalPrice[cartItem.id!!] = price
+                    if(couponToBuyerList.isEmpty()){
+                        val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity)
+                        totalPrice[cartItem.id!!] = price
+                    }else{
+                        couponToBuyerList.forEach {
+                            if (cartItem.product.id == it.coupon.product.id) {
+                                when (it.coupon.discountPolicy) {
+                                    DiscountPolicy.DISCOUNT_RATE -> {
+                                        val price = (cartItem.quantity * cartItem.product.productBackOffice!!.price) - (
+                                                (cartItem.quantity * cartItem.product.productBackOffice!!.price) * ((it.coupon.discount).toDouble() / 100.0)).toInt()
+                                        totalPrice[cartItem.id!!] = price
+                                        it.useCoupon()
+                                    }
+
+                                    DiscountPolicy.DISCOUNT_PRICE -> {
+                                        val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity) - it.coupon.discount
+                                        totalPrice[cartItem.id!!] = price
+                                        it.useCoupon()
+                                    }
                                 }
 
-                                DiscountPolicy.DISCOUNT_PRICE -> {
-                                    val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity) - coupon.discount
-                                    totalPrice[cartItem.id!!] = price
-                                }
+                            } else {
+                                val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity)
+                                totalPrice[cartItem.id!!] = price
                             }
-
-                        } else {
-                            val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity)
-                            totalPrice[cartItem.id!!] = price
                         }
                     }
-
                 }
-
-                couponToBuyer.forEach { it.useCoupon() }
 
                 //트랜잭션 전파 수준 변경
 
@@ -109,14 +111,19 @@ class OrderMasterService(
     }
 
     fun orderSave(buyer: Buyer, cart: List<ItemCart>, productPrice: Map<Long, Int>): OrderMaster {
+
+
         cart.forEach {
-            if (it.product.productBackOffice!!.quantity < it.quantity)
+            val productBackOffice = it.product.productBackOffice!!
+            if (productBackOffice.quantity < it.quantity)
                 throw InsufficientStockException(400, "재고가 부족 합니다")
-            it.product.productBackOffice!!.quantity -= it.quantity
-            it.product.productBackOffice!!.soldQuantity += it.quantity
+            productBackOffice.quantity -= it.quantity
+            productBackOffice.soldQuantity += it.quantity
             productBackOfficeRepository.saveAndFlush(it.product.productBackOffice!!)
         }
+
         val orderMaster = orderMasterRepository.saveAndFlush(OrderMaster())
+
         orderDetailsRepository.saveAll(
             cart.map {
                 OrderDetails(
@@ -131,6 +138,7 @@ class OrderMasterService(
                 )
             }
         )
+
         return orderMaster
     }
 
