@@ -1,9 +1,11 @@
 package com.highv.ecommerce.domain.item_cart.service
 
+import com.highv.ecommerce.common.aop.StopWatch
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.InvalidQuantityException
 import com.highv.ecommerce.common.exception.ItemNotFoundException
 import com.highv.ecommerce.common.exception.ProductNotFoundException
+import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.item_cart.dto.request.SelectProductQuantity
 import com.highv.ecommerce.domain.item_cart.dto.response.CartResponse
 import com.highv.ecommerce.domain.item_cart.dto.response.ItemResponse
@@ -12,16 +14,21 @@ import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.shop.entity.Shop
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class ItemCartService(
     private val itemCartRepository: ItemCartRepository,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val buyerRepository: BuyerRepository
 ) {
+
     @Transactional
     fun addItemIntoCart(productId: Long, request: SelectProductQuantity, buyerId: Long): DefaultResponse {
+
+        val buyer = buyerRepository.findByIdOrNull(buyerId)!!
 
         if (request.quantity < 1) {
             throw InvalidQuantityException(400, "상품의 수량이 1개보다 적을 수 없습니다.")
@@ -41,7 +48,7 @@ class ItemCartService(
             val item: ItemCart = ItemCart(
                 product = product,
                 quantity = request.quantity,
-                buyerId = buyerId,
+                buyer = buyer,
                 shop = product.shop
             )
 

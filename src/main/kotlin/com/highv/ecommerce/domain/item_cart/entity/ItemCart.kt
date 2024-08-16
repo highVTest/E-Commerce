@@ -1,6 +1,7 @@
 package com.highv.ecommerce.domain.item_cart.entity
 
 import com.highv.ecommerce.common.exception.InvalidQuantityException
+import com.highv.ecommerce.domain.buyer.entity.Buyer
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import jakarta.persistence.Column
@@ -24,8 +25,11 @@ class ItemCart(
     @Column(name = "quantity", nullable = false)
     var quantity: Int,
 
-    @Column(name = "buyer_id", nullable = false)
-    val buyerId: Long,
+//    @Column(name = "buyer_id", nullable = false)
+//    val buyerId: Long,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    val buyer: Buyer,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id")
