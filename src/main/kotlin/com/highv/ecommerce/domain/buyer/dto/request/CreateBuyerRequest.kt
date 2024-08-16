@@ -22,8 +22,8 @@ data class CreateBuyerRequest(
 
     val profileImage: String,
     @field: Pattern(
-        regexp = "^(010)-?[0-9]{4}-?[0-9]{4}$",
-        message = "유효한 핸드폰 번호가 아닙니다."
+        regexp = "^(010)-[0-9]{4}-[0-9]{4}$",
+        message = "010-XXXX-XXXX형식으로 입력해주세요"
     )
     val phoneNumber: String,
     val address: String,
