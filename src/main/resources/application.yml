@@ -25,12 +25,6 @@ spring:
       repositories:
         enabled: false
 
-    mongodb:
-      search:
-        db: ${MONGODB_URL}
-        host: ${MONGODB_HOST}
-        password: ${MONGODB_PASSWORD}
-        user: ${MONGODB_USER}
 
   mail:
     host: smtp.gmail.com

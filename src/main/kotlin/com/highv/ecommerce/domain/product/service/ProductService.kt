@@ -45,7 +45,6 @@ class ProductService(
             if (seller.activeStatus == ActiveStatus.PENDING || seller.activeStatus == ActiveStatus.RESIGNED) {
                 throw RuntimeException("Seller is not authorized to create a product")
             }
-
             val shop = shopRepository.findShopBySellerId(sellerId)
 
             if (productRepository.existsByNameAndShopId(
@@ -88,8 +87,17 @@ class ProductService(
         productId: Long,
         updateProductRequest: UpdateProductRequest,
     ): ProductResponse {
+
         val product = productRepository.findByIdOrNull(productId) ?: throw RuntimeException("Product not found")
+
         if (product.shop.sellerId != sellerId) throw RuntimeException("No Authority")
+
+        if (productRepository.existsByNameAndShopId(
+                updateProductRequest.name,
+                product.shop.id!!
+            )
+        ) throw RuntimeException("중복 상품명 입니다.")
+
         product.apply {
             name = updateProductRequest.name
             description = updateProductRequest.description

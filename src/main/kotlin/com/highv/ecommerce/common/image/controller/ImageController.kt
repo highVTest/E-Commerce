@@ -1,6 +1,5 @@
 package com.highv.ecommerce.common.image.controller
 
-import com.highv.ecommerce.common.image.dto.ImageRequest
 import com.highv.ecommerce.common.image.dto.ImageUrlResponse
 import com.highv.ecommerce.common.image.service.ImageService
 import com.highv.ecommerce.infra.security.UserPrincipal
@@ -33,14 +32,8 @@ class ImageController(
     fun uploadImages(
         @RequestPart files: List<MultipartFile>,
         @AuthenticationPrincipal user: UserPrincipal,
-        @RequestPart request: ImageRequest,
-    ): ResponseEntity<List<ImageUrlResponse>> = ResponseEntity.ok(imageService.uploadImages(files, request))
+    ): ResponseEntity<List<ImageUrlResponse>> = ResponseEntity.ok(imageService.uploadImages(files))
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER') or hasRole('BUYER')")
-    @GetMapping("/images/{id}")
-    fun getImage(
-        @PathVariable id: String,
-        @AuthenticationPrincipal user: UserPrincipal
-    ): ResponseEntity<List<ImageUrlResponse>> = ResponseEntity.ok(imageService.getImage(id))
+
 }
 
