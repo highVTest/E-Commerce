@@ -81,9 +81,8 @@ class BuyerController(private val buyerService: BuyerService) {
     fun changeProfile(
         @Valid @RequestBody request: UpdateBuyerProfileRequest,
         bindingResult: BindingResult,
-        @AuthenticationPrincipal user: UserPrincipal,
-
-        ): ResponseEntity<BuyerResponse> {
+        @AuthenticationPrincipal user: UserPrincipal
+    ): ResponseEntity<BuyerResponse> {
         if (bindingResult.hasErrors()) {
             throw LoginException(bindingResult.fieldError?.defaultMessage.toString())
         }

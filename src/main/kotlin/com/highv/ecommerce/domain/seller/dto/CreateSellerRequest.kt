@@ -16,7 +16,7 @@ data class CreateSellerRequest(
     @field: NotBlank(message = "이메일은 공백일 수 없습니다.")
     @field: Pattern(
         regexp = "^[A-Za-z0-9]+@((gmail)|(naver))[.]com$",
-        message = "이메일은 네이버 또는 지메일만 가능합니다."
+        message = "이메일은 네이버 또는 gmail 가능합니다."
     )
     val email: String,
     @field: Pattern(
