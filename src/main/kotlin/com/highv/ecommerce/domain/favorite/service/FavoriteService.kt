@@ -1,7 +1,6 @@
 package com.highv.ecommerce.domain.favorite.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.common.exception.BuyerNotFoundException
 import com.highv.ecommerce.common.exception.ProductNotFoundException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.favorite.dto.FavoriteResponse
@@ -20,21 +19,10 @@ class FavoriteService(
 ) {
 
     @Transactional
-    fun management(productId: Long, buyerId: Long): DefaultResponse {
+    fun favoriteAdd(productId: Long, buyerId: Long): DefaultResponse {
 
         if (!productRepository.existsById(productId)) {
             throw ProductNotFoundException(404, "해당 상품이 존재하지 않습니다.")
-        }
-
-        if (!buyerRepository.existsById(buyerId)) {
-            throw BuyerNotFoundException(404, "구매자 정보가 존재하지 않습니다.")
-        }
-
-        val existsFavorite: Boolean = favoriteRepository.existsByProductIdAndBuyerId(productId, buyerId)
-
-        if (existsFavorite) {
-            favoriteRepository.deleteFavorite(productId, buyerId)
-            return DefaultResponse("찜 목록에서 삭제했습니다.")
         }
 
         val favorite = Favorite(
@@ -45,6 +33,12 @@ class FavoriteService(
         favoriteRepository.save(favorite)
 
         return DefaultResponse("찜 목록에 추가 했습니다.")
+    }
+
+    @Transactional
+    fun favoriteDelete(productId: Long, buyerId: Long): DefaultResponse {
+        favoriteRepository.deleteFavorite(productId, buyerId)
+        return DefaultResponse("찜 목록에서 삭제했습니다.")
     }
 
     fun getFavorites(buyerId: Long): List<FavoriteResponse> {
