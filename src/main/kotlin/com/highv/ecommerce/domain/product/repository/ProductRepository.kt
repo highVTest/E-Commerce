@@ -91,8 +91,8 @@ class ProductQueryDslRepositoryImpl(
                     product.productBackOffice().price,
                 )
             ).from(product)
-            .leftJoin(product.shop())
-            .leftJoin(product.productBackOffice())
+            .leftJoin(product.shop()).fetchJoin()
+            .leftJoin(product.productBackOffice()).fetchJoin()
             .where(product.isDeleted.eq(false).and(keywordLike(keyword)))
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
