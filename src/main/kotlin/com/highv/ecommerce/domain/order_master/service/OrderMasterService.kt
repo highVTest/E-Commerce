@@ -38,7 +38,6 @@ class OrderMasterService(
     private val productBackOfficeRepository: ProductBackOfficeRepository,
 ) {
 
-    private val log = LoggerFactory.getLogger("맵 확인")
     fun requestPayment(buyerId: Long, paymentRequest: PaymentRequest): DefaultResponse {
 
         val key = "락락"
@@ -57,6 +56,7 @@ class OrderMasterService(
                 val totalPrice = mutableMapOf<Long, Int>()
 
                 cart.map { cartItem ->
+
                     if(couponToBuyerList.isEmpty()){
                         val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity)
                         totalPrice[cartItem.id!!] = price

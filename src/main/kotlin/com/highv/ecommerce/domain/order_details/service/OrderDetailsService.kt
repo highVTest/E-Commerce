@@ -192,7 +192,6 @@ class OrderDetailsService(
         return SellerOrderResponse.from(orderMaster, orderDetails)
     }
 
-    @StopWatch
     fun requestComplainAccept(
         shopId: Long,
         orderId: Long,

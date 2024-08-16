@@ -48,7 +48,7 @@ class CouponService(
 
         if(product.shop.sellerId != sellerId) throw RuntimeException("다른 사용자는 해당 쿠폰을 생성 할 수 없습니다")
 
-        if (couponRepository.existsByProductId(couponRequest.productId)) throw CouponAlreadyExistsException(400, "이미 해당 상품에 쿠폰이 발급 되어 있습니다")
+        if (couponRepository.existsByProductId(couponRequest.productId)) throw CouponAlreadyExistsException(400, "이미 해당 상품에 쿠폰이 발급되어 있습니다")
 
         couponRepository.save(
             Coupon(
