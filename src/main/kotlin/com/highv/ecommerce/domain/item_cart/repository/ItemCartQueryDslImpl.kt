@@ -20,7 +20,8 @@ class ItemCartQueryDslImpl(
             .innerJoin(itemCart.product()).fetchJoin()
             .innerJoin(itemCart.product().productBackOffice()).fetchJoin()
             .innerJoin(itemCart.product().shop()).fetchJoin()
-            .where(itemCart.buyerId.eq(buyerId))
+            .innerJoin(itemCart.buyer()).fetchJoin()
+            .where(itemCart.buyer().id.eq(buyerId))
             .fetch()
 
         return query
@@ -33,7 +34,8 @@ class ItemCartQueryDslImpl(
             .innerJoin(itemCart.product()).fetchJoin()
             .innerJoin(itemCart.product().productBackOffice()).fetchJoin()
             .innerJoin(itemCart.product().shop()).fetchJoin()
-            .where(itemCart.buyerId.eq(buyerId))
+            .innerJoin(itemCart.buyer()).fetchJoin()
+            .where(itemCart.buyer().id.eq(buyerId))
             .where(itemCart.product().id.eq(productId))
             .fetchOne()
 
@@ -47,7 +49,8 @@ class ItemCartQueryDslImpl(
             .innerJoin(itemCart.product()).fetchJoin()
             .innerJoin(itemCart.product().productBackOffice()).fetchJoin()
             .innerJoin(itemCart.product().shop()).fetchJoin()
-            .where(itemCart.buyerId.eq(buyerId))
+            .innerJoin(itemCart.buyer()).fetchJoin()
+            .where(itemCart.buyer().id.eq(buyerId))
             .where(itemCart.id.`in`(id))
             .fetch()
 

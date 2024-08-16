@@ -25,9 +25,11 @@ class ItemCart(
     @Column(name = "quantity", nullable = false)
     var quantity: Int,
 
-    @Column(name = "buyer_id", nullable = false)
-    val buyerId: Long,
+//    @Column(name = "buyer_id", nullable = false)
+//    val buyerId: Long,
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    val buyer: Buyer,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id")

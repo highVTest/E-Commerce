@@ -33,12 +33,10 @@ class OrderMasterService(
     private val orderMasterRepository: OrderMasterRepository,
     private val orderDetailsRepository: OrderDetailsRepository,
     private val itemCartRepository: ItemCartRepository,
-    private val buyerRepository: BuyerRepository,
     private val couponToBuyerRepository: CouponToBuyerRepository,
     private val redisLockService: RedisLockService,
     private val txAdvice: TxAdvice,
     private val productBackOfficeRepository: ProductBackOfficeRepository,
-    private val couponRepository: CouponRepository
 ) {
 
     @StopWatch
@@ -48,9 +46,6 @@ class OrderMasterService(
         var masterId = 0L
         kotlin.runCatching {
             redisLockService.runExclusiveWithRedissonLock(key, 50) {
-                //얘는 연관 관계를 맺는 다면 없엘 수 있지 않을까??
-                val buyer =
-                    buyerRepository.findByIdOrNull(buyerId) ?: throw BuyerNotFoundException(404, "구매자 정보가 존재하지 않습니다")
 
                 val cart = itemCartRepository.findAllByIdAndBuyerId(paymentRequest.cartIdList, buyerId)
 
@@ -60,13 +55,6 @@ class OrderMasterService(
                         buyerId
                     )
 
-                couponToBuyerList.forEach {
-                    if (it.coupon.expiredAt < LocalDateTime.now()) throw CouponExpiredException(
-                        400,
-                        "쿠폰 유효 시간이 만료 되었습니다"
-                    )
-                }
-
                 val totalPrice = mutableMapOf<Long, Int>()
 
                 cart.map { cartItem ->
@@ -75,6 +63,10 @@ class OrderMasterService(
                         totalPrice[cartItem.id!!] = price
                     }else{
                         couponToBuyerList.forEach {
+                            if (it.coupon.expiredAt < LocalDateTime.now()) throw CouponExpiredException(
+                                400,
+                                "쿠폰 유효 시간이 만료 되었습니다"
+                            )
                             if (cartItem.product.id == it.coupon.product.id) {
                                 when (it.coupon.discountPolicy) {
                                     DiscountPolicy.DISCOUNT_RATE -> {
@@ -101,7 +93,7 @@ class OrderMasterService(
 
                 //트랜잭션 전파 수준 변경
 
-                val orderMaster = txAdvice.run { orderSave(buyer, cart, totalPrice) }
+                val orderMaster = txAdvice.run { orderSave(cart[0].buyer, cart, totalPrice) }
 
                 masterId = orderMaster.id!!
                 itemCartRepository.deleteAll(cart)
