@@ -1,17 +1,20 @@
 package com.highv.ecommerce.domain.admin.service
 
+import com.highv.ecommerce.common.dto.AccessTokenResponse
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.common.exception.BlackListNotFoundException
-import com.highv.ecommerce.common.exception.ProductNotFoundException
-import com.highv.ecommerce.common.exception.SellerNotFoundException
+import com.highv.ecommerce.common.exception.*
 import com.highv.ecommerce.domain.admin.dto.BlackListResponse
 import com.highv.ecommerce.domain.admin.entity.BlackList
+import com.highv.ecommerce.domain.admin.repository.AdminRepository
 import com.highv.ecommerce.domain.admin.repository.BlackListRepository
+import com.highv.ecommerce.domain.auth.dto.LoginRequest
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.dto.ActiveStatus
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
+import com.highv.ecommerce.infra.security.jwt.JwtPlugin
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -21,8 +24,23 @@ class AdminService(
     private val sellerRepository: SellerRepository,
     private val productRepository: ProductRepository,
     private val shopRepository: ShopRepository,
-    private val blackListRepository: BlackListRepository
-) {
+    private val blackListRepository: BlackListRepository,
+    private val adminRepository: AdminRepository,
+    private val passwordEncoder: PasswordEncoder,
+    private val jwtPlugin: JwtPlugin,
+
+    ) {
+    fun loginAdmin(loginRequest: LoginRequest):AccessTokenResponse {
+
+        val admin = adminRepository.findByEmail(loginRequest.email)
+        if (admin != null && passwordEncoder.matches(loginRequest.password, admin.password)) {
+            val token = jwtPlugin.generateAccessToken(admin.id.toString(), admin.email, "ADMIN")
+            return AccessTokenResponse(token)
+        }
+        throw AdminLoginFailedException(message = "관리자 로그인 실패")
+    }
+
+
     // 판매자 제재 로직 구현
     @Transactional
     fun sanctionSeller(sellerId: Long): DefaultResponse {
