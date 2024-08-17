@@ -4,6 +4,7 @@ import com.highv.ecommerce.common.dto.AccessTokenResponse
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.domain.admin.dto.BlackListResponse
 import com.highv.ecommerce.domain.admin.service.AdminService
+import com.highv.ecommerce.domain.seller.dto.SellerResponse
 import com.highv.ecommerce.domain.auth.dto.LoginRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -82,4 +83,12 @@ class AdminController(
         ResponseEntity
             .status(HttpStatus.OK)
             .body(adminService.promotePendingSeller(sellerId))
+
+    // 판매자 전체 조회
+    @GetMapping("/sellers")
+    @PreAuthorize("hasRole('ADMIN')")
+    fun getSellerLists(): ResponseEntity<List<SellerResponse>> =
+        ResponseEntity
+            .status(HttpStatus.OK)
+            .body(adminService.getSellerLists())
 }
