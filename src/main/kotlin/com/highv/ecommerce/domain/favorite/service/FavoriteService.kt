@@ -3,10 +3,11 @@ package com.highv.ecommerce.domain.favorite.service
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.ProductNotFoundException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
+import com.highv.ecommerce.domain.favorite.dto.FavoriteCount
 import com.highv.ecommerce.domain.favorite.dto.FavoriteResponse
 import com.highv.ecommerce.domain.favorite.entity.Favorite
 import com.highv.ecommerce.domain.favorite.repository.FavoriteRepository
-import com.highv.ecommerce.domain.product.entity.Product
+import com.highv.ecommerce.domain.product.dto.ProductSummaryDto
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -44,12 +45,16 @@ class FavoriteService(
     fun getFavorites(buyerId: Long): List<FavoriteResponse> {
 
         val favorites: List<Favorite> = favoriteRepository.findAllByBuyerId(buyerId)
-        val products: List<Product> = productRepository.findAllById(favorites.map { it.id })
+        val products: List<ProductSummaryDto> = productRepository.findAllById(favorites.map { it.productId })
 
-        return products.map { FavoriteResponse(it.id!!, it.name, it.productBackOffice!!.price, it.productImage) }
+        return products.map { FavoriteResponse(it.id, it.name, it.price, it.image) }
     }
 
     fun countFavorite(productId: Long): Int {
         return favoriteRepository.countFavoriteByProductId(productId)
+    }
+
+    fun countFavorites(productIds: List<Long>): List<FavoriteCount> {
+        return favoriteRepository.favoritesCount(productIds)
     }
 }
