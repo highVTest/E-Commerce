@@ -117,7 +117,7 @@
 ## 📝 프로젝트 아키텍쳐
 
 <details>
-<summary>이미지 보기</summary>
+<summary>펼쳐서 보기</summary>
 <div markdown="1">
 
 ![image](https://github.com/user-attachments/assets/26a35b5d-411c-4cdd-a1df-3c00fd454a96)
@@ -127,7 +127,7 @@
 ## [Wireframe](https://www.figma.com/design/Pcn6VeErcGenAJxDOor9SG/Spa-2%EC%A1%B0-%EC%B5%9C%EC%A2%85?node-id=0-1&t=YT5Oho8LHWcjdKjn-0)
 
 <details>
-<summary>이미지 보기</summary>
+<summary>펼쳐서 보기</summary>
 <div markdown="1">
 
 ![Wireframe Image](https://github.com/user-attachments/assets/984b9027-4d4a-48e8-92bf-c5937aed494a)
@@ -138,7 +138,7 @@
 ## [ERD](https://www.figma.com/board/9tp3ICiW8Z5K6XbrL9iiQ9/%EC%8B%A4%EC%A0%84%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-5%EC%A1%B0?node-id=128-646&t=zWtge9vkIq5qf5xp-0)
 
 <details>
-<summary>이미지 보기</summary>
+<summary>펼쳐서 보기</summary>
 <div markdown="1">
 
 ![ERD Image](https://github.com/user-attachments/assets/a76b28ef-cd1b-40fc-8226-76b3147a6d5f)
