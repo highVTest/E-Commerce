@@ -3,6 +3,7 @@ package com.highv.ecommerce.domain.product.controller
 import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.product.dto.CreateRequest
 import com.highv.ecommerce.domain.product.dto.ProductResponse
+import com.highv.ecommerce.domain.product.dto.ProductSummaryResponse
 import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.service.ProductService
 import com.highv.ecommerce.infra.security.UserPrincipal
@@ -89,7 +90,7 @@ class ProductController(
     fun getProductsByCategory(
         categoryId: Long,
         @PageableDefault(size = 10, page = 0) pageable: Pageable
-    ): ResponseEntity<Page<ProductResponse>> = ResponseEntity
+    ): ResponseEntity<Page<ProductSummaryResponse>> = ResponseEntity
         .status(HttpStatus.OK)
         .body(productService.getProductsByCategory(categoryId, pageable))
 }

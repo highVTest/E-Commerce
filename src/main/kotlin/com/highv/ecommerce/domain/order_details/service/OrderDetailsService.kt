@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.order_details.service
 
+import com.highv.ecommerce.common.aop.StopWatch
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.InvalidRequestException
@@ -191,7 +192,6 @@ class OrderDetailsService(
         return SellerOrderResponse.from(orderMaster, orderDetails)
     }
 
-
     fun requestComplainAccept(
         shopId: Long,
         orderId: Long,
@@ -233,18 +233,17 @@ class OrderDetailsService(
             ComplainStatus.REFUND_REQUESTED -> {
 
                 orderDetails.map {
-
+                    val productBackOffice = it.product.productBackOffice!!
                     it.sellerUpdate(it.orderStatus, sellerOrderStatusRequest, ComplainStatus.REFUNDED)
 
-                    it.product.productBackOffice!!.quantity += it.productQuantity
-                    it.product.productBackOffice!!.soldQuantity -= it.productQuantity
+                    productBackOffice.quantity += it.productQuantity
+                    productBackOffice.soldQuantity -= it.productQuantity
 
-                    val couponToBuyerList = couponToBuyerRepository.findAllByCouponIdAndBuyerIdAndIsUsedTrue(
+                    couponToBuyerRepository.saveAllByCouponIdAndBuyerIdAndIsUsedTrue(
                         couponIdList,
                         it.buyer.id!!
                     )
 
-                    couponToBuyerList.map { couponToBuyer -> couponToBuyer.returnCoupon() }
                 }
 
 

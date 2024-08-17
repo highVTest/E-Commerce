@@ -1,6 +1,6 @@
 package com.highv.ecommerce.infra.redis.config
 
-import com.highv.ecommerce.domain.product.dto.ProductResponse
+import com.highv.ecommerce.domain.product.dto.ProductSummaryResponse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -35,8 +35,8 @@ class RedisConfig(
         redisTemplate.valueSerializer = StringRedisSerializer()
 
         // // Hash를 사용할 경우 시리얼라이저
-         redisTemplate.hashKeySerializer = StringRedisSerializer()
-         redisTemplate.hashValueSerializer = StringRedisSerializer()
+        redisTemplate.hashKeySerializer = StringRedisSerializer()
+        redisTemplate.hashValueSerializer = StringRedisSerializer()
 
         // RedisTemplete 에서 Transaction 을 지원하는지 여부
         redisTemplate.setEnableTransactionSupport(true)
@@ -48,8 +48,8 @@ class RedisConfig(
     }
 
     @Bean
-    fun productRedisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Page<ProductResponse>> {
-        val template = RedisTemplate<String, Page<ProductResponse>>()
+    fun productRedisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Page<ProductSummaryResponse>> {
+        val template = RedisTemplate<String, Page<ProductSummaryResponse>>()
         template.connectionFactory = redisConnectionFactory
         template.keySerializer = StringRedisSerializer()
         template.valueSerializer = GenericJackson2JsonRedisSerializer()

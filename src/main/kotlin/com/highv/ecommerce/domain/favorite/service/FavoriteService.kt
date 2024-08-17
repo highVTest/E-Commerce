@@ -50,7 +50,7 @@ class FavoriteService(
     fun getFavorites(buyerId: Long): List<FavoriteResponse> {
 
         val favorites: List<Favorite> = favoriteRepository.findAllByBuyerId(buyerId)
-        val products: List<Product> = productRepository.findAllById(favorites.map { it.productId })
+        val products: List<Product> = productRepository.findAllById(favorites.map { it.id })
 
         return products.map { FavoriteResponse(it.id!!, it.name, it.productBackOffice!!.price, it.productImage) }
     }
