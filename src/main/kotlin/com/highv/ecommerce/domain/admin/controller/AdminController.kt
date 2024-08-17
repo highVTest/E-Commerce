@@ -2,7 +2,7 @@ package com.highv.ecommerce.domain.admin.controller
 
 import com.highv.ecommerce.common.dto.AccessTokenResponse
 import com.highv.ecommerce.common.dto.DefaultResponse
-//import com.highv.ecommerce.domain.admin.dto.AdminBySellerResponse
+import com.highv.ecommerce.domain.admin.dto.AdminBySellerResponse
 import com.highv.ecommerce.domain.admin.dto.BlackListResponse
 import com.highv.ecommerce.domain.admin.service.AdminService
 import com.highv.ecommerce.domain.seller.dto.SellerResponse
@@ -94,12 +94,12 @@ class AdminController(
             .body(adminService.getSellerLists())
 
     // 판매자 상세 조회
-//    @GetMapping("/sellers/{sellerId}")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    fun getSellerBySellerId(
-//        @PathVariable sellerId: Long
-//    ): ResponseEntity<AdminBySellerResponse> =
-//        ResponseEntity
-//            .status(HttpStatus.OK)
-//            .body(adminService.getSellerBySellerId(sellerId))
+   @GetMapping("/sellers/{sellerId}")
+   @PreAuthorize("hasRole('ADMIN')")
+   fun getSellerBySellerId(
+       @PathVariable sellerId: Long
+   ): ResponseEntity<AdminBySellerResponse> =
+       ResponseEntity
+           .status(HttpStatus.OK)
+           .body(adminService.getSellerBySellerId(sellerId))
 }
