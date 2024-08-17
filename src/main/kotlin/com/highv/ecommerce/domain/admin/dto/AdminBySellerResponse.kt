@@ -6,10 +6,10 @@ import com.highv.ecommerce.domain.seller.shop.dto.ShopResponse
 import com.highv.ecommerce.domain.seller.shop.entity.Shop
 
 data class AdminBySellerResponse(
-    val id: Long?,
+    val id: Long,
     val email: String,
     val nickname: String,
-    val profileImage: String?,
+    val profileImage: String,
     val phoneNumber: String,
     val address: String,
     val activeStatus: ActiveStatus,
