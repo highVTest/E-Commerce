@@ -9,7 +9,14 @@ import com.highv.ecommerce.common.innercall.TxAdvice
 import com.highv.ecommerce.common.lock.service.RedisLockService
 import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
-import com.highv.ecommerce.domain.order_details.dto.*
+import com.highv.ecommerce.domain.order_details.dto.BuyerOrderDetailProductResponse
+import com.highv.ecommerce.domain.order_details.dto.BuyerOrderResponse
+import com.highv.ecommerce.domain.order_details.dto.BuyerOrderShopResponse
+import com.highv.ecommerce.domain.order_details.dto.BuyerOrderStatusRequest
+import com.highv.ecommerce.domain.order_details.dto.OrderStatusResponse
+import com.highv.ecommerce.domain.order_details.dto.SellerOrderResponse
+import com.highv.ecommerce.domain.order_details.dto.SellerOrderStatusRequest
+import com.highv.ecommerce.domain.order_details.dto.UpdateDeliveryStatusRequest
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainStatus
 import com.highv.ecommerce.domain.order_details.enumClass.ComplainType
@@ -54,44 +61,43 @@ class OrderDetailsService(
 
         return OrderStatusResponse.from(buyerOrderStatusRequest.complainType, "요청 완료 되었습니다")
     }
-
+    
     fun getBuyerOrders(buyerId: Long): List<BuyerOrderResponse> {
 
         val orderDetails: List<OrderDetails> = orderDetailsRepository.findAllByBuyerId(buyerId)
         val orderMasters: List<OrderMaster> =
             orderMasterRepository.findByIdInOrderByIdDesc(orderDetails.map { it.orderMasterId }.toSet<Long>())
 
-        val orderMasterGroup: MutableMap<Long, MutableMap<Shop, BuyerOrderShopResponse>> = mutableMapOf()
+        val orderMasterShopGroup: MutableMap<String, Pair<Shop, MutableList<BuyerOrderDetailProductResponse>>> =
+            mutableMapOf()
 
         orderDetails.forEach {
-            if (!orderMasterGroup.containsKey(it.orderMasterId)) {
-                orderMasterGroup[it.orderMasterId] = mutableMapOf()
+            val key = "${it.orderMasterId}+${it.shop.id}"
+            if (!orderMasterShopGroup.containsKey(key)) {
+                orderMasterShopGroup[key] = Pair(it.shop, mutableListOf())
             }
-            if (!orderMasterGroup[it.orderMasterId]!!.contains(it.shop)) {
-                orderMasterGroup[it.orderMasterId]!![it.shop] =
-                    BuyerOrderShopResponse(it.shop.id!!, it.shop.name, mutableListOf())
-            }
-            orderMasterGroup[it.orderMasterId]!![it.shop]!!.productsOrders.add(BuyerOrderDetailProductResponse.from(it))
+            orderMasterShopGroup[key]!!.second.add(BuyerOrderDetailProductResponse.from(it))
         }
 
-        val orderMasterAndShopGroup: MutableMap<Long, MutableList<BuyerOrderShopResponse>> = mutableMapOf()
+        val orderMasterGroup: MutableMap<Long, MutableList<BuyerOrderShopResponse>> = mutableMapOf()
 
-        orderMasterGroup.forEach {
-            if (!orderMasterAndShopGroup.containsKey(it.key)) {
-                orderMasterAndShopGroup[it.key] = mutableListOf()
+        orderMasterShopGroup.forEach {
+            val key = it.key.split("+")
+            val keyOrderId = key[0].toLong()
+
+            if (!orderMasterGroup.containsKey(keyOrderId)) {
+                orderMasterGroup[keyOrderId] = mutableListOf()
             }
-            it.value.forEach { item ->
-                orderMasterAndShopGroup[it.key]?.add(item.value)
-            }
+
+            orderMasterGroup[keyOrderId]!!.add(BuyerOrderShopResponse.from(it.value.first, it.value.second))
 
         }
-
 
         return orderMasters.map {
             BuyerOrderResponse(
                 orderMasterId = it.id!!,
                 orderRegisterDate = it.regDateTime,
-                orderMasterAndShopGroup[it.id]!!
+                orderShopDetails = orderMasterGroup[it.id]!!
             )
         }
     }
@@ -204,7 +210,7 @@ class OrderDetailsService(
         var complainType = ComplainType.REFUND
 
         kotlin.runCatching {
-            lockService.runExclusiveWithRedissonLock(lockKey, 1){
+            lockService.runExclusiveWithRedissonLock(lockKey, 1) {
                 // orderDetails
                 val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(
                     shopId,
@@ -226,7 +232,11 @@ class OrderDetailsService(
         return OrderStatusResponse.from(complainType, "전체 요청 승인 완료 되었습니다")
     }
 
-    private fun setAcceptLogic(orderDetails: List<OrderDetails>, sellerOrderStatusRequest: SellerOrderStatusRequest, couponIdList: List<Long>) {
+    private fun setAcceptLogic(
+        orderDetails: List<OrderDetails>,
+        sellerOrderStatusRequest: SellerOrderStatusRequest,
+        couponIdList: List<Long>
+    ) {
 
         when (orderDetails[0].complainStatus) {
 
@@ -245,8 +255,6 @@ class OrderDetailsService(
                     )
 
                 }
-
-
             }
 
             ComplainStatus.EXCHANGE_REQUESTED -> {
@@ -258,9 +266,7 @@ class OrderDetailsService(
 
             else -> throw InvalidRequestException(400, "구매자가 환불 및 교환 요청을 하지 않았 거나 요청 처리가 완료 되었습니다")
         }
-
     }
-
 
     @Transactional
     fun updateProductsDelivery(

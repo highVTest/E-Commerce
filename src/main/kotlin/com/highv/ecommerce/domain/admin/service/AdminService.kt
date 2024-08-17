@@ -3,6 +3,7 @@ package com.highv.ecommerce.domain.admin.service
 import com.highv.ecommerce.common.dto.AccessTokenResponse
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.*
+import com.highv.ecommerce.domain.admin.dto.AdminBySellerResponse
 import com.highv.ecommerce.domain.admin.dto.BlackListResponse
 import com.highv.ecommerce.domain.admin.entity.BlackList
 import com.highv.ecommerce.domain.admin.repository.AdminRepository
@@ -56,6 +57,7 @@ class AdminService(
             // 제재 횟수가 5 이상이면 제재 상태로 설정합니다.
             if (existingBlackList.sanctionsCount >= 5) {
                 existingBlackList.isSanctioned = true
+                seller.activeStatus = ActiveStatus.SANCTIONED
             }
             blackListRepository.save(existingBlackList)
         } else {
@@ -169,5 +171,12 @@ class AdminService(
         return sellers.map { seller ->
             SellerResponse.from(seller)
         }
+    }
+
+    fun getSellerBySellerId(sellerId: Long): AdminBySellerResponse {
+        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "판매자 id $sellerId not found")
+        val shop = shopRepository.findShopBySellerId(sellerId)
+
+        return AdminBySellerResponse.from(shop, seller)
     }
 }
