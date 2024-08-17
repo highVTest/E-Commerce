@@ -5,13 +5,13 @@ import com.highv.ecommerce.common.exception.BuyerNotFoundException
 import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.ProductNotFoundException
 import com.highv.ecommerce.common.exception.ReviewNotFoundException
-import com.highv.ecommerce.common.exception.ShopNotFoundException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.review.dto.ReviewRequest
 import com.highv.ecommerce.domain.review.dto.ReviewResponse
 import com.highv.ecommerce.domain.review.entity.Review
 import com.highv.ecommerce.domain.review.repository.ReviewRepository
+import com.highv.ecommerce.domain.seller.shop.entity.Shop
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.scheduling.annotation.Scheduled
@@ -36,9 +36,7 @@ class ReviewService(
             rate = reviewRequest.rate,
             content = reviewRequest.content
         )
-
         reviewRepository.saveAndFlush(review)
-        updateShopAverageRate(productId)
         return DefaultResponse("리뷰가 등록되었습니다.")
     }
 
@@ -60,7 +58,6 @@ class ReviewService(
     fun deleteReview(productId: Long, reviewId: Long, buyerId: Long): DefaultResponse {
         val review = validateBuyer(reviewId, buyerId)
         reviewRepository.delete(review)
-        updateShopAverageRate(productId)
         return DefaultResponse("리뷰가 삭제되었습니다.")
     }
 
@@ -85,15 +82,12 @@ class ReviewService(
     fun updateAllShopsAverageRate() {
         val shops = shopRepository.findAll()
         for (shop in shops) {
-            updateShopAverageRate(shop.id!!)
+            updateShopAverageRate(shop)
         }
     }
 
-    fun updateShopAverageRate(shopId: Long) {
-        val shop = shopRepository.findByIdOrNull(shopId)
-            ?: throw ShopNotFoundException(404, "Shop not found for this product and shop")
-        val reviews = reviewRepository.findAllByShopId(shopId)
-
+    fun updateShopAverageRate(shop: Shop) {
+        val reviews = reviewRepository.findAllByShopId(shop.id!!)
         val avgRate = if (reviews.isNotEmpty()) reviews.map { it.rate }.average().toFloat() else 0f
         shop.rate = round(avgRate * 100) / 100
         shopRepository.save(shop)
