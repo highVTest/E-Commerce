@@ -174,7 +174,7 @@ class AdminService(
 
    fun getSellerBySellerId(sellerId: Long): AdminBySellerResponse {
        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "판매자 id $sellerId not found")
-       val shop = shopRepository.findShopBySellerId(sellerId)
+       val shop = shopRepository.findBySellerId(sellerId)
 
        return AdminBySellerResponse.from(shop, seller)
    }
