@@ -108,7 +108,7 @@ class AdminService(
     // 블랙리스트 조회 로직 구현
     fun getBlackLists(): List<BlackListResponse> {
         return blackListRepository.findAll().map {
-            BlackListResponse(it.nickname, it.email, it.sanctionsCount, it.isSanctioned)
+            BlackListResponse(it.id!!, it.nickname, it.email, it.sanctionsCount, it.isSanctioned)
         }
     }
 
@@ -116,7 +116,7 @@ class AdminService(
     fun getBlackList(blackListId: Long): BlackListResponse {
         val blackList = blackListRepository.findByIdOrNull(blackListId)
             ?: throw BlackListNotFoundException(message = "블랙리스트가 존재하지 않습니다.")
-        return BlackListResponse(blackList.nickname, blackList.email, blackList.sanctionsCount, blackList.isSanctioned)
+        return BlackListResponse(blackListId, blackList.nickname, blackList.email, blackList.sanctionsCount, blackList.isSanctioned)
     }
 
     // 블랙리스트 삭제 로직 구현
