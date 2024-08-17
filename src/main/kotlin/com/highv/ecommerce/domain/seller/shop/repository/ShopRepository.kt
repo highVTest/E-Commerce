@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface ShopRepository : JpaRepository<Shop, Long> {
     fun existsBySellerId(sellerId: Long): Boolean
-    fun findShopBySellerId(sellerId: Long): Shop
+    fun findBySellerId(sellerId: Long): Shop
 }

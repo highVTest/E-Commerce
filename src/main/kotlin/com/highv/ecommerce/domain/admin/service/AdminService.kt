@@ -3,7 +3,7 @@ package com.highv.ecommerce.domain.admin.service
 import com.highv.ecommerce.common.dto.AccessTokenResponse
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.*
-//import com.highv.ecommerce.domain.admin.dto.AdminBySellerResponse
+import com.highv.ecommerce.domain.admin.dto.AdminBySellerResponse
 import com.highv.ecommerce.domain.admin.dto.BlackListResponse
 import com.highv.ecommerce.domain.admin.entity.BlackList
 import com.highv.ecommerce.domain.admin.repository.AdminRepository
@@ -32,7 +32,7 @@ class AdminService(
     private val jwtPlugin: JwtPlugin,
 
     ) {
-    fun loginAdmin(loginRequest: LoginRequest):AccessTokenResponse {
+    fun loginAdmin(loginRequest: LoginRequest): AccessTokenResponse {
 
         val admin = adminRepository.findByEmail(loginRequest.email)
         if (admin != null && passwordEncoder.matches(loginRequest.password, admin.password)) {
@@ -41,7 +41,6 @@ class AdminService(
         }
         throw AdminLoginFailedException(message = "관리자 로그인 실패")
     }
-
 
     // 판매자 제재 로직 구현
     @Transactional
@@ -140,7 +139,7 @@ class AdminService(
         seller.activeStatus = ActiveStatus.RESIGNED
 
         // 해당 판매자의 Shop을 찾습니다.
-        val shop = shopRepository.findShopBySellerId(sellerId)
+        val shop = shopRepository.findBySellerId(sellerId)
 
         // Shop에 속한 모든 Product를 삭제(소프트 삭제)합니다.
         val products = productRepository.findAllByShopId(shop.id!!)
@@ -173,10 +172,10 @@ class AdminService(
         }
     }
 
-//    fun getSellerBySellerId(sellerId: Long): AdminBySellerResponse {
-//        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "판매자 id $sellerId not found")
-//        val shop = shopRepository.findShopBySellerId(sellerId)
-//
-//        return AdminBySellerResponse.from(shop, seller)
-//    }
+   fun getSellerBySellerId(sellerId: Long): AdminBySellerResponse {
+       val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "판매자 id $sellerId not found")
+       val shop = shopRepository.findShopBySellerId(sellerId)
+
+       return AdminBySellerResponse.from(shop, seller)
+   }
 }

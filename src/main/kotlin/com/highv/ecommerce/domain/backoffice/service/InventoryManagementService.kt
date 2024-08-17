@@ -33,7 +33,7 @@ class InventoryManagementService(
     }
 
     fun getSellerProducts(sellerId: Long, pageable: Pageable): Page<SellersProductResponse> {
-        val shop = shopRepository.findShopBySellerId(sellerId)
+        val shop = shopRepository.findBySellerId(sellerId)
         val products = productRepository.findPaginatedByShopId(shop.id!!, pageable)
         return products.map { SellersProductResponse.from(it, it.productBackOffice!!) }
     }

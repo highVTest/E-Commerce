@@ -47,7 +47,7 @@ class ProductService(
                 throw RuntimeException("Seller is not authorized to create a product")
             }
 
-            val shop = shopRepository.findShopBySellerId(sellerId)
+            val shop = shopRepository.findBySellerId(sellerId)
 
             if (productRepository.existsByNameAndShopId(
                     productRequest.name,
