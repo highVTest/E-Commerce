@@ -143,7 +143,7 @@ class ProductQueryDslRepositoryImpl(
             .selectFrom(product)
             .innerJoin(product.productBackOffice()).fetchJoin()
             .innerJoin(product.shop()).fetchJoin()
-            .where(product.shop().sellerId.eq(shopId))
+            .where(product.shop().id.eq(shopId))
             .fetch()
 
         return query
