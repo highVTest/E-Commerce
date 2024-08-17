@@ -44,12 +44,15 @@ class ProductQueryDslRepositoryImpl(
                 )
             )
             .from(product)
-            .where(product.isDeleted.eq(false))
             .orderBy(*pageable.sort.map { it.toOrderSpecifier() }.toList().toTypedArray())
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .fetch()
-        val totalCount = results.size.toLong()
+
+        val totalCount = jpaQueryFactory.select(product.count())
+            .from(product)
+            .fetchOne() ?: 0
+
 
         return PageImpl(results, pageable, totalCount)
     }
@@ -70,7 +73,6 @@ class ProductQueryDslRepositoryImpl(
                     product.productBackOffice().price,
                 )
             ).from(product)
-            .leftJoin(product.shop()).fetchJoin()
             .where(product.categoryId.eq(categoryId))
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
@@ -91,15 +93,18 @@ class ProductQueryDslRepositoryImpl(
                     product.productBackOffice().price,
                 )
             ).from(product)
-            .leftJoin(product.shop()).fetchJoin()
-            .leftJoin(product.productBackOffice()).fetchJoin()
-            .where(product.isDeleted.eq(false).and(keywordLike(keyword)))
+            .innerJoin(product.productBackOffice())
+            .where(keywordLike(keyword))
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .orderBy(*pageable.sort.map { it.toOrderSpecifier() }.toList().toTypedArray())
             .fetch()
 
-        val totalCount = results.size.toLong()
+        val totalCount = jpaQueryFactory.select(product.count())
+            .from(product)
+            .where((keywordLike(keyword)))
+            .fetchOne() ?: 0
+
         return PageImpl(results, pageable, totalCount)
     }
 
@@ -114,8 +119,7 @@ class ProductQueryDslRepositoryImpl(
                 )
             )
             .from(product)
-            .innerJoin(product.productBackOffice()).fetchJoin()
-            .innerJoin(product.shop()).fetchJoin()
+            .innerJoin(product.productBackOffice()) // 살리고 함 테스트 해보기
             .where(product.id.`in`(productIds.toList()))
             .fetch()
 
@@ -149,8 +153,6 @@ class ProductQueryDslRepositoryImpl(
         val totalCount = jpaQueryFactory
             .select(product.count())
             .from(product)
-            .innerJoin(product.productBackOffice(), productBackOffice)
-            .innerJoin(product.shop())
             .where(product.shop().id.eq(shopId))
             .fetchOne() ?: 0L
 
