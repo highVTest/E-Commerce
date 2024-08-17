@@ -4,6 +4,7 @@ import com.highv.ecommerce.common.lock.service.RedisLockService
 import com.highv.ecommerce.domain.backoffice.dto.productbackoffice.ProductBackOfficeRequest
 import com.highv.ecommerce.domain.backoffice.entity.ProductBackOffice
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
+import com.highv.ecommerce.domain.favorite.dto.FavoriteCount
 import com.highv.ecommerce.domain.favorite.service.FavoriteService
 import com.highv.ecommerce.domain.product.dto.CreateProductRequest
 import com.highv.ecommerce.domain.product.dto.ProductResponse
@@ -45,6 +46,7 @@ class ProductService(
             if (seller.activeStatus == ActiveStatus.PENDING || seller.activeStatus == ActiveStatus.RESIGNED) {
                 throw RuntimeException("Seller is not authorized to create a product")
             }
+
             val shop = shopRepository.findShopBySellerId(sellerId)
 
             if (productRepository.existsByNameAndShopId(
@@ -68,12 +70,14 @@ class ProductService(
             )
 
             val savedProduct = productRepository.save(product)
+
             val productBackOffice = ProductBackOffice(
                 quantity = productBackOfficeRequest.quantity,
                 price = productBackOfficeRequest.price,
                 soldQuantity = 0,
                 product = savedProduct
             )
+
             savedProduct.productBackOffice = productBackOffice
             productBackOfficeRepository.save(productBackOffice)
             productRepository.save(savedProduct)
@@ -101,7 +105,6 @@ class ProductService(
         product.apply {
             name = updateProductRequest.name
             description = updateProductRequest.description
-            productImage = ""
             updatedAt = LocalDateTime.now()
             isSoldOut = updateProductRequest.isSoldOut
             categoryId = updateProductRequest.categoryId
@@ -129,6 +132,16 @@ class ProductService(
 
     fun getProductsByCategory(categoryId: Long, pageable: Pageable): Page<ProductSummaryResponse> {
         val products = productRepository.findByCategoryPaginated(categoryId, pageable)
-        return products.map { ProductSummaryResponse.from(it, favoriteService.countFavorite(it.id)) }
+
+        val favoritesCount = favoriteService.countFavorites(products.map { it.id }.toList())
+
+        val likeCount: MutableMap<Long, FavoriteCount> = mutableMapOf()
+
+        favoritesCount.forEach {
+            if (!likeCount.containsKey(it.productId)) {
+                likeCount[it.productId] = it
+            }
+        }
+        return products.map { ProductSummaryResponse.from(it, likeCount[it.id]?.count ?: 0) }
     }
 }

@@ -5,7 +5,7 @@ import java.io.Serializable
 
 data class ProductSummaryDto @QueryProjection constructor(
     val id: Long,
-    val image: String?,
+    val image: String,
     val name: String,
     val price: Int,
 ) : Serializable
