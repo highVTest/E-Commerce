@@ -8,9 +8,9 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "review")
 class Review(
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    val product: Product,
+
+    @Column(name = "product_id", nullable = false)
+    val productId: Long,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "buyer_id")

@@ -3,7 +3,7 @@ package com.highv.ecommerce.domain.admin.service
 import com.highv.ecommerce.common.dto.AccessTokenResponse
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.*
-import com.highv.ecommerce.domain.admin.dto.AdminBySellerResponse
+//import com.highv.ecommerce.domain.admin.dto.AdminBySellerResponse
 import com.highv.ecommerce.domain.admin.dto.BlackListResponse
 import com.highv.ecommerce.domain.admin.entity.BlackList
 import com.highv.ecommerce.domain.admin.repository.AdminRepository
@@ -173,10 +173,10 @@ class AdminService(
         }
     }
 
-    fun getSellerBySellerId(sellerId: Long): AdminBySellerResponse {
-        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "판매자 id $sellerId not found")
-        val shop = shopRepository.findShopBySellerId(sellerId)
-
-        return AdminBySellerResponse.from(shop, seller)
-    }
+//    fun getSellerBySellerId(sellerId: Long): AdminBySellerResponse {
+//        val seller = sellerRepository.findByIdOrNull(sellerId) ?: throw SellerNotFoundException(message = "판매자 id $sellerId not found")
+//        val shop = shopRepository.findShopBySellerId(sellerId)
+//
+//        return AdminBySellerResponse.from(shop, seller)
+//    }
 }
