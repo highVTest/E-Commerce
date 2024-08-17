@@ -10,6 +10,7 @@ import com.highv.ecommerce.domain.admin.repository.BlackListRepository
 import com.highv.ecommerce.domain.auth.dto.LoginRequest
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.dto.ActiveStatus
+import com.highv.ecommerce.domain.seller.dto.SellerResponse
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
 import com.highv.ecommerce.infra.security.jwt.JwtPlugin
@@ -160,5 +161,13 @@ class AdminService(
         seller.activeStatus = ActiveStatus.APPROVED
 
         return DefaultResponse("판매자 승인 완료")
+    }
+
+    // 판매자 전체 조회 로직 구현
+    fun getSellerLists(): List<SellerResponse> {
+        val sellers = sellerRepository.findAll()
+        return sellers.map { seller ->
+            SellerResponse.from(seller)
+        }
     }
 }
