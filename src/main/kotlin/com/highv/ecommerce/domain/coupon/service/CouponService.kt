@@ -1,12 +1,10 @@
 package com.highv.ecommerce.domain.coupon.service
 
-import com.highv.ecommerce.common.aop.StopWatch
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.*
 import com.highv.ecommerce.common.innercall.TxAdvice
-import com.highv.ecommerce.domain.buyer.entity.Buyer
-import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
-import com.highv.ecommerce.domain.coupon.dto.CouponResponse
+import com.highv.ecommerce.domain.coupon.dto.BuyerCouponResponse
+import com.highv.ecommerce.domain.coupon.dto.SellerCouponResponse
 import com.highv.ecommerce.domain.coupon.dto.CreateCouponRequest
 import com.highv.ecommerce.domain.coupon.dto.UpdateCouponRequest
 import com.highv.ecommerce.domain.coupon.entity.Coupon
@@ -17,9 +15,7 @@ import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
-import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -105,30 +101,28 @@ class CouponService(
     }
 
 
-    fun getSellerCouponById(couponId: Long, sellerId: Long): CouponResponse {
+    fun getSellerCouponById(couponId: Long, sellerId: Long): SellerCouponResponse {
 
         val coupon = couponRepository.findByIdAndSellerId(couponId, sellerId) ?: throw CouponNotFoundException(404, "쿠폰이 존재하지 않습니다")
 
-        return CouponResponse.from(coupon)
+        return SellerCouponResponse.from(coupon)
     }
 
-    fun getSellerCouponList(sellerId: Long): List<CouponResponse> {
-        return couponRepository.findAllBySellerId(sellerId).map { CouponResponse.from(it) }
+    fun getSellerCouponList(sellerId: Long): List<SellerCouponResponse> {
+        return couponRepository.findAllBySellerId(sellerId).map { SellerCouponResponse.from(it) }
     }
 
-    fun getBuyerCouponById(productId: Long, buyerId: Long): CouponResponse {
+    fun getBuyerCouponById(productId: Long, buyerId: Long): BuyerCouponResponse {
 
         val result =
             couponToBuyerRepository.findByProductIdAndBuyerId(productId, buyerId) ?: throw CouponNotFoundException(404, "쿠폰을 가지고 있지 않습니다")
 
-        return CouponResponse.from(result.coupon)
+        return BuyerCouponResponse.from(result)
     }
 
-    fun getBuyerCouponList(buyerId: Long): List<CouponResponse>? {
+    fun getBuyerCouponList(buyerId: Long): List<BuyerCouponResponse>? {
 
-        return couponToBuyerRepository.findAllProductIdWithBuyerId(buyerId).let {
-            couponRepository.findAllCouponIdWithBuyer(it).map { i -> CouponResponse.from(i) }
-        }
+        return couponToBuyerRepository.findAllByBuyerId(buyerId).map { BuyerCouponResponse.from(it) }
     }
 
     //낙관적 락의 장점
@@ -194,10 +188,10 @@ class CouponService(
     private fun redisUnLock(key: String): Boolean
             = redisTemplate.delete(key)
 
-    fun getDetailCoupon(productId: Long): CouponResponse {
+    fun getDetailCoupon(productId: Long): SellerCouponResponse {
 
        return couponRepository.findByProductId(productId)
-           .let { CouponResponse.from(it ?: throw CouponNotFoundException(409, "쿠폰이 존재하지 않습니다")) }
+           .let { SellerCouponResponse.from(it ?: throw CouponNotFoundException(409, "쿠폰이 존재하지 않습니다")) }
 
     }
 

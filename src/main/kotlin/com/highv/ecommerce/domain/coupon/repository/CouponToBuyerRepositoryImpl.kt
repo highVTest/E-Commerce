@@ -1,7 +1,6 @@
 package com.highv.ecommerce.domain.coupon.repository
 
 import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
-import com.highv.ecommerce.domain.coupon.entity.QCoupon.coupon
 import com.highv.ecommerce.domain.coupon.entity.QCouponToBuyer
 import com.querydsl.jpa.impl.JPADeleteClause
 import com.querydsl.jpa.impl.JPAQueryFactory
@@ -21,10 +20,11 @@ class CouponToBuyerRepositoryImpl(
     private val queryFactory: JPAQueryFactory = JPAQueryFactory(em)
     private val couponToBuyer = QCouponToBuyer.couponToBuyer
 
-    override fun findAllProductIdWithBuyerId(buyerId: Long): List<Long> {
+    override fun findAllByBuyerId(buyerId: Long): List<CouponToBuyer> {
 
-        return queryFactory.select(couponToBuyer.coupon().id)
+        return queryFactory.select(couponToBuyer)
             .from(couponToBuyer)
+            .innerJoin(couponToBuyer.coupon()).fetchJoin()
             .where(couponToBuyer.buyerId.eq(buyerId))
             .fetch()
     }
