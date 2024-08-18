@@ -188,7 +188,7 @@ class ProductQueryDslRepositoryImpl(
                 product.productImage,
             )
         ).from(product)
-            .where(product.id.`in`(product.id))
+            .where(product.id.`in`(productIdList))
             .fetch()
     }
 }
