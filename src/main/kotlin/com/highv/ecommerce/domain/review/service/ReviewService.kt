@@ -6,7 +6,9 @@ import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.ProductNotFoundException
 import com.highv.ecommerce.common.exception.ReviewNotFoundException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
+import com.highv.ecommerce.domain.product.dto.ReviewProductDto
 import com.highv.ecommerce.domain.product.repository.ProductRepository
+import com.highv.ecommerce.domain.review.dto.BuyerReviewResponse
 import com.highv.ecommerce.domain.review.dto.ReviewRequest
 import com.highv.ecommerce.domain.review.dto.ReviewResponse
 import com.highv.ecommerce.domain.review.entity.QReview.review
@@ -25,6 +27,7 @@ class ReviewService(
     private val reviewRepository: ReviewRepository,
     private val shopRepository: ShopRepository,
     private val buyerRepository: BuyerRepository,
+    private val productRepository: ProductRepository
 ) {
 
     @Transactional
@@ -66,9 +69,17 @@ class ReviewService(
         return reviews.map { ReviewResponse.from(it) }
     }
 
-    fun getBuyerReviews(buyerId: Long): List<ReviewResponse> {
+    fun getBuyerReviews(buyerId: Long): List<BuyerReviewResponse> {
         val reviews = reviewRepository.findAllByBuyerId(buyerId)
-        return reviews.map { ReviewResponse.from(it) }
+        val product = productRepository.findAllByProductId(reviews.map { it.productId })
+
+        val reviewResponseMap = mutableMapOf<Long, ReviewProductDto>()
+
+        product.forEach {
+            reviewResponseMap[it.productId] = it
+        }
+
+        return reviews.map { BuyerReviewResponse.from(it, reviewResponseMap[it.productId]!!) }
     }
 
 

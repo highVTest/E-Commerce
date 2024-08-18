@@ -2,6 +2,7 @@ package com.highv.ecommerce.domain.review.controller
 
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.CustomRuntimeException
+import com.highv.ecommerce.domain.review.dto.BuyerReviewResponse
 import com.highv.ecommerce.domain.review.dto.ReviewRequest
 import com.highv.ecommerce.domain.review.dto.ReviewResponse
 import com.highv.ecommerce.domain.review.service.ReviewService
@@ -81,7 +82,7 @@ class ReviewController(
     @PreAuthorize("hasRole('BUYER')")
     fun getBuyerReviews(
         @AuthenticationPrincipal buyerId: UserPrincipal
-    ): ResponseEntity<List<ReviewResponse>> {
+    ): ResponseEntity<List<BuyerReviewResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(reviewService.getBuyerReviews(buyerId.id))
