@@ -4,7 +4,7 @@ import com.highv.ecommerce.domain.coupon.entity.CouponToBuyer
 
 interface CouponToBuyerRepository {
 
-    fun findAllProductIdWithBuyerId(buyerId: Long): List<Long>
+    fun findAllByBuyerId(buyerId: Long): List<CouponToBuyer>
 
     fun existsByCouponIdAndBuyerId(couponId: Long, buyerId: Long): Boolean
 

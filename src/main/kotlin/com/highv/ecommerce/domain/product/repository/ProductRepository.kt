@@ -3,6 +3,8 @@ package com.highv.ecommerce.domain.product.repository
 import com.highv.ecommerce.domain.backoffice.entity.QProductBackOffice.productBackOffice
 import com.highv.ecommerce.domain.product.dto.ProductSummaryDto
 import com.highv.ecommerce.domain.product.dto.QProductSummaryDto
+import com.highv.ecommerce.domain.product.dto.QReviewProductDto
+import com.highv.ecommerce.domain.product.dto.ReviewProductDto
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.entity.QProduct.product
 import com.querydsl.core.types.dsl.BooleanExpression
@@ -27,6 +29,7 @@ interface ProductQueryDslRepository {
     fun findByIdOrNull(id: Long): Product?
     fun findAllByShopId(shopId: Long): List<Product>
     fun findPaginatedByShopId(shopId: Long, pageable: Pageable): Page<Product>
+    fun findAllByProductId(productIdList: List<Long>): List<ReviewProductDto>
 }
 
 class ProductQueryDslRepositoryImpl(
@@ -175,5 +178,17 @@ class ProductQueryDslRepositoryImpl(
         } else {
             null
         }
+    }
+
+    override fun findAllByProductId(productIdList: List<Long>): List<ReviewProductDto> {
+        return jpaQueryFactory.select(
+            QReviewProductDto(
+                product.id,
+                product.name,
+                product.productImage,
+            )
+        ).from(product)
+            .where(product.id.`in`(product.id))
+            .fetch()
     }
 }
