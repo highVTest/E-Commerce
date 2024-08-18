@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 
 class BuyerCouponResponse(
     val couponId: Long,
+    val productId: Long,
     val discountPolicy: String,
     val discount : Int,
     val expiredAt : LocalDateTime,
@@ -15,6 +16,7 @@ class BuyerCouponResponse(
     companion object {
         fun from(couponToBuyer: CouponToBuyer) = BuyerCouponResponse(
             couponId = couponToBuyer.coupon.id!!,
+            productId = couponToBuyer.coupon.product.id!!,
             discountPolicy = couponToBuyer.coupon.discountPolicy.name,
             discount = couponToBuyer.coupon.discount,
             expiredAt = couponToBuyer.coupon.expiredAt,
