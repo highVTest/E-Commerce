@@ -3,7 +3,7 @@ package com.highv.ecommerce.domain.backoffice.service
 import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.domain.backoffice.dto.salesstatics.ProductSalesResponse
 import com.highv.ecommerce.domain.backoffice.dto.salesstatics.TotalSalesResponse
-import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
+import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepository
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
@@ -11,15 +11,13 @@ import org.springframework.stereotype.Service
 
 @Service
 class SalesStatisticsService(
-    private val productBackOfficeRepository: ProductBackOfficeRepository,
+    private val orderDetailsRepository: OrderDetailsRepository,
     private val productRepository: ProductRepository,
     private val shopRepository: ShopRepository
 ) {
     fun getTotalSales(sellerId: Long): TotalSalesResponse {
         val shop = shopRepository.findBySellerId(sellerId)
-        val products = productRepository.findAllByShopId(shop.id!!)
-        val productIds = products.mapNotNull { it.id }
-        val totalSales = productBackOfficeRepository.findTotalSalesStatisticsByProductIds(productIds)
+        val totalSales = orderDetailsRepository.totalSalesStatisticsByShop(shop.id!!)
         return TotalSalesResponse(totalSales.totalQuantity, totalSales.totalPrice)
     }
 
