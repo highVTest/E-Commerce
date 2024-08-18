@@ -2,7 +2,6 @@ package com.highv.ecommerce.domain.item_cart.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.InvalidQuantityException
-import com.highv.ecommerce.common.exception.ItemNotFoundException
 import com.highv.ecommerce.common.exception.ProductNotFoundException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.item_cart.dto.request.SelectProductQuantity
@@ -75,13 +74,11 @@ class ItemCartService(
     @Transactional
     fun updateItemIntoCart(productId: Long, request: SelectProductQuantity, buyerId: Long): DefaultResponse {
 
-        val item: ItemCart =
-            itemCartRepository.findByProductIdAndBuyerId(productId, buyerId)
-                ?: throw ItemNotFoundException(404, "장바구니에 해당 상품이 존재하지 않습니다.")
+        if (request.quantity < 1) {
+            throw InvalidQuantityException(400, "상품의 수량이 1개보다 적을 수 없습니다.")
+        }
 
-        item.updateQuantity(request.quantity)
-
-        itemCartRepository.save(item)
+        itemCartRepository.updateQuantityByProductIdAndBuyerId(productId, buyerId, request.quantity)
 
         return DefaultResponse("수량이 변경됐습니다.")
     }

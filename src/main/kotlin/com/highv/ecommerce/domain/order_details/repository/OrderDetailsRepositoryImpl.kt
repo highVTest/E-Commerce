@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.order_details.repository
 
+import com.highv.ecommerce.domain.backoffice.dto.salesstatics.TotalSalesResponse
 import com.highv.ecommerce.domain.item_cart.entity.QItemCart
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.entity.QOrderDetails
@@ -105,6 +106,22 @@ class OrderDetailsRepositoryImpl(
 
     override fun updateDeliveryStatus(changeStatus: OrderStatus, whereStatus: OrderStatus) {
         orderDetailsJpaRepository.updateDeliveryStatus(changeStatus, whereStatus)
+    }
+
+    override fun totalSalesStatisticsByShop(shopId: Long): TotalSalesResponse {
+        val result = queryFactory
+            .select(
+                orderDetails.productQuantity.sum(),
+                orderDetails.totalPrice.sum()
+            )
+            .from(orderDetails)
+            .where(orderDetails.shop().id.eq(shopId).and(orderDetails.orderStatus.ne(OrderStatus.ORDER_CANCELED)))
+            .fetchOne()
+
+        val totalSalesQuantity = result?.get(0, Int::class.java)?.toInt() ?: 0
+        val totalSalesAmount = result?.get(1, Int::class.java)?.toInt() ?: 0
+
+        return TotalSalesResponse(totalSalesQuantity, totalSalesAmount)
     }
 
     override fun findAllByShopIdOrderStatus(shopId: Long, orderStatus: OrderStatus): List<OrderDetails> {

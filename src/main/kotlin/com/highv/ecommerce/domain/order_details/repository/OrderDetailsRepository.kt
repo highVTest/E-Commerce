@@ -1,5 +1,6 @@
 package com.highv.ecommerce.domain.order_details.repository
 
+import com.highv.ecommerce.domain.backoffice.dto.salesstatics.TotalSalesResponse
 import com.highv.ecommerce.domain.order_details.entity.OrderDetails
 import com.highv.ecommerce.domain.order_details.enumClass.OrderStatus
 
@@ -26,4 +27,6 @@ interface OrderDetailsRepository {
     fun findAllByBuyerIdAndOrderMasterId(buyerId: Long, orderId: Long): List<OrderDetails>
 
     fun updateDeliveryStatus(changeStatus: OrderStatus, whereStatus: OrderStatus)
+
+    fun totalSalesStatisticsByShop(shopId: Long): TotalSalesResponse
 }

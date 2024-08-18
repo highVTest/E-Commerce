@@ -10,5 +10,9 @@ interface ItemCartRepository : JpaRepository<ItemCart, Long>, ItemCartQueryDsl {
     @Query("delete from ItemCart c where c.product.id = :productId and c.buyer.id = :buyerId")
     fun deleteByProductIdAndBuyerId(productId: Long, buyerId: Long)
 
+    @Modifying(clearAutomatically = true)
+    @Query("update ItemCart ic set ic.quantity = :quantity where ic.product.id = :productId and ic.buyer.id = :buyerId")
+    fun updateQuantityByProductIdAndBuyerId(productId: Long, buyerId: Long, quantity: Int)
+
     fun findAllByBuyerId(buyerId: Long): List<ItemCart>
 }
