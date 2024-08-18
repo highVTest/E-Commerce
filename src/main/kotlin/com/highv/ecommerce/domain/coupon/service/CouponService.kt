@@ -36,8 +36,6 @@ class CouponService(
     private val redisTemplate: RedisTemplate<String, String>
 ) {
 
-    val log = LoggerFactory.getLogger("javaClass")
-
     @Transactional
     fun createCoupon(couponRequest: CreateCouponRequest, sellerId: Long): DefaultResponse {
 
