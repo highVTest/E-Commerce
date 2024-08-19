@@ -124,8 +124,9 @@ class ProductService(
             isDeleted = true
             deletedAt = LocalDateTime.now()
         }
-        productRepository.save(product)
         reviewRepository.deleteByProductId(productId)
+        productRepository.save(product)
+
     }
 
     fun getProductById(productId: Long): ProductResponse {

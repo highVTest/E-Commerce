@@ -6,11 +6,8 @@ import com.highv.ecommerce.domain.review.entity.Review
 
 data class BuyerReviewResponse(
     val id: Long,
-    val productId: Long,
     val rate: Float,
     val content: String,
-    val buyerName: String,
-    val buyerProfileImage: String,
     val productName: String,
     val productImage: String,
 )
@@ -18,11 +15,8 @@ data class BuyerReviewResponse(
     companion object {
         fun from(review: Review, reviewProductDto: ReviewProductDto)=BuyerReviewResponse(
             id = review.id!!,
-            productId = review.productId,
             rate = review.rate,
             content = review.content,
-            buyerName = review.buyer.nickname,
-            buyerProfileImage = review.buyer.profileImage,
             productName = reviewProductDto.productName,
             productImage = reviewProductDto.productImage,
         )
