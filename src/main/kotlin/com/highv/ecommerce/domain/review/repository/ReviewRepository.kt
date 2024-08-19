@@ -20,7 +20,7 @@ interface ReviewRepository : JpaRepository<Review, Long>, ReviewQueryDslReposito
     @Query("DELETE FROM Review r WHERE r.id = :reviewId and r.buyer.id = :buyerId")
     fun deleteByReviewIdAndBuyerId(reviewId: Long, buyerId: Long)
 
-    @Modifying(clearAutomatically = false)
+    @Modifying
     @Query("DELETE FROM Review r WHERE r.productId = :productId")
     fun deleteByProductId(productId: Long)
 }
