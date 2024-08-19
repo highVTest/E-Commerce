@@ -47,16 +47,16 @@ spring:
 
 
 
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: debug
-        orm:
-          jdbc:
-            bind: trace
-      springframework:
-        transaction: DEBUG
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        SQL: debug
+#        orm:
+#          jdbc:
+#            bind: trace
+#      springframework:
+#        transaction: DEBUG
 
 oauth2:
   kakao:
