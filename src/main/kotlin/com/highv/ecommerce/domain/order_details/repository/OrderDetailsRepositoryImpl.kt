@@ -19,8 +19,6 @@ class OrderDetailsRepositoryImpl(
 
     private val queryFactory = JPAQueryFactory(em)
 
-    // private val orderStatus = QOrderStatus.orderStatus
-    // private val productsOrder = QProductsOrder.productsOrder
     private val cartItem = QItemCart.itemCart
     private val orderDetails = QOrderDetails.orderDetails
 
@@ -40,7 +38,6 @@ class OrderDetailsRepositoryImpl(
     }
 
     override fun findAllByBuyerId(buyerId: Long): List<OrderDetails> {
-        // 연관관계 N+1 문제 때문에 아래와 같이 fetchJoin 사용
         val query = queryFactory
             .select(orderDetails)
             .from(orderDetails)
@@ -52,7 +49,6 @@ class OrderDetailsRepositoryImpl(
             .fetch()
 
         return query
-        // return orderDetailsJpaRepository.findAllByBuyerId(buyerId)
     }
 
     override fun save(orderStatus: OrderDetails): OrderDetails {
@@ -63,7 +59,6 @@ class OrderDetailsRepositoryImpl(
         return orderDetailsJpaRepository.saveAll(orderStatuses)
     }
 
-    // TODO("수정 필요")
     override fun findAllByShopId(shopId: Long): List<OrderDetails> {
         val query = queryFactory
             .selectFrom(orderDetails)
@@ -75,10 +70,6 @@ class OrderDetailsRepositoryImpl(
             .fetch()
 
         return query
-    }
-
-    override fun findByItemCartIdAndBuyerId(orderStatusId: Long, buyerId: Long): OrderDetails? {
-        TODO()
     }
 
     override fun findByIdAndShopId(orderStatusId: Long, shopId: Long): OrderDetails? {

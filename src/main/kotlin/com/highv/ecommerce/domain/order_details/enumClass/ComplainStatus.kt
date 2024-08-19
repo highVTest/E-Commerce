@@ -1,6 +1,5 @@
 package com.highv.ecommerce.domain.order_details.enumClass
 
-
 enum class ComplainStatus {
 
     NONE,
@@ -12,5 +11,4 @@ enum class ComplainStatus {
     EXCHANGE_REQUESTED,
     EXCHANGED,
     EXCHANGE_REJECTED,
-
 }

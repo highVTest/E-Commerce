@@ -14,7 +14,6 @@ import jakarta.persistence.OneToOne
 import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDateTime
 
-//product와 관련된 모든 sql에 적용된다. 삭제된 데이터를 불러온다거나 하는 기능이 있을 경우 사용하면 안된다.
 @SQLRestriction("is_deleted=false")
 @Entity
 class Product(

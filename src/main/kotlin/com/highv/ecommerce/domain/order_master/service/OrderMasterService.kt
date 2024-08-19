@@ -1,17 +1,13 @@
 package com.highv.ecommerce.domain.order_master.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
-import com.highv.ecommerce.common.exception.BuyerNotFoundException
-import com.highv.ecommerce.common.exception.CartEmptyException
 import com.highv.ecommerce.common.exception.CouponExpiredException
 import com.highv.ecommerce.common.exception.InsufficientStockException
 import com.highv.ecommerce.common.innercall.TxAdvice
 import com.highv.ecommerce.common.lock.service.RedisLockService
 import com.highv.ecommerce.domain.backoffice.repository.ProductBackOfficeRepository
 import com.highv.ecommerce.domain.buyer.entity.Buyer
-import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.coupon.enumClass.DiscountPolicy
-import com.highv.ecommerce.domain.coupon.repository.CouponRepository
 import com.highv.ecommerce.domain.coupon.repository.CouponToBuyerRepository
 import com.highv.ecommerce.domain.item_cart.entity.ItemCart
 import com.highv.ecommerce.domain.item_cart.repository.ItemCartRepository
@@ -22,8 +18,6 @@ import com.highv.ecommerce.domain.order_details.repository.OrderDetailsRepositor
 import com.highv.ecommerce.domain.order_master.dto.PaymentRequest
 import com.highv.ecommerce.domain.order_master.entity.OrderMaster
 import com.highv.ecommerce.domain.order_master.repository.OrderMasterRepository
-import org.slf4j.LoggerFactory
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -57,10 +51,10 @@ class OrderMasterService(
 
                 cart.map { cartItem ->
 
-                    if(couponToBuyerList.isEmpty()){
+                    if (couponToBuyerList.isEmpty()) {
                         val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity)
                         totalPrice[cartItem.id!!] = price
-                    }else{
+                    } else {
                         couponToBuyerList.forEach {
                             if (it.coupon.expiredAt < LocalDateTime.now()) throw CouponExpiredException(
                                 400,
@@ -70,18 +64,18 @@ class OrderMasterService(
                                 when (it.coupon.discountPolicy) {
                                     DiscountPolicy.DISCOUNT_RATE -> {
                                         val price = (cartItem.quantity * cartItem.product.productBackOffice!!.price) - (
-                                                (cartItem.quantity * cartItem.product.productBackOffice!!.price) * ((it.coupon.discount).toDouble() / 100.0)).toInt()
+                                            (cartItem.quantity * cartItem.product.productBackOffice!!.price) * ((it.coupon.discount).toDouble() / 100.0)).toInt()
                                         totalPrice[cartItem.id!!] = price
                                         it.useCoupon()
                                     }
 
                                     DiscountPolicy.DISCOUNT_PRICE -> {
-                                        val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity) - it.coupon.discount
+                                        val price =
+                                            (cartItem.product.productBackOffice!!.price * cartItem.quantity) - it.coupon.discount
                                         totalPrice[cartItem.id!!] = price
                                         it.useCoupon()
                                     }
                                 }
-
                             } else {
                                 val price = (cartItem.product.productBackOffice!!.price * cartItem.quantity)
                                 totalPrice[cartItem.id!!] = price
@@ -89,8 +83,6 @@ class OrderMasterService(
                         }
                     }
                 }
-
-                //트랜잭션 전파 수준 변경
 
                 val orderMaster = txAdvice.run { orderSave(cart[0].buyer, cart, totalPrice) }
 
@@ -103,7 +95,6 @@ class OrderMasterService(
     }
 
     fun orderSave(buyer: Buyer, cart: List<ItemCart>, productPrice: Map<Long, Int>): OrderMaster {
-
 
         cart.forEach {
             val productBackOffice = it.product.productBackOffice!!
@@ -133,6 +124,5 @@ class OrderMasterService(
 
         return orderMaster
     }
-
 }
 
