@@ -76,7 +76,7 @@ class OrderDetailsController(
     @PreAuthorize("hasRole('SELLER')")
     @GetMapping("/shop/order-details/{shopId}/{orderId}")
     fun getSellerOrderDetailsBuyer(
-        @PathVariable("shopId") shopId: Long,  // Shop 추가 시 논의 후에 삭제 예정
+        @PathVariable("shopId") shopId: Long,
         @PathVariable("orderId") orderId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
     ): ResponseEntity<SellerOrderResponse> = ResponseEntity.status(HttpStatus.OK)
@@ -85,7 +85,7 @@ class OrderDetailsController(
     @PreAuthorize("hasRole('SELLER')")
     @PatchMapping("/shop/complain/{shopId}/{orderId}/accept")
     fun requestComplainAccept(
-        @PathVariable("shopId") shopId: Long,  // Shop 추가 시 논의 후에 삭제 예정
+        @PathVariable("shopId") shopId: Long,
         @PathVariable("orderId") orderId: Long,
         @AuthenticationPrincipal userPrincipal: UserPrincipal,
         @RequestBody sellerOrderStatusRequest: SellerOrderStatusRequest
