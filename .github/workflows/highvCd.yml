@@ -37,10 +37,10 @@ jobs:
           echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
           cat .env
 
-      - name: Set JDK 22
+      - name: Set JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '21'
+          java-version: '17'
           distribution: 'temurin'
 
       - name: Build with Gradle
