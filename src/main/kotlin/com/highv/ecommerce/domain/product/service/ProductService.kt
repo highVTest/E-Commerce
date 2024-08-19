@@ -12,6 +12,7 @@ import com.highv.ecommerce.domain.product.dto.ProductSummaryResponse
 import com.highv.ecommerce.domain.product.dto.UpdateProductRequest
 import com.highv.ecommerce.domain.product.entity.Product
 import com.highv.ecommerce.domain.product.repository.ProductRepository
+import com.highv.ecommerce.domain.review.repository.ReviewRepository
 import com.highv.ecommerce.domain.seller.dto.ActiveStatus
 import com.highv.ecommerce.domain.seller.repository.SellerRepository
 import com.highv.ecommerce.domain.seller.shop.repository.ShopRepository
@@ -30,6 +31,7 @@ class ProductService(
     private val productBackOfficeRepository: ProductBackOfficeRepository,
     private val favoriteService: FavoriteService,
     private val redisLockService: RedisLockService,
+    private val reviewRepository: ReviewRepository,
 ) {
     @Transactional
     fun createProduct(
@@ -123,6 +125,7 @@ class ProductService(
             deletedAt = LocalDateTime.now()
         }
         productRepository.save(product)
+        reviewRepository.deleteByProductId(productId)
     }
 
     fun getProductById(productId: Long): ProductResponse {

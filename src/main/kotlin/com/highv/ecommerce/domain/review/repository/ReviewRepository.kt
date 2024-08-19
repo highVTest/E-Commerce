@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ReviewRepository : JpaRepository<Review, Long>, ReviewQueryDslRepository{
+interface ReviewRepository : JpaRepository<Review, Long>, ReviewQueryDslRepository {
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Review r SET r.rate = :rate , r.content = :content WHERE r.id = :reviewId and r.buyer.id = :buyerId")
@@ -20,6 +20,9 @@ interface ReviewRepository : JpaRepository<Review, Long>, ReviewQueryDslReposito
     @Query("DELETE FROM Review r WHERE r.id = :reviewId and r.buyer.id = :buyerId")
     fun deleteByReviewIdAndBuyerId(reviewId: Long, buyerId: Long)
 
+    @Modifying(clearAutomatically = false)
+    @Query("DELETE FROM Review r WHERE r.productId = :productId")
+    fun deleteByProductId(productId: Long)
 }
 
 interface ReviewQueryDslRepository {
@@ -57,7 +60,8 @@ class ReviewQueryDslRepositoryImpl(
     override fun findAllByShopId(shopId: Long): List<Float> {
 
         val productIdList = queryFactory.select(
-          product.id)
+            product.id
+        )
             .from(product)
             .where(product.shop().id.eq(shopId))
             .fetch()
@@ -68,5 +72,4 @@ class ReviewQueryDslRepositoryImpl(
             .where(review.productId.`in`(productIdList))
             .fetch()
     }
-
 }
