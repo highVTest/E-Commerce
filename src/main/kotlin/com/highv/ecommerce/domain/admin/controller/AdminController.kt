@@ -37,13 +37,6 @@ class AdminController(
             .status(HttpStatus.OK)
             .body(adminService.sanctionProduct(productId))
 
-    // // 구매자 제재 (미구현)
-    // @PostMapping("/sanctions/buyer/{buyerId}")
-    // @PreAuthorize("hasRole('ADMIN')")
-    // fun sanctionBuyer(@PathVariable buyerId: Long): ResponseEntity<DefaultResponse> =
-    //     ResponseEntity
-    //     .status(HttpStatus.OK)
-    //     .body(adminService.sanctionBuyer(buyerId))
 
     // 블랙리스트 조회
     @GetMapping("/black-list")

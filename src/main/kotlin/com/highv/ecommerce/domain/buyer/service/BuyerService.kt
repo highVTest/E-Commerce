@@ -119,10 +119,10 @@ class BuyerService(
         return buyerRepository.findByProviderNameAndProviderId(userInfo.provider.toString(), userInfo.id)
             ?: buyerRepository.save(
                 Buyer(
-                    email = "null", // 소셜 로그인 한 사람은 업데이트 못하게 하기
-                    password = "null", // 소셜 로그인 한 사람은 업데이트 못하게 하기
-                    phoneNumber = "null", // 소셜 로그인 한 사람은 업데이트 하기
-                    address = "null", // 소셜 로그인 한 사람은 업데이트 하기
+                    email = "null",
+                    password = "null",
+                    phoneNumber = "null",
+                    address = "null",
                     providerName = userInfo.provider.toString(),
                     providerId = userInfo.id,
                     nickname = userInfo.nickname,
