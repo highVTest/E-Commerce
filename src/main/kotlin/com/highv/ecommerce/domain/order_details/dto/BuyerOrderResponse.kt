@@ -15,7 +15,7 @@ data class BuyerOrderResponse(
             BuyerOrderResponse(
                 orderMasterId = productsOrder.id!!,
                 orderRegisterDate = productsOrder.regDateTime,
-                orderShopDetails = orderShopDetails // 수정 필요
+                orderShopDetails = orderShopDetails
             )
     }
 }

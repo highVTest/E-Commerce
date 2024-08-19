@@ -12,9 +12,6 @@ class ItemCartQueryDslImpl(
     private val queryFactory: JPAQueryFactory
 ) : ItemCartQueryDsl {
 
-    // private val product = QProduct.product
-    // private val itemCart = QItemCart.itemCart
-
     override fun findByBuyerId(buyerId: Long): List<ItemCart> {
         val query = queryFactory
             .select(itemCart)

@@ -1,6 +1,5 @@
 package com.highv.ecommerce.domain.order_details.service
 
-import com.highv.ecommerce.common.aop.StopWatch
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.CustomRuntimeException
 import com.highv.ecommerce.common.exception.InvalidRequestException
@@ -61,7 +60,7 @@ class OrderDetailsService(
 
         return OrderStatusResponse.from(buyerOrderStatusRequest.complainType, "요청 완료 되었습니다")
     }
-    
+
     fun getBuyerOrders(buyerId: Long): List<BuyerOrderResponse> {
 
         val orderDetails: List<OrderDetails> = orderDetailsRepository.findAllByBuyerId(buyerId)
@@ -211,7 +210,6 @@ class OrderDetailsService(
 
         kotlin.runCatching {
             lockService.runExclusiveWithRedissonLock(lockKey, 1) {
-                // orderDetails
                 val orderDetails = orderDetailsRepository.findAllByShopIdAndOrderMasterId(
                     shopId,
                     orderId
@@ -292,19 +290,16 @@ class OrderDetailsService(
     @Transactional
     fun updateDelivery(): DefaultResponse {
 
-        // 1. SHIPPING 상태를 DELIVERED 변경
         orderDetailsRepository.updateDeliveryStatus(
             changeStatus = OrderStatus.DELIVERED,
             whereStatus = OrderStatus.SHIPPING
         )
 
-        // 2. DELIVERY_PREPARING 상태를 SHIPPING 상태로 변경
         orderDetailsRepository.updateDeliveryStatus(
             changeStatus = OrderStatus.SHIPPING,
             whereStatus = OrderStatus.DELIVERY_PREPARING
         )
 
-        // 3. PRODUCT_PREPARING 상태를 DELIVERY_PREPARING 상태로 변경
         orderDetailsRepository.updateDeliveryStatus(
             changeStatus = OrderStatus.DELIVERY_PREPARING,
             whereStatus = OrderStatus.PRODUCT_PREPARING

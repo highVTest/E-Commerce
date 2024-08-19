@@ -25,19 +25,14 @@ class ItemCart(
     @Column(name = "quantity", nullable = false)
     var quantity: Int,
 
-//    @Column(name = "buyer_id", nullable = false)
-//    val buyerId: Long,
-
     @ManyToOne(fetch = FetchType.LAZY)
     val buyer: Buyer,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id")
     val shop: Shop,
-    // @Column(name = "shop_id", nullable = false)
-    // val shopId: Long,
 
-) {
+    ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

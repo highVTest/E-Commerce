@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
@@ -33,7 +32,7 @@ class SecurityConfig(
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
             .csrf { it.disable() }
-            .cors {  }
+            .cors { }
             .authorizeHttpRequests {
                 it.requestMatchers(
                     "/api/v1/login",
@@ -59,17 +58,16 @@ class SecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
 
-        configuration.allowedOrigins = listOf("https://www.highvecommerce.com", "http://localhost:5173")   // 허용할 URL
+        configuration.allowedOrigins = listOf("https://www.highvecommerce.com", "http://localhost:5173")
 
-        configuration.allowedMethods = listOf("POST", "GET", "DELETE", "PUT", "PATCH")  // 허용할 Method
+        configuration.allowedMethods = listOf("POST", "GET", "DELETE", "PUT", "PATCH")
 
-        configuration.allowedHeaders = listOf("*") // 허용할 Header
+        configuration.allowedHeaders = listOf("*")
 
-        configuration.allowCredentials = true // 세션 쿠키를 유지할 지 여부
+        configuration.allowCredentials = true
 
         val source = UrlBasedCorsConfigurationSource() // cors 적용
         source.registerCorsConfiguration("/**", configuration)
         return source
     }
-
 }
