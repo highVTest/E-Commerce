@@ -27,14 +27,6 @@ class SalesStatisticsController(
         .status(HttpStatus.OK)
         .body(salesStatisticsService.getTotalSales(seller.id))
 
-    //월별 상품 전체 판매량
-    @GetMapping("/product")
-    @PreAuthorize("hasRole('SELLER')")
-    fun getMonthsProductSales(
-        @AuthenticationPrincipal seller: UserPrincipal,
-    ): ResponseEntity<List<TotalSalesResponse>> = ResponseEntity
-        .status(HttpStatus.OK)
-        .body(salesStatisticsService.getMonthsProductSales(seller.id))
 
     //상품 판매 수량 및 금액
     @GetMapping("/sales")

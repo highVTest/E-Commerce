@@ -30,7 +30,7 @@ class UserController(
     fun loginBuyer(@RequestBody loginRequest: LoginRequest): ResponseEntity<AccessTokenResponse> =
         ResponseEntity.ok().body(userService.loginBuyer(loginRequest))
 
-    // email 컨트롤러 분리하기? 구매자, 판매자
+
     @PostMapping("/email/send")
     fun sendMail(
         @Valid @RequestBody request: EmailAuthRequest,

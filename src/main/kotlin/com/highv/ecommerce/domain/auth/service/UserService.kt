@@ -69,7 +69,7 @@ class UserService(
             expiredTimeMillis = expirationMillis
         )
 
-        return DefaultResponse("인증번호가 발송됐습니다.") // TODO: 배포때는 인증번호 반환 X
+        return DefaultResponse("인증번호가 발송됐습니다.")
     }
 
     fun verifyCode(email: String, role: UserRole, code: String): EmailAuthResponse {

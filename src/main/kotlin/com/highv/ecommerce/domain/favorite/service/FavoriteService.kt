@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional
 class FavoriteService(
     private val favoriteRepository: FavoriteRepository,
     private val productRepository: ProductRepository,
-    private val buyerRepository: BuyerRepository,
 ) {
 
     @Transactional
