@@ -2,16 +2,12 @@ package com.highv.ecommerce.domain.review.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.BuyerNotFoundException
-import com.highv.ecommerce.common.exception.CustomRuntimeException
-import com.highv.ecommerce.common.exception.ProductNotFoundException
-import com.highv.ecommerce.common.exception.ReviewNotFoundException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.product.dto.ReviewProductDto
 import com.highv.ecommerce.domain.product.repository.ProductRepository
 import com.highv.ecommerce.domain.review.dto.BuyerReviewResponse
 import com.highv.ecommerce.domain.review.dto.ReviewRequest
 import com.highv.ecommerce.domain.review.dto.ReviewResponse
-import com.highv.ecommerce.domain.review.entity.QReview.review
 import com.highv.ecommerce.domain.review.entity.Review
 import com.highv.ecommerce.domain.review.repository.ReviewRepository
 import com.highv.ecommerce.domain.seller.shop.entity.Shop
@@ -47,19 +43,18 @@ class ReviewService(
 
     @Transactional
     fun updateReview(
-        productId: Long,
         reviewId: Long,
         reviewRequest: ReviewRequest,
         buyerId: Long
     ): DefaultResponse {
 
-        reviewRepository.updateByReviewIdAndBuyerId(reviewId, buyerId , reviewRequest.rate, reviewRequest.content)
+        reviewRepository.updateByReviewIdAndBuyerId(reviewId, buyerId, reviewRequest.rate, reviewRequest.content)
 
         return DefaultResponse("리뷰가 수정되었습니다.")
     }
 
     @Transactional
-    fun deleteReview(productId: Long, reviewId: Long, buyerId: Long): DefaultResponse {
+    fun deleteReview(reviewId: Long, buyerId: Long): DefaultResponse {
         reviewRepository.deleteByReviewIdAndBuyerId(reviewId, buyerId)
         return DefaultResponse("리뷰가 삭제되었습니다.")
     }
@@ -81,7 +76,6 @@ class ReviewService(
 
         return reviews.map { BuyerReviewResponse.from(it, reviewResponseMap[it.productId]!!) }
     }
-
 
     @Scheduled(cron = "0 0 * * * *")
     fun updateAllShopsAverageRate() {
