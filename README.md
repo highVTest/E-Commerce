@@ -334,7 +334,7 @@ src
 <summary>펼쳐서 보기</summary>
 <div markdown="1">
 
-          ![image](https://github.com/user-attachments/assets/15a175d6-835c-47fc-b75e-d8ed4970af2f)
+![image](https://github.com/user-attachments/assets/18a965ae-28b8-4cb5-975c-a6f933c30a81)
 
 </div>
 </details>
