@@ -10,8 +10,8 @@
             <th style="text-align:center;">김도균</th>
             <th style="text-align:center;">류원형</th>
             <th style="text-align:center;">김형섭</th>
-            <th style="text-align:center;">최민수</th>
             <th style="text-align:center;">정혜린</th>
+            <th style="text-align:center;">최민수</th>
         </tr>
     </thead>
     <tbody>
@@ -19,15 +19,15 @@
             <td><a href="https://ibb.co/XytT1N0"><img width="160" src="https://github.com/user-attachments/assets/c890bef2-34cd-48bf-8900-aabebe2a3fce" alt="김도균"></a></td>
             <td><a href="https://ibb.co/XytT1N0"><img width="160" src="https://ca.slack-edge.com/T06B9PCLY1E-U06JRMGT8DR-a7f803af1c6b-512" alt="류원형"></a></td>
             <td><a href="https://imgbb.com/"><img width="160" src="https://github.com/user-attachments/assets/b58c20f8-0e64-4569-8ba6-9442df09177a" alt="김형섭"></a></td>
-            <td><a href="https://imgbb.com/"><img width="160" src="https://github.com/user-attachments/assets/d3a861b4-08ce-4645-837d-948594c917ee" alt="최민수"></a></td>
             <td><a href="https://imgbb.com/"><img width="160" src="https://ca.slack-edge.com/T06B9PCLY1E-U06TBTH1UNB-97491d0390cb-512" alt="정혜린"></a></td>
+            <td><a href="https://imgbb.com/"><img width="160" src="https://github.com/user-attachments/assets/d3a861b4-08ce-4645-837d-948594c917ee" alt="최민수"></a></td>
         </tr>
         <tr>
             <td><a href="https://github.com/Ppajingae">@Ppajingae</a></td>
             <td><a href="https://github.com/1hyung">@1hyung</a></td>
             <td><a href="https://github.com/hysup">@hysup</a></td>
-            <td><a href="https://github.com/HifumiAlice">@HifumiAlice</a></td>
             <td><a href="https://github.com/DEVxMOON">@DEVxMOON</a></td>
+            <td><a href="https://github.com/HifumiAlice">@HifumiAlice</a></td>
         </tr>
     </tbody>
 </table>
@@ -62,6 +62,8 @@
     - 소규모 사업자(판매자)
 
 ## 🧮 프로젝트 구조
+
+## 기능 구현 사항
 
 ### 공통 기능
 
@@ -144,7 +146,7 @@
 </div>
 </details>
 
-## 프로젝트 구조
+## [프로젝트 구조](https://github.com/user-attachments/assets/ee9e2355-2203-4bb4-9df6-93135d25a9ed)
 
 <details>
 <summary>펼쳐서 보기</summary>
@@ -378,6 +380,48 @@ src
 - 승인 대기 회원 관리:
     - 판매자 회원가입 승인 및 거부를 관리하여 신뢰성 있는 플랫폼 운영.
 
+# 🎞 프로젝트 시연 영상
+
+### 구매자
+
+https://youtu.be/eiZUwmHpeWU
+
+### 판매자
+
+- 상품 삭제
+
+  ![상품 삭제](https://github.com/user-attachments/assets/d8c030af-3599-4761-9b9b-fa17eb0461ba)
+
+- 상품 생성
+
+  ![상품생성.mp4](https://github.com/user-attachments/assets/6c455310-40c7-4cb7-9ed3-3af1114f8b10)
+
+- 상품, 수량, 가격 수정 및 쿠폰 등록
+
+  ![상품, 수량, 가격 수정 및 쿠폰 등록.mp4](https://github.com/user-attachments/assets/f8cd2ef0-5647-41e7-af5a-747411ffeb9a)
+
+- 환불 승인, 거절
+
+  ![환불 승인, 거절](https://github.com/user-attachments/assets/62b5300a-1c61-4495-8934-49b8eddffc01)
+
+- 주문 상태 관리
+
+  ![주문상태관리.mp4](https://github.com/user-attachments/assets/6cb8c52d-ef8a-4360-9e95-0d307d92e85f)
+
+- 판매자 백오피스
+
+    ![판매자 백오피스](https://github.com/user-attachments/assets/04aa67bd-fdd1-44bf-b959-8343f088cac9)
+
+### 관리자
+
+- 승인 대기 판매자 관리
+
+    ![승인 대기 판매자 관리](https://github.com/user-attachments/assets/f04b02c0-0bd3-47c2-be37-db6cec0bcfbd)
+
+- 블랙리스트 관리
+
+    ![블랙리스트 관리](https://github.com/user-attachments/assets/ef637a11-6f55-4822-aa22-8b790e307c13)
+
 ## 개발 계획
 
 개발 일정:
@@ -417,8 +461,6 @@ src
 
 ### 김형섭
 
-### 최민수
-
 ### 🍀 정혜린
 
 이번 6주간의 프로젝트를 통해 개발자로서 기본적으로 갖추어야 할 역량이 무엇인지 깊이 깨닫는 시간을 가진 것 같습니다. 이 프로젝트를 통해 spring framework, kotlin 문법, JPA, SQL 쿼리,
@@ -428,3 +470,9 @@ Redis 등 다양한 기술을 접하고 공부할 수 있는 좋은 기회가 �
 이번 프로젝트에서는 부족한 점도 많았다고 느꼈지만, 매번 이렇게 쌓여가는 경험들이 저를 더 나은 개발자로 성장시켜 줄 것이라 생각하고 있습니다. 다음 프로젝트에서는 한층 더 발전한 모습이겠죠?(///)
 
 마지막으로, 팀원들 모두에게 진심으로 감사의 인사를 전합니다.
+
+### 😼 최민수
+
+쿼리를 줄이는 작업이;;; 즐거웠습니다.
+
+
