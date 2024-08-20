@@ -207,7 +207,7 @@ class OrderDetailsService(
 
         val lockKey = "${shopId}_${sellerId}"
 
-        var complainType = ComplainType.REFUND
+        var defaultResponse = OrderStatusResponse("")
 
         kotlin.runCatching {
             lockService.runExclusiveWithRedissonLock(lockKey, 1) {
@@ -219,17 +219,19 @@ class OrderDetailsService(
 
                 val couponIdList = couponRepository.findAllByProductId(orderDetails.map { it.product.id!! })
 
-                complainType =
+                val complainType =
                     if (orderDetails[0].complainStatus == ComplainStatus.REFUND_REQUESTED) ComplainType.REFUND
                     else ComplainType.EXCHANGE
 
                 txAdvice.run { setAcceptLogic(orderDetails, sellerOrderStatusRequest, couponIdList) }
 
                 orderDetailsRepository.saveAll(orderDetails)
+
+                defaultResponse = OrderStatusResponse.from(complainType, "전체 요청 승인 완료 되었습니다")
             }
         }.getOrThrow()
 
-        return OrderStatusResponse.from(complainType, "전체 요청 승인 완료 되었습니다")
+        return defaultResponse
     }
 
     private fun setAcceptLogic(
