@@ -2,6 +2,7 @@ package com.highv.ecommerce.domain.review.service
 
 import com.highv.ecommerce.common.dto.DefaultResponse
 import com.highv.ecommerce.common.exception.BuyerNotFoundException
+import com.highv.ecommerce.common.exception.ProductNotFoundException
 import com.highv.ecommerce.domain.buyer.repository.BuyerRepository
 import com.highv.ecommerce.domain.product.dto.ReviewProductDto
 import com.highv.ecommerce.domain.product.repository.ProductRepository
@@ -28,6 +29,10 @@ class ReviewService(
 
     @Transactional
     fun addReview(productId: Long, reviewRequest: ReviewRequest, buyerId: Long): DefaultResponse {
+
+        if (!productRepository.existsById(productId)) {
+            throw ProductNotFoundException(404, "상품이 없습니다")
+        }
         val buyer = buyerRepository.findByIdOrNull(buyerId)
             ?: throw BuyerNotFoundException(404, "Buyer id $buyerId not found")
 
