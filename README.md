@@ -1,6 +1,6 @@
 <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=180&text=최종프로젝트E-Commerce%20&animation=fadeIn&fontColor=F8FBEF&fontSize=60" />
 
-# 소규모의 다양한 상품을 쉽게 거래할 수 있는 플랫폼 - Made By
+# 소상공인을 위한 플랫폼 - Made By
 
 ## 팀원 소개
 
@@ -16,11 +16,11 @@
     </thead>
     <tbody>
         <tr>
-            <td><a href="https://ibb.co/XytT1N0"><img width="160" src="https://ca.slack-edge.com/T07BXLG6UF8-U07CGV6JBA5-2192acff0763-512" alt="김도균"></a></td>
-            <td><a href="https://ibb.co/XytT1N0"><img width="160" src="https://i.ibb.co/SQBpbWY/DALL-E-2024-06-18-22-05-45-An-illustration-of-a-young-boy-who-loves-boxing-and-is-also-a-developer-i.png" alt="류원형"></a></td>
-            <td><a href="https://imgbb.com/"><img width="160" src="https://i.ibb.co/z4t29cZ/162294237.png" alt="김형섭"></a></td>
-            <td><a href="https://imgbb.com/"><img width="160" src="https://ca.slack-edge.com/T07BXLG6UF8-U07BPNS8CTZ-26ee1b54322e-512" alt="최민수"></a></td>
-            <td><a href="https://imgbb.com/"><img width="160" src="https://ca.slack-edge.com/T07BXLG6UF8-U07BPNS64PR-26ce5573acdd-512" alt="정혜린"></a></td>
+            <td><a href="https://ibb.co/XytT1N0"><img width="160" src="https://github.com/user-attachments/assets/c890bef2-34cd-48bf-8900-aabebe2a3fce" alt="김도균"></a></td>
+            <td><a href="https://ibb.co/XytT1N0"><img width="160" src="https://ca.slack-edge.com/T06B9PCLY1E-U06JRMGT8DR-a7f803af1c6b-512" alt="류원형"></a></td>
+            <td><a href="https://imgbb.com/"><img width="160" src="https://github.com/user-attachments/assets/b58c20f8-0e64-4569-8ba6-9442df09177a" alt="김형섭"></a></td>
+            <td><a href="https://imgbb.com/"><img width="160" src="https://github.com/user-attachments/assets/d3a861b4-08ce-4645-837d-948594c917ee" alt="최민수"></a></td>
+            <td><a href="https://imgbb.com/"><img width="160" src="https://ca.slack-edge.com/T06B9PCLY1E-U06TBTH1UNB-97491d0390cb-512" alt="정혜린"></a></td>
         </tr>
         <tr>
             <td><a href="https://github.com/Ppajingae">@Ppajingae</a></td>
@@ -34,14 +34,14 @@
 
 ## 개요
 
-- 프로젝트 이름: Made By
+- 프로젝트 이름: Made By.
 - 프로젝트 지속기간: 2024.07.12 ~ 2024.08.22
 - 개발 엔진 및 언어: Kotlin
 
 ## 프로젝트 설명
 
-- 이 프로젝트는 Kotlin과 Spring Boot를 사용하여 물건을 거래할 수 있는 플랫폼입니다.
-- ADMIN, SELLER, BUYER의 세 가지 ROLE을 통해 다양한 기능을 제공
+아이디어는 있지만 대량 생산이 부담스러운 소상공인들이 직접 제작한 소량의 제품을 쉽게 판매하고, 구매자들이 다양한 아이디어 제품을 구매할 수 있도록 지원하는 플랫폼입니다. 관리자, 구매자, 판매자 간의 긴밀한 연결을
+통해 원활한 거래 환경을 제공합니다.
 
 ## 배포용 링크: <a href="http://test.highvecommerce.com/">Made By</a>
 
@@ -61,37 +61,31 @@
     - 일반 소비자(구매자)
     - 소규모 사업자(판매자)
 
-## 주요 기능
+## 🧮 프로젝트 구조
 
 ### 공통 기능
 
-- 메인 화면: 추천 리스트와 카테고리별 인기 상품을 통해 사용자에게 맞춤형 상품을 제공.
-- 상품 확인: 상세 정보, 리뷰 및 평점 기능을 통해 사용자가 상품에 대해 충분히 정보를 얻을 수 있도록 지원.
-- 상품 검색: 인기 검색어 순위 및 필터/정렬 기능을 통해 원하는 상품을 쉽게 찾을 수 있도록 지원.
+- 메인 화면: 사용자의 구매 패턴에 따른 맞춤형 추천 상품 제공 및 인기 상품 표시.
+- 상품 확인: 상세 정보, 리뷰, 평점, Q&A 기능 제공.
+- 상품 검색: 인기 검색어와 필터/정렬 기능 제공.
 
 ### 구매자 기능
 
-- 회원가입 및 프로필 관리: 간편한 회원가입, 프로필 수정, 그리고 회원 탈퇴 기능 제공.
-- 상품 구매 기능: 장바구니, 바로 구매, 결제수단 관리 등 다양한 구매 관련 기능 제공.
-- 구매 이력 확인: 과거 주문 내역과 배송 상태를 확인할 수 있는 기능 제공.
-- 리뷰 작성: 상품에 대한 평점과 리뷰 작성 기능 제공.
+- 회원가입 및 프로필 관리: 기본 정보 관리, 간편 로그인, 회원 탈퇴 기능.
+- 상품 구매: 장바구니, 즉시 구매, 결제수단 및 배송지 관리.
+- 구매 이력: 주문 내역 조회, 주문 상세 보기, 배송 추적.
+- 리뷰 및 피드백: 상품 리뷰 작성 및 Q&A 기능.
 
 ### 판매자 기능
 
-- 회원가입 및 프로필 관리: 판매자 전용 가입과 상점 정보 등록, 인증 절차를 통해 신뢰성 있는 판매자 등록 지원.
-- 상품 관리: 상품 등록, 수정, 삭제 기능을 통해 상품 관리 가능.
-- 백오피스 기능: 판매 및 재고 현황, 입금 현황 관리 기능 제공.
+- 회원가입 및 프로필 관리: 판매자 정보 등록 및 인증 절차.
+- 상품 등록: 상품 정보 등록, 수정, 삭제 기능.
+- 백오피스: 판매, 재고, 입금 현황 및 공지사항 관리.
 
 ### 관리자 기능
 
-- 회원 관리: 판매자 및 구매자 계정 정보 조회 및 관리, 사용자 신고 처리 기능 제공.
-- 승인 대기 회원 관리: 판매자 회원가입 승인 및 거부를 관리하여 플랫폼의 신뢰성 유지.
-
-## 보안 및 인증
-
-- JWT 기반 사용자 인증: 보안을 강화하기 위한 사용자 인증 방식.
-- 데이터 보호: 사용자 데이터 암호화 저장 및 접근 제어를 통해 민감한 정보 보호.
-- 정기적인 보안 점검: 플랫폼의 안전성을 유지하기 위한 보안 점검 및 취약점 관리.
+- 회원 관리: 판매자/구매자 계정 정보 조회 및 관리, 신고 처리.
+- 승인 대기 회원 관리: 판매자 가입 승인/거부 관리.
 
 <h2 style="border-bottom: 1px solid #d8dee4; color: #22d33;"> 
  🛠️ Tech Stacks </h2>
@@ -118,34 +112,34 @@
 - ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)
 - ![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat-square&logo=slack&logoColor=white)
 
-## 📝 프로젝트 아키텍쳐
+## [프로젝트 아키텍처](https://github.com/user-attachments/assets/45599108-05cb-495a-b5bd-e48f1ba80f2e)
 
 <details>
 <summary>펼쳐서 보기</summary>
 <div markdown="1">
 
-![image](https://github.com/user-attachments/assets/26a35b5d-411c-4cdd-a1df-3c00fd454a96)
+![프로젝트 아키텍처](https://github.com/user-attachments/assets/45599108-05cb-495a-b5bd-e48f1ba80f2e)
 </div>
 </details>
 
-## [Wireframe](https://www.figma.com/design/Pcn6VeErcGenAJxDOor9SG/Spa-2%EC%A1%B0-%EC%B5%9C%EC%A2%85?node-id=0-1&t=YT5Oho8LHWcjdKjn-0)
+## [화면 구성](https://github.com/user-attachments/assets/2c50507e-0946-4916-a032-3b4057e57a83)
 
 <details>
 <summary>펼쳐서 보기</summary>
 <div markdown="1">
 
-![Wireframe Image](https://github.com/user-attachments/assets/984b9027-4d4a-48e8-92bf-c5937aed494a)
+![화면구성](https://github.com/user-attachments/assets/2c50507e-0946-4916-a032-3b4057e57a83)
 
 </div>
 </details>
 
-## [ERD](https://www.figma.com/board/9tp3ICiW8Z5K6XbrL9iiQ9/%EC%8B%A4%EC%A0%84%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-5%EC%A1%B0?node-id=128-646&t=zWtge9vkIq5qf5xp-0)
+## [ERD](https://github.com/user-attachments/assets/ee9e2355-2203-4bb4-9df6-93135d25a9ed)
 
 <details>
 <summary>펼쳐서 보기</summary>
 <div markdown="1">
 
-![ERD Image](https://github.com/user-attachments/assets/a76b28ef-cd1b-40fc-8226-76b3147a6d5f)
+![ERD Image](https://github.com/user-attachments/assets/ee9e2355-2203-4bb4-9df6-93135d25a9ed)
 
 </div>
 </details>
@@ -303,271 +297,86 @@ src
 
 ### 공통 기능
 
-#### 메인 화면
-
-1. **추천 리스트**:
-    - **사용자 구매 패턴 분석**:
-        - 사용자별 구매 이력과 패턴을 분석하여 맞춤형 상품을 추천.
-    - **가장 많이 팔린 상품 10개 표시**:
-        - 전체 판매량을 기준으로 상위 10개의 상품을 메인 화면 상단에 배치하여 소비자가 쉽게 접근할 수 있도록 지원.
-
-2. **카테고리별 인기 상품**:
-    - **조회수 및 좋아요 수 기반 필터링**:
-        - 각 카테고리에서 조회수 및 좋아요 수가 높은 상품을 상위 n개로 정렬하여 표시.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![Image](https://github.com/user-attachments/assets/9a42cecb-11d6-4d3c-ae4c-5ac0b2bd1993)
-
-</div>
-</details>
-
-#### 상품 확인
-
-1. **상세 정보 보기**:
-    - **상품 정보 제공**:
-        - 상품의 이미지, 설명, 가격, 재고 상태, 찜하기 등을 포함한 상세 정보를 사용자가 볼 수 있도록 제공.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![image](https://github.com/user-attachments/assets/18a965ae-28b8-4cb5-975c-a6f933c30a81)
-
-</div>
-</details>
-
-2. **리뷰 및 평점 보기**:
-    - **신뢰성 있는 구매 결정 지원**:
-        - 다른 사용자가 작성한 리뷰와 평점을 제공하여 구매 결정에 도움을 줌.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![Image](https://github.com/user-attachments/assets/a5d165d0-e0b8-4d57-934e-e32496b6ae27)
-
-</div>
-</details>
-
-#### 상품 검색
-
-1. **인기 검색어 순위**:
-    - **실시간 업데이트**:
-        - 사용자의 관심을 반영하여 실시간으로 인기 검색어 순위를 업데이트하고 제공.
-
-2. **필터 및 정렬 기능**:
-    - **다양한 기준으로 검색 가능**:
-        - 이름, 가격, 평점, 인기, 최신 순으로 필터링 및 정렬하여 사용자가 원하는 상품을 쉽게 찾을 수 있게 지원.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![image](https://github.com/user-attachments/assets/98615384-e10e-4ae6-8868-36e03ee5725d)
-
-</div>
-</details>
+- 메인 화면
+    - 추천 리스트:
+        - 사용자의 구매 패턴을 분석하여 맞춤형 추천 상품을 제공.
+        - 가장 많이 팔린 상품 10개를 상단에 표시하여 소비자의 선택을 도와줌.
+    - 카테고리별 인기 상품:
+        - 조회수 및 좋아요 수를 기준으로 상위 n개의 상품 정보를 필터링하여 표시.
+- 상품 확인
+    - 상세 정보 보기:
+        - 상품의 이미지, 설명, 가격, 재고 상태 등을 상세히 제공.
+    - 리뷰 및 평점 보기:
+        - 다른 구매자들이 작성한 리뷰와 평점을 통해 신뢰성 있는 구매 결정을 지원.
+    - Q&A 보기:
+        - 상품에 대한 질문과 판매자의 답변을 통해 추가 정보를 제공.
+- 상품 검색
+    - 인기 검색어 순위:
+        - 실시간으로 인기 검색어를 업데이트하여 사용자가 관심 있는 상품을 쉽게 찾을 수 있도록 지원.
+    - 필터 및 정렬 기능:
+        - 사용자가 상품을 이름, 가격, 평점, 인기, 최신 순으로 검색하고 정렬할 수 있는 기능 제공.
 
 ### 구매자 기능
 
-#### 회원가입 및 프로필 관리
-
-1. **회원가입**:
-    - **기본 정보 입력 및 인증**:
-        - 이메일 인증을 통한 회원가입 절차 제공.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![image](https://github.com/user-attachments/assets/47dca264-b2c7-4bd1-840e-f267f5d738a8)
-
-</div>
-</details>
-
-2. **프로필 관리**:
-    - **사용자 정보 수정**:
-        - 배송지 정보 및 연락처 등 사용자가 자신의 프로필 정보를 수정할 수 있는 기능 제공.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![image](https://github.com/user-attachments/assets/a5eaa944-de28-4da4-ab78-1a61e15ca926)
-
-</div>
-</details>
-
-#### 상품 구매 기능
-
-1. **장바구니**:
-    - **상품 저장 및 확인**:
-        - 사용자가 선택한 상품을 저장하고 결제 전 확인할 수 있는 기능 제공.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![image](https://github.com/user-attachments/assets/314432ae-36b7-4f8e-a256-43673d770af3)
-
-</div>
-</details>
-
-#### 구매 이력 확인
-
-1. **주문 내역 조회**:
-    - **과거 주문 정보 확인**:
-        - 사용자가 과거의 주문 정보를 쉽게 확인할 수 있는 기능 제공.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![image](https://github.com/user-attachments/assets/1d3bbbf6-dcd0-44a3-bb8f-5a6b44851308)
-
-</div>
-</details>
-
-2. **주문 상세 보기**:
-    - **특정 주문 상세 정보 제공**:
-        - 특정 주문에 대한 상세 정보를 제공하여 사용자가 주문 상태를 쉽게 확인할 수 있도록 지원.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![image](https://github.com/user-attachments/assets/f11a5355-a1db-477c-811f-f2e6d912f562)
-
-</div>
-</details>
-
-#### 리뷰
-
-1. **상품 리뷰 작성**:
-    - **평점 및 리뷰 작성 기능**:
-        - 사용자가 구매한 상품에 대해 평점과 리뷰를 남길 수 있는 기능 제공.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![image](https://github.com/user-attachments/assets/f27b0e20-4dc6-438e-a014-177047a0d434)
-
-</div>
-</details>
+- 회원가입 및 프로필 관리
+    - 회원가입:
+        - 기본 정보 입력 및 이메일 인증 절차를 통해 회원가입 진행.
+        - OAuth를 통한 간편 로그인 지원.
+    - 프로필 관리:
+        - 사용자 정보를 수정할 수 있는 기능 제공.배송지 정보 및 연락처 관리.
+    - 회원 탈퇴:
+        - 간편한 회원 탈퇴 절차를 통해 사용자에게 선택권 제공.
+- 상품 구매 기능
+    - 장바구니:
+        - 사용자가 선택한 상품을 저장하고 결제 전 확인할 수 있는 기능.
+    - 바로 구매:
+        - 장바구니 없이 즉시 결제할 수 있는 옵션 제공.
+    - 결제수단 관리:
+        - 다양한 결제 수단(신용카드, 간편결제 등)을 등록하고 관리할 수 있는 기능.
+    - 배송지 관리:
+        - 여러 배송지를 등록하고 선택할 수 있는 기능 제공.
+- 구매 이력 확인
+    - 주문 내역 조회:
+        - 사용자가 과거의 주문 정보를 쉽게 확인할 수 있는 기능.
+    - 주문 상세 보기:
+        - 특정 주문에 대한 상세 정보 제공.
+    - 배송 추적:
+        - 실시간으로 배송 상태를 확인할 수 있는 기능.
+- 리뷰 및 피드백
+- 상품 리뷰 작성:구매자가 상품에 대한 평점과 리뷰를 남길 수 있는 기능.
+- Q&A 작성:상품에 대한 질문을 작성하고, 판매자의 답변을 통해 정보 교환 가능.
 
 ### 판매자 기능
 
-#### 회원가입 및 프로필 관리 기능
-
-1. **회원가입**:
-    - **판매자 전용 회원가입**:
-        - 판매자 정보 입력 및 인증 절차를 통해 회원가입 절차 진행.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![image](https://github.com/user-attachments/assets/b1db00d2-16b0-4877-b9a6-2fca23fe521f)
-
-</div>
-</details>
-
-2. **상점 정보**:
-    - **상점명 및 연락처 등록**:
-        - 상점명, 발송지 정보, 전화번호 등을 등록할 수 있는 기능 제공.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![image](https://github.com/user-attachments/assets/e34a9448-adc9-4acb-b92f-0b4f3d7d959d)
-![image](https://github.com/user-attachments/assets/a1b2e61c-dd30-4a88-aee5-a5e6d6bb8e7a)
-
-</div>
-</details>
-
-3. **인증 절차**:
-    - **신뢰성 있는 판매자 등록**:
-        - 전화번호 및 이메일 인증을 통해 신뢰성 있는 판매자로 등록.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![image](https://github.com/user-attachments/assets/4ab0c6cb-dadb-4eca-a4f4-19101a897179)
-
-</div>
-</details>
-
-#### 상품 등록 관련
-
-1. **CREATE**:
-    - **상품 정보 등록**:
-        - 판매자가 상품의 기본 정보, 이미지, 가격 등을 등록할 수 있는 기능 제공.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![image](https://github.com/user-attachments/assets/3bef43fd-75a9-49da-82f5-2f6aed6a11e0)
-
-</div>
-</details>
-
-2. **UPDATE**:
-    - **상품 정보 수정**:
-        - 판매 중인 상품의 일부 정보를 수정할 수 있는 기능 제공. 단, 가격 등 일부 필드는 수정 불가.
-
-3. **DELETE**:
-    - **상품 정보 삭제**:
-        - 판매자가 상품 정보를 삭제할 수 있는 기능 제공.
-
-#### 백오피스 기능
-
-1. **판매 및 재고 현황**:
-    - **대시보드 제공**:
+- 회원가입 및 프로필 관리 기능
+    - 회원가입:
+        - 판매자 전용 정보 입력 및 인증 절차를 통해 회원가입.
+    - 상점 정보:
+        - 상점명, 발송지 정보, 전화번호 등을 등록할 수 있는 기능.
+    - 인증 절차:
+        - 전화번호 및 이메일 인증을 통해 신뢰성 있는 판매자 등록.
+- 상품 등록 관련
+    - CREATE:
+        - 판매자가 상품 정보를 등록할 수 있는 기능.
+    - UPDATE:
+        - 판매 중인 상품 정보를 수정할 수 있는 기능 제공. 일부 필드는 절대 수정 불가 설정.
+    - DELETE:
+        - 판매자가 상품 정보를 삭제할 수 있는 기능.
+- 백오피스 기능
+    - 판매 및 재고 현황:
         - 판매 품명, 가격, 총 판매량, 매출, 잔여 재고 등을 한눈에 볼 수 있는 대시보드 제공.
-
-<details>
-<summary>펼쳐서 보기</summary>
-<div markdown="1">
-
-![image](https://github.com/user-attachments/assets/a1539aa1-7290-4165-be9d-9d7d0f69b701)
-
-</div>
-</details>
+    - 입금 현황:
+        - 거래 상태에 따라 입금 현황을 관리하고 ~~CSV 파일로 변환 가능.~~
+    - 공지사항 관리:
+        - 판매자와 구매자에게 전달할 공지사항을 작성하고 관리할 수 있는 기능.
 
 ### 관리자 기능
 
-#### 회원 관리
-
-1. **판매자 및 구매자 계정 관리**:
-    - **계정 정보 조회 및 관리**:
-        - 판매자 및 구매자의 계정을 조회하고 관리할 수 있는 기능 제공.
-    - **사용자 신고 처리 및 제재**:
-        - 필요 시 사용자 신고 처리 및 제재 조치 가능.
-
-#### 승인 대기 회원 관리
-
-1. **판매자 회원가입 승인 및 거부**:
-    - **회원가입 승인 절차 관리**:
-        - 승인 대기 중인 판매자 회원가입을 관리하여 플랫폼의 신뢰성을 유지.
-
-### 보안 및 인증
-
-1. **사용자 인증 방식**:
-    - **JWT 기반 인증**:
-        - 사용자 인증에 JWT(Json Web Token)를 사용하여 보안성 강화.
-
-2. **데이터 보호 및 보안 고려사항**:
-    - **사용자 데이터 암호화 저장**:
-        - 사용자 데이터를 암호화하여 저장하고, 민감한 정보에 대한 접근을 제한.
-    - **정기적인 보안 점검 및 취약점 관리**:
-        - 정기적인 보안 점검을 통해 시스템의 취약점을 관리하고 보안을 강화.
+- 회원 관리:
+    - 판매자 및 구매자 계정의 정보를 조회하고 상태를 관리.
+    - 필요 시 사용자 신고 처리 및 제재 조치 가능.
+- 승인 대기 회원 관리:
+    - 판매자 회원가입 승인 및 거부를 관리하여 신뢰성 있는 플랫폼 운영.
 
 ## 개발 계획
 
@@ -595,10 +404,27 @@ src
 
 ### 김도균
 
-### 류원형
+죽을거 같습니다
+
+### 😆 류원형
+
+부트캠프에 참여하면서 처음으로 코드를 접하게 되었고, 이번 프로젝트를 통해 많은 새로운 기술들을 처음으로 적용해보았습니다. Spring Framework, Kotlin 문법, JPA, SQL 쿼리, Redis 등
+다양한 기술을 접하며 공부할 수 있는 좋은 기회가 되었지만, 동시에 많은 어려움과 부족함을 느꼈습니다.
+
+이 과정에서 팀원들로부터 많은 것을 배울 수 있었고, 더 나은 개발자가 되기 위해 제 부족한 부분을 파악하고 이를 추후에 보완해야겠다는 생각을 많이 하게 되었습니다.
+
+함께해 준 팀원들에게 깊은 감사의 마음을 전하며, 앞으로 저도 성장하여 팀에 기여할 수 있는 개발자가 되고 싶습니다.
 
 ### 김형섭
 
 ### 최민수
 
-### 정혜린
+### 🍀 정혜린
+
+이번 6주간의 프로젝트를 통해 개발자로서 기본적으로 갖추어야 할 역량이 무엇인지 깊이 깨닫는 시간을 가진 것 같습니다. 이 프로젝트를 통해 spring framework, kotlin 문법, JPA, SQL 쿼리,
+Redis 등 다양한 기술을 접하고 공부할 수 있는 좋은 기회가 되었습니다. 팀원들과 함께 프로젝트를 완성해 나가면서, 무언가를 창조하고 그 결과물이 눈앞에 보이는 것이 얼마나 큰 보람인지 실감할 수 있었습니다.
+역시 프로젝트의 진행에는 기술뿐만 아니라 커뮤니케이션 능력도 매우 중요단 점도 느끼게 되었구요.
+
+이번 프로젝트에서는 부족한 점도 많았다고 느꼈지만, 매번 이렇게 쌓여가는 경험들이 저를 더 나은 개발자로 성장시켜 줄 것이라 생각하고 있습니다. 다음 프로젝트에서는 한층 더 발전한 모습이겠죠?(///)
+
+마지막으로, 팀원들 모두에게 진심으로 감사의 인사를 전합니다.
