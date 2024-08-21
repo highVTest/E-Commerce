@@ -112,7 +112,7 @@
 
 <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=Swagger&logoColor=white"><img src="https://img.shields.io/badge/aws-232F3E?style=for-the-badge&logo=Amazon Web Services&logoColor=white"><img src="https://img.shields.io/badge/postman-FF6C37?style=for-the-badge&logo=Postman&logoColor=white"><img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white"><img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=NGINX&logoColor=white">
 
-## 협업 도구
+## 🤝 협업 도구
 
 - ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white)
 - ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)
@@ -535,29 +535,29 @@ src
     </div>
     </details>
 
-## 개발 계획
+## ✏️ 개발 계획
 
-개발 일정:
+### 개발 일정:
 
 6주 마일스톤:
 
-1주차 : 프로젝트 기획 및 기본 CRUD 개발
+- 1주차 : 프로젝트 기획 및 기본 CRUD 개발
 
-2주차 : 구체적인 기능 개발 , 캐싱 처리 및 코드 리펙터링 진행
+- 2주차 : 구체적인 기능 개발 , 캐싱 처리 및 코드 리펙터링 진행
 
-3주차 : 프론트앤드 개발 및 1차 서버 배포 진행
+- 3주차 : 프론트앤드 개발 및 1차 서버 배포 진행
 
-4주차 : 동시성 제어 및 성능 테스트 진행 & 추가 적인 기능 개발
+- 4주차 : 동시성 제어 및 성능 테스트 진행 & 추가 적인 기능 개발
 
-5주차 : 2차 배포 및 성능 최적화 작업 , 버그 수정
+- 5주차 : 2차 배포 및 성능 최적화 작업 , 버그 수정
 
-6주차 : 최종 배포 및 발표 준비
+- 6주차 : 최종 배포 및 발표 준비
 
 ## 현재 진행 상황
 
 기본 기능 구현 후 FE와 연결 및 FE+BE 배포
 
-## 환경설정
+## ⚙️ 환경설정
 
 - **Language**: Kotlin
 - **Framework**: Spring Boot
