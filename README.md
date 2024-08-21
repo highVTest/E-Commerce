@@ -82,7 +82,7 @@
 
 - 회원가입 및 프로필 관리: 판매자 정보 등록 및 인증 절차.
 - 상품 등록: 상품 정보 등록, 수정, 삭제 기능.
-- 백오피스: 판매, 재고, 입금 현황 및 공지사항 관리.
+- 백오피스: 판매, 재고, 입금 현황 관리.
 
 ### 관리자 기능
 
@@ -382,9 +382,41 @@ src
 
 ### 구매자
 
-- 구매자 관점
+- 상품페이지
 
-  <img src="https://github.com/user-attachments/assets/898291dc-0ff9-40df-8c8a-e02c01e5b9fd" alt="HighV 최종 구매자 흐름 영상 (1)" style="width:100%;">
+    <img src="https://github.com/user-attachments/assets/9b6275d1-1127-4daa-afe7-20535c7080fe"  style="width:100%;">
+
+- 결제 
+
+    <img src="https://github.com/user-attachments/assets/19b2521c-17f8-4fc2-8f0f-fc72656d6a1f"  style="width:100%;">
+
+- 환불
+
+    <img src="https://github.com/user-attachments/assets/10522666-b1a8-4270-be3c-fcbe6c1dfd52"  style="width:100%;">
+
+- 마이페이지
+ 
+    <img src="https://github.com/user-attachments/assets/1cf5ac42-6e9a-4838-9bf0-b0280f65c3d9"  style="width:100%;">
+
+- 찜하기
+
+    <img src="https://github.com/user-attachments/assets/42be0bf2-4e09-4a44-84a7-ca276476b853"  style="width:100%;">
+
+- 리뷰
+
+    <img src="https://github.com/user-attachments/assets/fdff2ebe-0a2b-4eeb-a09e-114bf2ab64b3"  style="width:100%;">
+
+- 필터
+
+    <img src="https://github.com/user-attachments/assets/948d1b8b-5f26-47cb-bad8-a597b8875ee4"  style="width:100%;">
+
+- 장바구니
+
+    <img src="https://github.com/user-attachments/assets/a385969d-cbf8-40f1-8276-318c8a6b7bdd"  style="width:100%;">
+
+- 쿠폰
+
+  <img src="https://github.com/user-attachments/assets/e23b6fe1-4370-4df2-aed6-2aa62cec30d9"  style="width:100%;">
 
 ### 판매자
 
