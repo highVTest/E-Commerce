@@ -384,43 +384,45 @@ src
 
 ### 구매자
 
-https://youtu.be/eiZUwmHpeWU
+- 구매자 관점
+
+  <img src="https://github.com/user-attachments/assets/898291dc-0ff9-40df-8c8a-e02c01e5b9fd" alt="HighV 최종 구매자 흐름 영상 (1)" style="width:100%;">
 
 ### 판매자
 
 - 상품 삭제
 
-  ![상품 삭제](https://github.com/user-attachments/assets/d8c030af-3599-4761-9b9b-fa17eb0461ba)
+  <img src="https://github.com/user-attachments/assets/d8c030af-3599-4761-9b9b-fa17eb0461ba" alt="상품 삭제" style="width:100%;">
 
 - 상품 생성
 
-  ![상품생성.mp4](https://github.com/user-attachments/assets/6c455310-40c7-4cb7-9ed3-3af1114f8b10)
+  <img src="https://github.com/user-attachments/assets/6c455310-40c7-4cb7-9ed3-3af1114f8b10" alt="상품생성.mp4" style="width:100%;">
 
 - 상품, 수량, 가격 수정 및 쿠폰 등록
 
-  ![상품, 수량, 가격 수정 및 쿠폰 등록.mp4](https://github.com/user-attachments/assets/f8cd2ef0-5647-41e7-af5a-747411ffeb9a)
+  <img src="https://github.com/user-attachments/assets/f8cd2ef0-5647-41e7-af5a-747411ffeb9a" alt="상품, 수량, 가격 수정 및 쿠폰 등록.mp4" style="width:100%;">
 
 - 환불 승인, 거절
 
-  ![환불 승인, 거절](https://github.com/user-attachments/assets/62b5300a-1c61-4495-8934-49b8eddffc01)
+  <img src="https://github.com/user-attachments/assets/62b5300a-1c61-4495-8934-49b8eddffc01" alt="환불 승인, 거절" style="width:100%;">
 
 - 주문 상태 관리
 
-  ![주문상태관리.mp4](https://github.com/user-attachments/assets/6cb8c52d-ef8a-4360-9e95-0d307d92e85f)
+  <img src="https://github.com/user-attachments/assets/6cb8c52d-ef8a-4360-9e95-0d307d92e85f" alt="주문상태관리.mp4" style="width:100%;">
 
 - 판매자 백오피스
 
-    ![판매자 백오피스](https://github.com/user-attachments/assets/04aa67bd-fdd1-44bf-b959-8343f088cac9)
+  <img src="https://github.com/user-attachments/assets/04aa67bd-fdd1-44bf-b959-8343f088cac9" alt="판매자 백오피스" style="width:100%;">
 
 ### 관리자
 
 - 승인 대기 판매자 관리
 
-    ![승인 대기 판매자 관리](https://github.com/user-attachments/assets/f04b02c0-0bd3-47c2-be37-db6cec0bcfbd)
+  <img src="https://github.com/user-attachments/assets/f04b02c0-0bd3-47c2-be37-db6cec0bcfbd" alt="승인 대기 판매자 관리" style="width:100%;">
 
 - 블랙리스트 관리
 
-    ![블랙리스트 관리](https://github.com/user-attachments/assets/ef637a11-6f55-4822-aa22-8b790e307c13)
+  <img src="https://github.com/user-attachments/assets/ef637a11-6f55-4822-aa22-8b790e307c13" alt="블랙리스트 관리" style="width:100%;">
 
 ## 개발 계획
 
