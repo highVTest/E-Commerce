@@ -386,7 +386,7 @@ src
 
 - 구매자 관점
 
-  <img src="https://github.com/user-attachments/assets/898291dc-0ff9-40df-8c8a-e02c01e5b9fd" alt="HighV 최종 구매자 흐름 영상 (1)" style="width:200%;">
+  <img src="https://github.com/user-attachments/assets/898291dc-0ff9-40df-8c8a-e02c01e5b9fd" alt="HighV 최종 구매자 흐름 영상 (1)" style="width:100%;">
 
 ### 판매자
 
