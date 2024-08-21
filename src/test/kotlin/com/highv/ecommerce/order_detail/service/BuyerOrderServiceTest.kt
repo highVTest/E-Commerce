@@ -31,8 +31,9 @@ class BuyerOrderServiceTest : BehaviorSpec() {
         val couponToBuyerRepository = mockk<CouponToBuyerRepository>()
         val couponRepository = mockk<CouponRepository>()
         val orderMasterRepository = mockk<OrderMasterRepository>()
-        val txAdvice = mockk<TxAdvice>()
         val lockService = mockk<RedisLockService>()
+        val txAdvice = mockk<TxAdvice>()
+
         val orderDetailsService =
             OrderDetailsService(
                 orderDetailsRepository,

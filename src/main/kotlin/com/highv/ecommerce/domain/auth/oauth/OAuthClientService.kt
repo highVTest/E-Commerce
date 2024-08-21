@@ -6,7 +6,7 @@ import jakarta.transaction.NotSupportedException
 import org.springframework.stereotype.Service
 
 @Service
-class OAuthClientService(private val clients: List<OAuthClient> //해당 인터페이스를 구현하는 모든 객체가 포함된 리스트가 자동주입
+class OAuthClientService(private val clients: List<OAuthClient>
 ) {
 
     fun generateLoginUrl(provider: OAuthProvider): String {

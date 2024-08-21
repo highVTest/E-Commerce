@@ -21,9 +21,6 @@ class SalesStatisticsService(
         return TotalSalesResponse(totalSales.totalQuantity, totalSales.totalPrice)
     }
 
-    fun getMonthsProductSales(sellerId: Long): List<TotalSalesResponse> {
-        TODO("최근 1년의 판매를 기준으로 월별 표기. 1월부터 ~ 12월까지 표기")
-    }
 
     fun getProductSales(sellerId: Long): List<ProductSalesResponse> {
         val products = validateProduct(sellerId)

@@ -122,7 +122,7 @@ class ProductQueryDslRepositoryImpl(
                 )
             )
             .from(product)
-            .innerJoin(product.productBackOffice()) // 살리고 함 테스트 해보기
+            .innerJoin(product.productBackOffice())
             .where(product.id.`in`(productIds.toList()))
             .fetch()
 

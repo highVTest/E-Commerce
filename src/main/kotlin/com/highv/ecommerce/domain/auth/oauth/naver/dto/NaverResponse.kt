@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
-class NaverResponse<T>( //아무 타입이든 들어갈수 있음?
+class NaverResponse<T>(
     @JsonProperty("resultcode") val code: String,
     val message: String,
     val response: T

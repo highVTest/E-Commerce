@@ -13,7 +13,15 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.BindingResult
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/reviews")
@@ -38,10 +46,9 @@ class ReviewController(
             .body(reviewService.addReview(productId, reviewRequest, buyerId.id))
     }
 
-    @PutMapping("/{productId}/{reviewId}")
+    @PutMapping("/{reviewId}")
     @PreAuthorize("hasRole('BUYER')")
     fun updateReview(
-        @PathVariable productId: Long,
         @PathVariable reviewId: Long,
         @AuthenticationPrincipal buyerId: UserPrincipal,
         @Valid @RequestBody reviewRequest: ReviewRequest,
@@ -54,19 +61,18 @@ class ReviewController(
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(reviewService.updateReview(productId, reviewId, reviewRequest, buyerId.id))
+            .body(reviewService.updateReview(reviewId, reviewRequest, buyerId.id))
     }
 
-    @DeleteMapping("/{productId}/{reviewId}")
+    @DeleteMapping("/{reviewId}")
     @PreAuthorize("hasRole('BUYER')")
     fun deleteReview(
-        @PathVariable productId: Long,
         @PathVariable reviewId: Long,
         @AuthenticationPrincipal buyerId: UserPrincipal
     ): ResponseEntity<DefaultResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(reviewService.deleteReview(productId, reviewId, buyerId.id))
+            .body(reviewService.deleteReview(reviewId, buyerId.id))
     }
 
     @GetMapping
@@ -87,5 +93,4 @@ class ReviewController(
             .status(HttpStatus.OK)
             .body(reviewService.getBuyerReviews(buyerId.id))
     }
-
 }

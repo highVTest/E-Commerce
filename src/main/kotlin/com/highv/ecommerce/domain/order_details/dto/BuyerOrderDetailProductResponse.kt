@@ -12,7 +12,6 @@ data class BuyerOrderDetailProductResponse(
     val productPrice: Int,
     val productQuantity: Int,
     val productImageUrl: String,
-    // val productTotalPrice: Int
 ) {
     companion object {
         fun from(
@@ -26,7 +25,6 @@ data class BuyerOrderDetailProductResponse(
                 productPrice = orderDetails.totalPrice,
                 productQuantity = orderDetails.productQuantity,
                 productImageUrl = orderDetails.product.productImage
-                // productTotalPrice = cart.product.p
             )
     }
 }

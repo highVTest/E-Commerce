@@ -22,7 +22,7 @@ class S3Manager(
             types.add(util.validImgFile(it.inputStream))
         }
 
-        types.forEach { // 만약 하나라도 문제가 있으면 안됨
+        types.forEach {
             if (it.isNullOrEmpty()) {
                 throw CustomRuntimeException(400, "이미지 파일만 업로드 해주세요")
             }
@@ -38,7 +38,7 @@ class S3Manager(
 
         for (i in uuids.indices) {
             filesName.add("${uuids[i]}-${files[i].originalFilename}")
-            metadata.add(ObjectMetadata().apply { // 파일의 컨텐츠 타입과 크기를 설정
+            metadata.add(ObjectMetadata().apply {
                 contentType = types[i]
                 contentLength = files[i].size
             })
@@ -50,7 +50,7 @@ class S3Manager(
                 filesName[i],
                 files[i].inputStream,
                 metadata[i]
-            ) // Amazon S3 클라이언트를 사용하여 파일을 S3 버킷에 업로드
+            )
         }
 
 
