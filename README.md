@@ -388,11 +388,11 @@ src
 
 - 결제 
 
-    <img src="https://github.com/user-attachments/assets/cff3a156-c621-4fec-9afd-0850b68087db"  style="width:100%;">
+    <img src="https://github.com/user-attachments/assets/4a032243-f1b3-4cfc-8884-86ba71bf9d61"  style="width:100%;">
 
 - 환불
 
-    <img src="https://github.com/user-attachments/assets/9da33cd0-2c58-4a07-93c3-4a3ccb498bf9"  style="width:100%;">
+    <img src="https://github.com/user-attachments/assets/e15de1e3-e499-4e2b-b0d6-e5f9ed1ea128"  style="width:100%;">
 
 - 마이페이지
  
@@ -408,7 +408,7 @@ src
 
 - 필터
 
-    <img src="https://github.com/user-attachments/assets/35a37c27-23a5-4750-a0a5-ae86f3dc7bd1"  style="width:100%;">
+    <img src="https://github.com/user-attachments/assets/544ff911-8209-4196-b4a4-9776718a6a61"  style="width:100%;">
 
 - 장바구니
 
