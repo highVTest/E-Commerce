@@ -63,20 +63,24 @@
 
 ## 🧮 프로젝트 구조
 
-## 기능 구현 사항
+## 간략 기능 구현 사항
+
+<details>
+<summary>펼쳐서 보기</summary>
+<div markdown="1">
 
 ### 공통 기능
 
-- 메인 화면: 사용자의 구매 패턴에 따른 맞춤형 추천 상품 제공 및 인기 상품 표시.
-- 상품 확인: 상세 정보, 리뷰, 평점, Q&A 기능 제공.
-- 상품 검색: 인기 검색어와 필터/정렬 기능 제공.
+- 메인 화면: 최근 등록된 상품 리스트 제공.
+- 상품 확인: 상품 이미지, 설명, 가격, 다른 구매자들이 작성한 리뷰와 평점 등의 상세 정보 을 통해 구매 결정 지원.
+- 상품 검색: 시간, 가격순으로 상품을 검색하고 정렬할 수 있는 기능 제공.
 
 ### 구매자 기능
 
-- 회원가입 및 프로필 관리: 기본 정보 관리, 간편 로그인, 회원 탈퇴 기능.
-- 상품 구매: 장바구니, 즉시 구매, 결제수단 및 배송지 관리.
+- 회원가입 및 프로필 관리: 기본 정보 관리, 회원 탈퇴 기능.
+- 상품 구매: 장바구니, 결제 및 배송지 관리.
 - 구매 이력: 주문 내역 조회, 주문 상세 보기, 배송 추적.
-- 리뷰 및 피드백: 상품 리뷰 작성 및 Q&A 기능.
+- 리뷰: 상품 리뷰 작성 기능.
 
 ### 판매자 기능
 
@@ -88,6 +92,8 @@
 
 - 회원 관리: 판매자/구매자 계정 정보 조회 및 관리, 신고 처리.
 - 승인 대기 회원 관리: 판매자 가입 승인/거부 관리.
+    </div>
+    </details>
 
 <h2 style="border-bottom: 1px solid #d8dee4; color: #22d33;"> 
  🛠️ Tech Stacks </h2>
@@ -293,35 +299,31 @@ src
 </div>
 </details>
 
-## 기능 구현 세부사항
+## 세부 기능 구현 사항
+
+  <details>
+  <summary>펼쳐서 보기</summary>
+  <div markdown="1">
 
 ### 공통 기능
 
 - 메인 화면
-    - 추천 리스트:
-        - 사용자의 구매 패턴을 분석하여 맞춤형 추천 상품을 제공.
-        - 가장 많이 팔린 상품 10개를 상단에 표시하여 소비자의 선택을 도와줌.
-    - 카테고리별 인기 상품:
-        - 조회수 및 좋아요 수를 기준으로 상위 n개의 상품 정보를 필터링하여 표시.
+    - 최근 상품 리스트:
+        - 최신 상품 제공.
 - 상품 확인
     - 상세 정보 보기:
-        - 상품의 이미지, 설명, 가격, 재고 상태 등을 상세히 제공.
+        - 상품의 이미지, 설명, 가격 등을 상세히 제공.
     - 리뷰 및 평점 보기:
         - 다른 구매자들이 작성한 리뷰와 평점을 통해 신뢰성 있는 구매 결정을 지원.
-    - Q&A 보기:
-        - 상품에 대한 질문과 판매자의 답변을 통해 추가 정보를 제공.
 - 상품 검색
-    - 인기 검색어 순위:
-        - 실시간으로 인기 검색어를 업데이트하여 사용자가 관심 있는 상품을 쉽게 찾을 수 있도록 지원.
     - 필터 및 정렬 기능:
-        - 사용자가 상품을 이름, 가격, 평점, 인기, 최신 순으로 검색하고 정렬할 수 있는 기능 제공.
+        - 사용자가 상품을 이름, 가격, 최신 순으로 검색하고 정렬할 수 있는 기능 제공.
 
 ### 구매자 기능
 
 - 회원가입 및 프로필 관리
     - 회원가입:
         - 기본 정보 입력 및 이메일 인증 절차를 통해 회원가입 진행.
-        - OAuth를 통한 간편 로그인 지원.
     - 프로필 관리:
         - 사용자 정보를 수정할 수 있는 기능 제공.배송지 정보 및 연락처 관리.
     - 회원 탈퇴:
@@ -329,10 +331,6 @@ src
 - 상품 구매 기능
     - 장바구니:
         - 사용자가 선택한 상품을 저장하고 결제 전 확인할 수 있는 기능.
-    - 바로 구매:
-        - 장바구니 없이 즉시 결제할 수 있는 옵션 제공.
-    - 결제수단 관리:
-        - 다양한 결제 수단(신용카드, 간편결제 등)을 등록하고 관리할 수 있는 기능.
     - 배송지 관리:
         - 여러 배송지를 등록하고 선택할 수 있는 기능 제공.
 - 구매 이력 확인
@@ -340,11 +338,8 @@ src
         - 사용자가 과거의 주문 정보를 쉽게 확인할 수 있는 기능.
     - 주문 상세 보기:
         - 특정 주문에 대한 상세 정보 제공.
-    - 배송 추적:
-        - 실시간으로 배송 상태를 확인할 수 있는 기능.
 - 리뷰 및 피드백
 - 상품 리뷰 작성:구매자가 상품에 대한 평점과 리뷰를 남길 수 있는 기능.
-- Q&A 작성:상품에 대한 질문을 작성하고, 판매자의 답변을 통해 정보 교환 가능.
 
 ### 판매자 기능
 
@@ -366,9 +361,7 @@ src
     - 판매 및 재고 현황:
         - 판매 품명, 가격, 총 판매량, 매출, 잔여 재고 등을 한눈에 볼 수 있는 대시보드 제공.
     - 입금 현황:
-        - 거래 상태에 따라 입금 현황을 관리하고 ~~CSV 파일로 변환 가능.~~
-    - 공지사항 관리:
-        - 판매자와 구매자에게 전달할 공지사항을 작성하고 관리할 수 있는 기능.
+        - 거래 상태에 따라 입금 현황을 관리.
 
 ### 관리자 기능
 
@@ -378,81 +371,169 @@ src
 - 승인 대기 회원 관리:
     - 판매자 회원가입 승인 및 거부를 관리하여 신뢰성 있는 플랫폼 운영.
 
+</div>
+    </details>
+
 # 🎞 프로젝트 시연 영상
 
 ### 구매자
 
 - 상품페이지
 
-    <img src="https://github.com/user-attachments/assets/9b6275d1-1127-4daa-afe7-20535c7080fe"  style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+        <img src="https://github.com/user-attachments/assets/9b6275d1-1127-4daa-afe7-20535c7080fe"  style="width:100%;">
+    </div>
+    </details>
 
-- 결제 
+- 결제
 
-    <img src="https://github.com/user-attachments/assets/4a032243-f1b3-4cfc-8884-86ba71bf9d61"  style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+        <img src="https://github.com/user-attachments/assets/4a032243-f1b3-4cfc-8884-86ba71bf9d61"  style="width:100%;">
+    </div>
+    </details>
 
 - 환불
 
-    <img src="https://github.com/user-attachments/assets/e15de1e3-e499-4e2b-b0d6-e5f9ed1ea128"  style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+        <img src="https://github.com/user-attachments/assets/e15de1e3-e499-4e2b-b0d6-e5f9ed1ea128"  style="width:100%;">
+    </div>
+    </details>
 
 - 마이페이지
- 
-    <img src="https://github.com/user-attachments/assets/1cf5ac42-6e9a-4838-9bf0-b0280f65c3d9"  style="width:100%;">
+
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1"> 
+        <img src="https://github.com/user-attachments/assets/1cf5ac42-6e9a-4838-9bf0-b0280f65c3d9"  style="width:100%;">
+    </div>
+    </details>
 
 - 찜하기
 
-    <img src="https://github.com/user-attachments/assets/42be0bf2-4e09-4a44-84a7-ca276476b853"  style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+        <img src="https://github.com/user-attachments/assets/42be0bf2-4e09-4a44-84a7-ca276476b853"  style="width:100%;">
+    </div>
+    </details>
 
 - 리뷰
 
-    <img src="https://github.com/user-attachments/assets/fdff2ebe-0a2b-4eeb-a09e-114bf2ab64b3"  style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+        <img src="https://github.com/user-attachments/assets/fdff2ebe-0a2b-4eeb-a09e-114bf2ab64b3"  style="width:100%;">
+    </div>
+    </details>
 
 - 필터
 
-    <img src="https://github.com/user-attachments/assets/544ff911-8209-4196-b4a4-9776718a6a61"  style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+        <img src="https://github.com/user-attachments/assets/544ff911-8209-4196-b4a4-9776718a6a61"  style="width:100%;">
+    </div>
+    </details>
 
 - 장바구니
 
-    <img src="https://github.com/user-attachments/assets/a385969d-cbf8-40f1-8276-318c8a6b7bdd"  style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+        <img src="https://github.com/user-attachments/assets/a385969d-cbf8-40f1-8276-318c8a6b7bdd"  style="width:100%;">
+    </div>
+    </details>
 
 - 쿠폰
 
-  <img src="https://github.com/user-attachments/assets/e23b6fe1-4370-4df2-aed6-2aa62cec30d9"  style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+      <img src="https://github.com/user-attachments/assets/e23b6fe1-4370-4df2-aed6-2aa62cec30d9"  style="width:100%;">
+    </div>
+    </details>
 
 ### 판매자
 
 - 상품 삭제
 
-  <img src="https://github.com/user-attachments/assets/d8c030af-3599-4761-9b9b-fa17eb0461ba" alt="상품 삭제" style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+      <img src="https://github.com/user-attachments/assets/d8c030af-3599-4761-9b9b-fa17eb0461ba" alt="상품 삭제" style="width:100%;">
+    </div>
+    </details>
 
 - 상품 생성
 
-  <img src="https://github.com/user-attachments/assets/6c455310-40c7-4cb7-9ed3-3af1114f8b10" alt="상품생성.mp4" style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+      <img src="https://github.com/user-attachments/assets/6c455310-40c7-4cb7-9ed3-3af1114f8b10" alt="상품생성.mp4" style="width:100%;">
+    </div>
+    </details>
 
 - 상품, 수량, 가격 수정 및 쿠폰 등록
 
-  <img src="https://github.com/user-attachments/assets/f8cd2ef0-5647-41e7-af5a-747411ffeb9a" alt="상품, 수량, 가격 수정 및 쿠폰 등록.mp4" style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+      <img src="https://github.com/user-attachments/assets/f8cd2ef0-5647-41e7-af5a-747411ffeb9a" alt="상품, 수량, 가격 수정 및 쿠폰 등록.mp4" style="width:100%;">
+    </div>
+    </details>
 
 - 환불 승인, 거절
 
-  <img src="https://github.com/user-attachments/assets/62b5300a-1c61-4495-8934-49b8eddffc01" alt="환불 승인, 거절" style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+      <img src="https://github.com/user-attachments/assets/62b5300a-1c61-4495-8934-49b8eddffc01" alt="환불 승인, 거절" style="width:100%;">
+    </div>
+    </details>
 
 - 주문 상태 관리
 
-  <img src="https://github.com/user-attachments/assets/6cb8c52d-ef8a-4360-9e95-0d307d92e85f" alt="주문상태관리.mp4" style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+      <img src="https://github.com/user-attachments/assets/6cb8c52d-ef8a-4360-9e95-0d307d92e85f" alt="주문상태관리.mp4" style="width:100%;">
+    </div>
+    </details>
 
 - 판매자 백오피스
 
-  <img src="https://github.com/user-attachments/assets/04aa67bd-fdd1-44bf-b959-8343f088cac9" alt="판매자 백오피스" style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+      <img src="https://github.com/user-attachments/assets/04aa67bd-fdd1-44bf-b959-8343f088cac9" alt="판매자 백오피스" style="width:100%;">
+    </div>
+    </details>
 
 ### 관리자
 
 - 승인 대기 판매자 관리
 
-  <img src="https://github.com/user-attachments/assets/f04b02c0-0bd3-47c2-be37-db6cec0bcfbd" alt="승인 대기 판매자 관리" style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+      <img src="https://github.com/user-attachments/assets/f04b02c0-0bd3-47c2-be37-db6cec0bcfbd" alt="승인 대기 판매자 관리" style="width:100%;">
+    </div>
+    </details>
 
 - 블랙리스트 관리
 
-  <img src="https://github.com/user-attachments/assets/ef637a11-6f55-4822-aa22-8b790e307c13" alt="블랙리스트 관리" style="width:100%;">
+    <details>
+    <summary>펼쳐서 보기</summary>
+    <div markdown="1">
+      <img src="https://github.com/user-attachments/assets/ef637a11-6f55-4822-aa22-8b790e307c13" alt="블랙리스트 관리" style="width:100%;">
+    </div>
+    </details>
 
 ## 개발 계획
 
