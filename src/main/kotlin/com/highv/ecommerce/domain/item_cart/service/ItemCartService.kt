@@ -39,10 +39,10 @@ class ItemCartService(
             itemCartRepository.save(existsCart)
         } else {
 
-            val buyer = buyerRepository.findByIdOrNull(buyerId)!!
-
             val product: Product =
                 productRepository.findByIdOrNull(productId) ?: throw ProductNotFoundException(404, "해당 상품이 존재하지 않습니다.")
+
+            val buyer = buyerRepository.findByIdOrNull(buyerId)!!
 
             val item = ItemCart(
                 product = product,
